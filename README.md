@@ -9,7 +9,21 @@ As it started out as a thin wrapper for MassiveOES, it's name was inspired on th
 However, the basic desired functionality was easier to implement separately in a stateless manner, rather than basically reworking the entire library.
 
 Also do note that it ultimately provides less rigorous treatment options for spectra than what MassiveOES includes out of the box, such as non-linear baseline correction or quadratic wavelength axis correction.
-Such functionality can be implemented easily by extending the provided methods and model in combination with [lmfit](https://lmfit.github.io/lmfit-py/) or even using it's [Composite Model](https://lmfit.github.io/lmfit-py/model.html#composite-models-adding-or-multiplying-models) feature.
+Such functionality can be implemented by extending the provided methods and model in combination with [lmfit](https://lmfit.github.io/lmfit-py/) or even using it's [Composite Model](https://lmfit.github.io/lmfit-py/model.html#composite-models-adding-or-multiplying-models) feature.
+
+## Supported bands
+Since `Moose` reuses the databases from [MassiveOES](https://bitbucket.org/OES_muni/massiveoes), it supports the same bands for fitting.
+Details can be found in [data_sources.txt](./Moose/data/data_sources.txt).
+
+| **Molecule** | **Band** |
+| --- | --- |
+| OH | A-X |
+| N2+ | B-X |
+| NH | A-X |
+| NO | B-X |
+| N2 | C-B |
+| C2 | Swan |
+
 
 ## Dependencies
 The following packages are dependencies to be able to use `Moose`. 
@@ -44,7 +58,6 @@ It is important that the wavelength range over which we query the database (`wl_
 Extending the fitting over multiple cores/processes can be done by using for instance the excellent [Dask](https://dask.org/) library, via i.e. `client.map`.
 
 ```python
-
 import Moose, lmfit
 
 wl_interval = (320,345) # Wavelength interval over which to simulate the spectrum
@@ -73,7 +86,6 @@ The original software is massiveOES developed by the Masaryk University availabl
 VORÁČ, Jan; SYNEK, Petr; PROCHÁZKA, Vojtěch; HODER, Tomáš. State-by-state emission spectra fitting for non-equilibrium plasmas: OH spectra of surface barrier discharge at argon/water interface. Journal of Physics D: Applied Physics. 2017, 50(29), 294002. DOI: https://doi.org/10.1088/1361-6463/aa7570.
 
 
-VORÁČ, Jan; SYNEK, Petr; POTOČŇÁKOVÁ, Lucia; HNILICA, Jaroslav; KUDRLE, Vít. Batch processing of overlapping molecular spectra as a tool for spatio-temporal diagnostics of power modulated microwave plasma jet. Plasma Sources Science and Technology 26.2 (2017), 025010. DOI: https://doi.org/10.
-1088/1361-6595/aa51f0.“
+VORÁČ, Jan; SYNEK, Petr; POTOČŇÁKOVÁ, Lucia; HNILICA, Jaroslav; KUDRLE, Vít. Batch processing of overlapping molecular spectra as a tool for spatio-temporal diagnostics of power modulated microwave plasma jet. Plasma Sources Science and Technology 26.2 (2017), 025010. DOI: https://doi.org/10.1088/1361-6595/aa51f0.
 
 
