@@ -161,3 +161,9 @@ cython_debug/
 
 # (local) backup files, either manual or e.g. by notepad++
 *.bak
+
+# Jupyter notebooks
+*.ipynb
+
+# testing files
+/test

@@ -15,9 +15,20 @@ import scipy.integrate
 import scipy.signal
 import scipy.interpolate
 import scipy.constants as const
+from scipy.stats import binned_statistic
 
 
-def query_DB(db_name:str, wl:tuple=(0,np.inf), kind:str='emission',mode:str='air', path:str=pkg.resource_filename('Moose', 'data')) -> pd.DataFrame:
+_default_params = {
+    'sigma':{'value':0.05, 'min':0.0001, 'max':0.3}, 
+    'gamma': {'value':0.05,'min':0.0001,'max': 0.3}, 
+    'T_rot': {'value': 1000, 'min': 250, 'max': 10000}, 
+    'T_vib': {'value': 1000, 'min': 250, 'max': 10000},
+    'mu': {'value': 0, 'min':-2, 'max':2}, 
+    'A': {'value': 1, 'min': 0.2, 'max': 2}, 
+    'b': {'value':0, 'min': -0.05,'max': 0.05}
+    }
+
+def query_DB(db_name:str, wl:tuple=(0,np.inf), kind:str='emission',mode:str='air', v_max=None, J_max=None, path:str=pkg.resource_filename('Moose', 'data')) -> pd.DataFrame:
     wl_min, wl_max = wl
     db_path = pathlib.Path(path).joinpath(db_name)
     if not db_path.exists():
@@ -35,15 +46,25 @@ def query_DB(db_name:str, wl:tuple=(0,np.inf), kind:str='emission',mode:str='air
     elif kind =='absorption':
         q_kind='B'
         q_join = 'lower_states on lower_state=lower_states.id'
+        
+    if not J_max:
+        q_j = ''
+    else:
+        q_j = f' and J <= {J_max}'
+    if not v_max:
+        q_v = ''
+    else:
+        q_v = f' and v <= {v_max}'
+        
 
     q_mode='{}_wavelength'.format(mode) # vacuum vs air wavelength equivalent
 
     if wl_min != 0 and wl_max != np.inf:
-        q_lines = "(SELECT * FROM lines WHERE {} BETWEEN {} and {})".format(q_mode,wl_min,wl_max)
+        q_wl = f" where lines.{q_mode} between {wl_min} and {wl_max}{q_j}{q_v}"
     else:
-        q_lines = "lines"
-    
-    query = "SELECT air_wavelength,vacuum_wavelength,{},J,E_J,E_v,wavenumber FROM {} INNER JOIN {} ORDER BY {}".format(q_kind, q_lines, q_join, q_mode)
+        q_wl = ''
+        
+    query = f"SELECT lines.id, {q_kind}, upper_state, branch, vacuum_wavelength, air_wavelength, wavenumber, lower_state, E_J, J, component, E_v, v from lines inner join {q_join}{q_wl} ORDER BY {q_mode}"
     df = pd.read_sql_query(query,conn)
     conn.close()
     
@@ -66,44 +87,41 @@ def create_stick_spectrum(T_vib,T_rot,df_db:pd.DataFrame=None, mode:'Absorption/
     pops = (2*df_db['J']+1)*np.exp(-df_db['E_v']/(kB*T_vib)-df_db['E_J']/(kB*T_rot))
     pops/= scipy.integrate.trapezoid(pops,df_db['{}_wavelength'.format(wl_mode)])
     if mode=='Emission':
-        y = pops*df_db['A']
+        y = pops*df_db['A']*df_db['wavenumber']
     elif mode == 'Absorption':
-        y = pops*df_db['B']
+        y = pops*df_db['B']*df_db['wavenumber']
     
     return np.array([df_db['{}_wavelength'.format(wl_mode)], y]).T
 
-def equidistant_mesh(sim:np.array, wl_pad=2, resolution=3000):
-    '''Creates an equidistant, finer mesh from a simulation
+def equidistant_mesh(sim:np.array, wl_pad: int=2, factor:int=10):
+    '''Creates an equidistant, mesh from a simulation, where the amount of points is scaled up by a factor of `factor`.
+    The simulated line strengths are rebinned onto the equidistant mesh by summing their values.
     
     Arguments:
         sim:        The 2D numpy array containing a simulation
         wl_pad:     The padding of the wavelength axis in nm to avoid edge effects
-        resolution: The amount of equidistant points per nm for the mesh    
+        factor:     The factor by which to increase the amount of points on the equidistant mesh compared to the simulation (default: 10)
     '''
-    x = sim[:,0]
-    x_start, x_end = min(x)-wl_pad, max(x)+wl_pad
-    points = int(np.abs((x_end-x_start))*resolution)
+    equid = np.linspace(sim[:,0].min()-wl_pad, sim[:,0].max()+wl_pad, int(sim.shape[0]*factor))
+    binned, _, _ = binned_statistic(sim[:,0], sim[:,1], statistic='sum', bins=equid)
+    wl_grid = equid[:-1]+(equid[1]-equid[0])/2 # grid at middle points of intervals
     
-    new_sim = np.zeros((points,2))
-    new_sim[:,0] = np.linspace(x_start,x_end,points)
-
-    for i in range(*x.shape):
-        fine_index = int((x[i]-x_start)*resolution+0.5)
-        new_sim[fine_index,1] += sim[i,1]
+    return np.array([wl_grid,binned]).T
     
-    return new_sim
 
 def vgt (x,sigma,gamma,mu,a,b):
     """Voigt profile implementation"""
     return a*voigt_profile(x-mu,sigma,gamma)+b
 
-def apply_voigt(sim,sigma, gamma):
-    '''Applies voigt broadening to a simulated stick spectrum, normalizing the surface to 1.
+def apply_voigt(sim,sigma, gamma, norm=False):
+    '''Applies Voigt broadening to a simulated stick spectrum, optionally normalizing the surface to 1.
+    To avoid repeated (different) normalisations from being used while fitting, it defaults to False.
     
     Arguments:
         sim:        A (stick) simulation
         sigma:      The Gaussian sigma for the voigt
         gamma:      The Lorentzian gamma (HWHM) for the voigt
+        norm:       Boolean to toggle normalizing (default: False)
     '''
     x = sim[:,0]
     dim = int(len(x))
@@ -114,14 +132,23 @@ def apply_voigt(sim,sigma, gamma):
 
     v = vgt(x,sigma,gamma,mu,1,0)
     conv = scipy.signal.fftconvolve(sim[:,1], v, mode='same')
-    conv /= scipy.integrate.trapezoid(conv,x)
+    if norm: 
+        conv /= scipy.integrate.trapezoid(conv,x)
     
     return np.array([x,conv]).T
 
 def match_spectra(meas: np.array, sim: np.array):
     '''Matches a simulation to the same x-axis as the measurement using interpolation.
     Make sure the simulation spans a larger range, fully containing the experimental range.
-    Effectively downsamples the simulation to the measurement x data points, interpolating the y values, for residual minimization'''
+    Effectively downsamples the simulation to the measurement x data points, interpolating the y values, for residual minimization
+    
+    Arguments:
+        - meas (np.array)   :   A 2D array containing a single measurement of emission as function of wavelength
+        - sim  (np.array)   :   A 2D array containing a simulated spectrum.
+        
+    Returns:
+        - np.array          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
+    '''
 
     interp=scipy.interpolate.interp1d(sim[:,0], sim[:,1])
     matched_y=interp(meas[:,0])
@@ -137,23 +164,26 @@ def model_for_fit(x,sigma,gamma, mu, T_rot,T_vib,A=1,b=0,sim_db: pd.DataFrame = 
         x:              The x-axis of the (measured) data that we want to compare/fit against
         sigma:          Gaussian broadening width of Voigt
         gamma:          Lorentzian broadening width of Voigt
-        mu:             The shift in x-coordinates between data and simulation
+        mu:             The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength
         T_rot:          The rotational temperature
         T_vib:          The vibrational temperature
         A:              The amplitude scaling factor of the spectrum (default: 1)
         b:              The offset w.r.t. 0 of the spectrum (default: 0)
         sim_db:         The pandas.DataFrame containing the database used for the simulation.
         wl_pad:         The amount of nanometer to pad the x-axis of the simulation with to avoid edge effects. Default: 2
-        resolution:     The resolution in points per nanometer for the resampling of the simulation to an equidistant mesh
+        factor:         The factor by which to increase the amount of points on the equidistant mesh compared to the simulation (default: 10)
         mode:           The mode of the spectrum, i.e. 'Emission' versus 'Absorption' (default: Emission)
         wl_mode:        Whether to use 'air' vs 'vacuum' wavelength (default: air)
+        
+    Returns:
+        np.array:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.
     """
     wl_pad = kwargs.pop('wl_pad',2)
-    resolution = kwargs.pop('resolution', 3000)
+    factor = kwargs.pop('factor', 10)
     sticks = create_stick_spectrum(T_vib,T_rot,sim_db, mode=kwargs.pop('mode', 'Emission'), wl_mode=kwargs.pop('wl_mode', 'air'))
-    refined = equidistant_mesh(sticks, wl_pad = wl_pad, resolution=resolution)
+    refined = equidistant_mesh(sticks, wl_pad = wl_pad, factor=factor)
     simulation = apply_voigt(refined,sigma,gamma)
-    sim_matched=match_spectra(np.array([x-mu,x-mu]).T,simulation)
+    sim_matched=match_spectra((x-mu).reshape(-1,1),simulation)
     
     # normalize to [0,1] rather than integral=1
     val=sim_matched[:,1]
@@ -163,10 +193,7 @@ def model_for_fit(x,sigma,gamma, mu, T_rot,T_vib,A=1,b=0,sim_db: pd.DataFrame = 
 
 def set_param(params,param_name,value=0,min=-np.inf, max=np.inf, vary=True):
     '''Function to set/modify a single parameter'''
-    params[param_name].value=value
-    params[param_name].min=min
-    params[param_name].max=max
-    params[param_name].vary=vary
+    params[param_name].set(value=value,min=min,max=max, vary=vary)
 
 def set_params(params,param_dict, print=False):
     '''Function to set/modify a bunch of parameters using a dict'''
