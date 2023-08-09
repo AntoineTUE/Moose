@@ -77,8 +77,8 @@ def create_stick_spectrum(T_vib,T_rot,df_db:pd.DataFrame=None, mode:'Absorption/
     T_vib:          Vibrational temperature
     T_rot:          Rotational temperature
     df_db:          A pandas DataFrame containing the database data
-    mode:           either 'Absorption' or 'Emission' depending on mode we want to use
-    wl_mode:        either 'air' or 'vacuum' depending which equivalent we want.
+    mode:           Either 'Absorption' or 'Emission' depending on mode we want to use
+    wl_mode:        Either 'air' or 'vacuum' depending which equivalent we want.
     """
 
     if type(df_db) == type(None):
@@ -87,10 +87,9 @@ def create_stick_spectrum(T_vib,T_rot,df_db:pd.DataFrame=None, mode:'Absorption/
     pops = (2*df_db['J']+1)*np.exp(-df_db['E_v']/(kB*T_vib)-df_db['E_J']/(kB*T_rot))
     pops/= scipy.integrate.trapezoid(pops,df_db['{}_wavelength'.format(wl_mode)])
     if mode=='Emission':
-        y = pops*df_db['A']*df_db['wavenumber']
+        y = pops*df_db['A']
     elif mode == 'Absorption':
-        y = pops*df_db['B']*df_db['wavenumber']
-    
+        y = pops*df_db['B']
     return np.array([df_db['{}_wavelength'.format(wl_mode)], y]).T
 
 def equidistant_mesh(sim:np.array, wl_pad: int=2, factor:int=10):
