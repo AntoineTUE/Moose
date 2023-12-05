@@ -1,0 +1,91 @@
+site_name: "Moose Docs"
+site_author: Antoine Salden
+
+theme:
+  name: material
+  logo: assets/moose.svg
+  favicon: assets/moose.svg
+  features:
+    - navigation.list
+    # - navigation.instant
+    - navigation.sections
+    - navigation.footer
+    - toc.integrate
+    - toc.follow
+    - content.code.copy
+  palette:
+    - scheme: pioneer
+      primary: green
+      accent: pink
+      toggle:
+         icon: material/brightness-7 
+         name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: pink
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - abbr
+  - attr_list
+  - md_in_html
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/mml-chtml.min.js
+
+plugins:
+- search
+- mkdocs-jupyter:
+    include_requirejs: true
+- git-revision-date-localized
+- gen-files:
+    scripts:
+    - docs/gen_ref_pages.py
+- literate-nav:
+    nav_file: SUMMARY.md
+- section-index
+- mkdocstrings:
+    default_handler: python
+
+
+
+nav:
+- index.md
+- Getting started: get_started.md
+- Principles: Theory.md
+- Citing: citing.md
+# defer to gen-files + literate-nav
+- Code Reference: reference/
+- Examples:
+  - examples.md
+  - Bokeh: examples/bokeh.ipynb
+  - Plotly: examples/plotly.ipynb
+  - Matplotlib: examples/matplotlib.ipynb
+  - Fitting backends: examples/Moose_fitting_backends.ipynb
+  - Parallel fitting with Dask: examples/dask.ipynb
