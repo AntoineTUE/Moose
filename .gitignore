@@ -167,3 +167,6 @@ cython_debug/
 
 # testing files
 /test
+
+# hatchling versio info
+_version.py

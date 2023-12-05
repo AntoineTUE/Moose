@@ -1,3 +1,60 @@
 [build-system]
-requires = ["setuptools>=60"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "Moose"
+dynamic = ["version"]
+description = "A thin wrapper around MassiveOES to extend functionality and streamline workflow"
+readme = "README.md"
+license = "MIT"
+license-files = { paths = ["LICENSE"] }
+requires-python = ">=3.9"
+authors = [
+    { name = "Antoine Salden", email = "toine.salden@unitn.it" },
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+]
+
+[project.urls]
+Source = "https://gitlab.com/pioneerco/analysis/moose"
+
+[project.optional-dependencies]
+fit = ["lmfit"]
+docs = ["mkdocs-material","mkdocstrings", "mkdocstrings-python", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-section-index", "mkdocs-jupyter"]
+examples = ["Moose[fit]", "matplotlib", "plotly", "ipywidgets", "panel"]
+all = ["Moose[fit]", "Moose[docs]", "Moose[examples]"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "src/Moose",
+]
+include =[
+    "src/Moose"
+]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+"data" = "src/Moose/data/*.db"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/Moose",
+]
+exclude = [
+    "/docs"
+]
