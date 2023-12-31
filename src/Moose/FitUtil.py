@@ -9,13 +9,13 @@ This behaviour occurs regardless of if `Moose` has been installed with the [fit]
 
 import lmfit
 import numpy as np
-from .Simulation import _default_params, model_for_fit, query_DB
+from .Simulation import default_params, thermal_default_params, model_for_fit, query_DB
 
 def set_param(params: lmfit.Parameters,param_name:str,value:float=0,min:float=-np.inf, max:float=np.inf, vary:bool=True):
     '''Function to set/modify a single parameter in `lmfit.Parameters` object'''
     params[param_name].set(value=value,min=min,max=max, vary=vary)
 
-def set_params(params:lmfit.Parameters,param_dict:dict=_default_params, print:bool=False):
+def set_params(params:lmfit.Parameters,param_dict:dict=default_params, print:bool=False):
     '''Function to set/modify a bunch of parameters using a dict in a `lmfit.Parameters` object.'''
     for param in param_dict.keys():
         set_param(params,param,**param_dict[param])
@@ -36,10 +36,11 @@ def make_model(species:str, range:tuple[float,float]=(0,np.inf),resolution:int=1
         model (lmfit.Model): A `Model` object that can be used for fitting
         params (lmfit.Parameters): A `Parameters` object that can be used for fitting, containing default initial values and ranges.
     """
+    pars = kwargs.pop('params', default_params)
     db = query_DB(species, range, **kwargs)
     # param_names = kwargs.pop('param_names', [p for p in _default_params.keys()]) # Makes it possible to change what are considered fit parameters. Be default only `wl_pad` and `resolution` are excluded
     model = lmfit.Model(model_for_fit,sim_db=db)
-    params = lmfit.create_params(**_default_params)
+    params = lmfit.create_params(**pars)
     params['wl_pad'].value = wl_pad
     params['resolution'].value = resolution
     return model, params

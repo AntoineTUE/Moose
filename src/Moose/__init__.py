@@ -14,7 +14,6 @@ To see `Moose` in action, check out the [examples](../../examples)
 """
 
 from .Simulation import *
-from .Simulation import _default_params
 import importlib.util
 if importlib.util.find_spec('lmfit') is not None:
     from .FitUtil import *

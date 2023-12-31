@@ -17,9 +17,9 @@ import scipy.signal
 import scipy.interpolate
 import scipy.constants as const
 from scipy.stats import binned_statistic
-from typing import Literal
+from typing import Literal, List
 
-_default_params = {
+default_params = {
     'sigma':{'value':0.05, 'min':0.0001, 'max':0.3}, 
     'gamma': {'value':0.05,'min':0.0001,'max': 0.3},
     'mu': {'value': 0, 'min':-2, 'max':2}, 
@@ -31,24 +31,36 @@ _default_params = {
     'wl_pad': {'value':10 ,'vary': False } 
     }
 
-def query_DB(db_name:str, wl:tuple=(0,np.inf), kind:str='emission',mode:str='air', v_max=None, J_max=None, path:str=pkg.resource_filename('Moose', 'data')) -> pd.DataFrame:
+thermal_default_params = {
+    'sigma':{'value':0.05, 'min':0.0001, 'max':0.3}, 
+    'gamma': {'value':0.05,'min':0.0001,'max': 0.3},
+    'mu': {'value': 0, 'min':-2, 'max':2}, 
+    'T_rot': {'value': 1000, 'min': 250, 'max': 10000}, 
+    'T_vib': {'expr': 'T_rot', 'min': 250, 'max': 10000},
+    'A': {'value': 1, 'min': 0.2, 'max': 2}, 
+    'b': {'value':0, 'min': -0.05,'max': 0.05},
+    'resolution': {'value':100, 'vary':False},
+    'wl_pad': {'value':10 ,'vary': False } 
+    }
+
+def query_DB(db_name:str, wl:tuple=(0,np.inf), kind:str='emission',mode:Literal['air','vacuum']='air', v_max=None, J_max=None, path:str=pkg.resource_filename('Moose', 'data')) -> pd.DataFrame:
     """Queries a SQL database that must contain line-by-line information, compatible with the format used by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes).
 
     Args:
-        db_name (str): _description_
-        wl (tuple, optional): _description_. Defaults to (0,np.inf).
-        kind (str, optional): _description_. Defaults to 'emission'.
-        mode (str, optional): _description_. Defaults to 'air'.
-        v_max (_type_, optional): _description_. Defaults to None.
-        J_max (_type_, optional): _description_. Defaults to None.
-        path (str, optional): _description_. Defaults to pkg.resource_filename('Moose', 'data').
+        db_name (str): The name of the database file to query. 
+        wl (tuple, optional): A wavelength range to constrain the query to. Defaults to (0,np.inf).
+        kind (str, optional): The `kind` of spectrum that you want to create, either `emission` or `absorption`. The latter is not really tested. Defaults to 'emission'.
+        mode (str, optional): A selection of the `mode` for wavelength, either in air or vacuum equivalent. Defaults to 'air'.
+        v_max (_type_, optional): Maximum vibrational quantum number `v` for the query. Defaults to None.
+        J_max (_type_, optional): Maximum rotational quantum number `J` for the query. Defaults to None.
+        path (str, optional): The path to the folder containing database files. Defaults to the location of pre-packed databases.
 
     Raises:
-        FileNotFoundError: _description_
-        sql.DatabaseError: _description_
+        FileNotFoundError: If there is no database file with name `db_name` found in the location `path`.
+        sql.DatabaseError: If the SQL query failed, due to incompatible database format, or errors in input
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: A pandas DataFrame object containing the result of the query.
     """
     if '.db' not in db_name:
         db_name += '.db'
@@ -93,15 +105,15 @@ def query_DB(db_name:str, wl:tuple=(0,np.inf), kind:str='emission',mode:str='air
     
     return df
 
-def create_stick_spectrum(T_vib:float,T_rot:float,df_db:pd.DataFrame=None, mode:Literal['Absorption','Emission']='Emission', wl_mode: Literal['air', 'vacuum']='air'):
+def create_stick_spectrum(T_vib:float,T_rot:float,df_db:pd.DataFrame=None, kind:Literal['Absorption','Emission']='Emission', wl_mode: Literal['air', 'vacuum']='air'):
     """Create a stick spectrum based on the data retrieved from a SQL database.
     
     Arguments:
-        T_vib:          Vibrational temperature
-        T_rot:          Rotational temperature
-        df_db:          A pandas DataFrame containing the database data
-        mode:           Either 'Absorption' or 'Emission' depending on mode we want to use
-        wl_mode:        Either 'air' or 'vacuum' depending which equivalent we want.
+        T_vib (float):          Vibrational temperature
+        T_rot (float):          Rotational temperature
+        df_db (pd.DataFrame):   A pandas DataFrame containing the database data
+        kind (str):             Either 'Absorption' or 'Emission' depending on the kind of spectrum to simulate.
+        wl_mode (str):          Either 'air' or 'vacuum' depending which equivalent we want for the wavelength.
     """
 
     if type(df_db) == type(None):
@@ -110,21 +122,24 @@ def create_stick_spectrum(T_vib:float,T_rot:float,df_db:pd.DataFrame=None, mode:
     pops = (2*df_db['J']+1)*np.exp(-df_db['E_v']/(kB*T_vib)-df_db['E_J']/(kB*T_rot))
     # pops/= scipy.integrate.trapezoid(pops,df_db['{}_wavelength'.format(wl_mode)])
     pops /= pops.sum()
-    if mode=='Emission':
+    if kind=='Emission':
         y = pops*df_db['A']
-    elif mode == 'Absorption':
+    elif kind == 'Absorption':
         y = pops*df_db['B']
     return np.array([df_db['{}_wavelength'.format(wl_mode)], y]).T
 
-def equidistant_mesh(sim:np.array, wl_pad: float=10, resolution:int=100):
-    '''Creates an equidistant, mesh from a simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
+def equidistant_mesh(sim:np.array, wl_pad: float=10, resolution:int=100)-> np.ndarray:
+    '''Creates an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
     
-    The simulated line strengths are rebinned onto the equidistant mesh by summing their values.
+    The simulated line strengths are rebinned onto the equidistant mesh by summing their values, if multiple lines fall into the same bin.
     
     Arguments:
-        sim:            The 2D numpy array containing a simulation
-        wl_pad:         The padding of the wavelength axis in nm to avoid edge effects
-        resolution:     The resolution at which to construct the equidistant mesh (per nanometer) compared to the simulation (default: 100)
+        sim (np.array):     The 2D numpy array containing a simulation
+        wl_pad (float):     The padding of the wavelength axis in nm to avoid edge effects
+        resolution (int):   The resolution at which to construct the equidistant mesh (per nanometer) compared to the simulation (default: 100)
+        
+    Returns:
+        np.array:           A 2D array containing the mesh grid positions and corresponding stick values.
     '''
     # points = int((sim[-1,0]-sim[0,0]+2*wl_pad)/(sim[1,0]-sim[0,0])*factor+1)
     delta = sim[-1,0]-sim[0,0] +2*wl_pad
@@ -136,11 +151,11 @@ def equidistant_mesh(sim:np.array, wl_pad: float=10, resolution:int=100):
     return np.array([wl_grid,binned]).T
     
 
-def vgt (x:np.array,sigma:float,gamma:float,mu:float,a:float,b:float):
+def vgt (x:np.array,sigma:float,gamma:float,mu:float,a:float,b:float)-> np.array:
     """Voigt profile implementation, thinly wraps the scipy implementation.
 
     Args:
-        x (np.array): the x-axis array for the voigt profile
+        x (np.array): the x-axis array for the voigt profile.
         sigma (float): Gaussian broadening parameter, the standard deviation
         gamma (float): Lorentzian broadening parameter, half width at half maximum
         mu (float): Shift parameter with respect to the center of the x-axis, in the same units as `x`.
@@ -152,16 +167,19 @@ def vgt (x:np.array,sigma:float,gamma:float,mu:float,a:float,b:float):
     """
     return a*voigt_profile(x-mu,sigma,gamma)+b
 
-def apply_voigt(sim:np.array,sigma:float, gamma:float, norm:bool=False):
-    '''Applies Voigt broadening to a simulated stick spectrum, optionally normalizing the surface to 1.
+def apply_voigt(sim:np.array,sigma:float, gamma:float, norm:bool=False) -> np.array:
+    '''Applies Voigt broadening to a simulated stick spectrum, optionally normalizing the surface area to 1.
     
     To avoid repeated (different) normalisations from being used while fitting, it defaults to False.
     
     Arguments:
-        sim:        A (stick) simulation
-        sigma:      The Gaussian sigma for the voigt
-        gamma:      The Lorentzian gamma (HWHM) for the voigt
-        norm:       Boolean to toggle normalizing (default: False)
+        sim (np.array):     A (stick) simulation
+        sigma (float):      The Gaussian sigma for the voigt
+        gamma (float):      The Lorentzian gamma (HWHM) for the voigt
+        norm (bool):        Boolean to toggle normalizing (default: False)
+        
+    Returns:
+        np.array:           A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
     '''
     x = sim[:,0]
     dim = int(len(x))
@@ -177,7 +195,7 @@ def apply_voigt(sim:np.array,sigma:float, gamma:float, norm:bool=False):
     
     return np.array([x,conv]).T
 
-def match_spectra(meas: np.array, sim: np.array):
+def match_spectra(meas: np.array, sim: np.array, method:Literal['interp','binned']='interp',**kwargs):
     '''Matches a simulation to the same x-axis as the measurement using interpolation.
     
     Make sure the simulation spans a larger range, fully containing the experimental range.
@@ -189,7 +207,7 @@ def match_spectra(meas: np.array, sim: np.array):
         sim  (np.array)   :   A 2D array containing a simulated spectrum.
         
     Returns:
-        - np.array          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
+        np.array          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
     '''
 
     interp=scipy.interpolate.interp1d(sim[:,0], sim[:,1])
@@ -198,9 +216,9 @@ def match_spectra(meas: np.array, sim: np.array):
     except ValueError as e:
        raise ValueError(f"Wavelength outside of interpolation range, try setting a larger value for `wl_pad` kwarg:\n{e.args}")
     return np.array([meas[:,0], matched_y]).T
-
+   
 def model_for_fit(x:np.array,sigma:float,gamma:float, mu:float, T_rot:float,T_vib:float,A:float=1,b:float=0, resolution:int=100, wl_pad:float=10, sim_db: pd.DataFrame = None,**kwargs):
-    """Model function with function signature compatible for usage with [LMFit](https://lmfit.github.io/lmfit-py/).
+    """Model function with function signature compatible for usage with [lmfit](https://lmfit.github.io/lmfit-py/).
     
     Creates and broadens an equidistant stick spectrum from the provided simulation database.
     
@@ -213,8 +231,8 @@ def model_for_fit(x:np.array,sigma:float,gamma:float, mu:float, T_rot:float,T_vi
         sigma:          Gaussian broadening width of Voigt
         gamma:          Lorentzian broadening width of Voigt
         mu:             The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength
-        T_rot:          The rotational temperature
-        T_vib:          The vibrational temperature
+        T_rot:          The rotational temperature in Kelvin
+        T_vib:          The vibrational temperature in Kelvin
         A:              The amplitude scaling factor of the spectrum (default: 1)
         b:              The offset w.r.t. 0 of the spectrum (default: 0)
         sim_db:         The pandas.DataFrame containing the database used for the simulation.
@@ -226,7 +244,7 @@ def model_for_fit(x:np.array,sigma:float,gamma:float, mu:float, T_rot:float,T_vi
     Returns:
         np.array:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.
     """
-    sticks = create_stick_spectrum(T_vib,T_rot,sim_db, mode=kwargs.pop('mode', 'Emission'), wl_mode=kwargs.pop('wl_mode', 'air'))
+    sticks = create_stick_spectrum(T_vib,T_rot,sim_db, kind=kwargs.pop('mode', 'Emission'), wl_mode=kwargs.pop('wl_mode', 'air'))
     refined = equidistant_mesh(sticks, wl_pad = wl_pad, resolution=resolution)
     simulation = apply_voigt(refined,sigma,gamma)
     sim_matched=match_spectra((x-mu).reshape(-1,1),simulation)
