@@ -3,7 +3,7 @@
 
 To give you some inspiration on getting started, we have a number of examples.
 
-These examples all demonstrate, how you could use `Moose` to fit emission spectra and (interactively) plot the results with different backends. 
+These examples all demonstrate how you could use `Moose` to fit emission spectra and (interactively) plot the results with different backends. 
 
 !!! note "Examples have additional dependencies"
     Note however that these examples may rely on additional dependencies, that need to be installed in your environment if you want to execute them yourself.

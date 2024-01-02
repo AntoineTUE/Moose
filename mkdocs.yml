@@ -71,7 +71,9 @@ plugins:
     nav_file: SUMMARY.md
 - section-index
 - mkdocstrings:
-    default_handler: python
+    handlers:
+      python:
+        paths: [src]
 
 
 
