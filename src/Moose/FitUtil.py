@@ -12,12 +12,12 @@ import numpy as np
 from .Simulation import default_params, thermal_default_params, model_for_fit, query_DB
 
 def set_param(params: lmfit.Parameters,param_name:str,value:float=0,min:float=-np.inf, max:float=np.inf, vary:bool=True):
-    '''Function to set/modify a single parameter in `lmfit.Parameters` object'''
+    """Function to set/modify a single parameter in `lmfit.Parameters` object"""
     params[param_name].set(value=value,min=min,max=max, vary=vary)
 
 def set_params(params:lmfit.Parameters,param_dict:dict=default_params, print:bool=False):
-    '''Function to set/modify a bunch of parameters using a dict in a `lmfit.Parameters` object.'''
-    for param in param_dict.keys():
+    """Function to set/modify a bunch of parameters using a dict in a `lmfit.Parameters` object."""
+    for param in param_dict:
         set_param(params,param,**param_dict[param])
     if print:
         params.pretty_print()

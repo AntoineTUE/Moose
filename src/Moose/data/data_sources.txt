@@ -51,3 +51,9 @@ C2_swan.db
 James S.A. Brooke and Peter F. Bernath and Timothy W. Schmidt and George B. Bacskay; Journal of Quantitative Spectroscopy and Radiative Transfer; 2013; DOI: 10.1016/j.jqsrt.2013.02.025
 
 Carbone, Emile and D'Isa, Federico and Hecimovic, Ante and Fantz, Ursel; PSST; 2020; DOI: 10.1088/1361-6595/ab74b4
+
+
+------------------
+CNBX.db
+
+Carbone, Emile and D'Isa, Federico and Hecimovic, Ante and Fantz, Ursel; PSST; 2020; DOI: 10.1088/1361-6595/ab74b4

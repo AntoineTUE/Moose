@@ -1,4 +1,4 @@
-# Moose: a Massive OES wrapper
+# Moose: Molecular optical emission spectroscopy for Python
 Welcome to `Moose`, a python package for simulating optical emission spectra for diatomic molecules.
 
 `Moose` was born out of a need to fit rotational and vibrational temperatures for a large set of data.
@@ -25,12 +25,14 @@ Details can be found in [data_sources.txt](./Moose/data/data_sources.txt).
 | NO | B-X |
 | N2 | C-B |
 | C2 | Swan |
+| CN | B-X |
 
 
 ## Dependencies
 The following packages are dependencies to be able to use `Moose`. 
 Version numbers are just indications of the package versions that were used to develop the code, your mileage may vary using either older or newer versions.
-Furthermore, even though the project does not import `lmfit` and contains no functions that specifically rely on it, the code contains convenience functions that were specifically written for usage with the `lmfit.Model` and `lmfit.Parameters` classes. 
+Furthermore, even though the project does not import by default `lmfit` and contains no functions that specifically rely on it, the code contains convenience functions that were specifically written for usage with the `lmfit.Model` and `lmfit.Parameters` classes. 
+If `lmfit` is installed in the active enironment, some additional convenience function will be imported.
 
 These dependencies will be installed when you install `Moose` using `pip`.
 
@@ -39,7 +41,7 @@ These dependencies will be installed when you install `Moose` using `pip`.
 | Numpy  | >= 1.21.5  |
 | Pandas | >= 1.4.0 |
 | scipy | >= 1.7.3 |
-| *lmfit* | >= *1.2.0* |
+| *lmfit* (optional) | >= *1.2.0* |
 
 
 
