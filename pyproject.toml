@@ -29,7 +29,7 @@ Source = "https://gitlab.com/pioneerco/analysis/moose"
 
 [project.optional-dependencies]
 fit = ["lmfit"]
-docs = ["mkdocs-material","mkdocstrings", "mkdocstrings-python", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-section-index", "mkdocs-jupyter"]
+docs = ["mkdocs-material","mkdocstrings", "mkdocstrings-python", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-section-index", "mkdocs-jupyter", "mkdocs-git-revision-date-localized-plugin"]
 examples = ["Moose[fit]", "matplotlib", "plotly", "ipywidgets", "panel"]
 all = ["Moose[fit]", "Moose[docs]", "Moose[examples]"]
 
