@@ -78,7 +78,7 @@ plugins:
 nav:
 - index.md
 - Getting started: get_started.md
-- Principles: Theory.md
+# - Principles: Theory.md
 - Citing: citing.md
 # defer to gen-files + literate-nav
 - Code Reference: reference/
@@ -89,3 +89,4 @@ nav:
   - Matplotlib: examples/matplotlib.ipynb
   - Fitting backends: examples/Moose_fitting_backends.ipynb
   - Parallel fitting with Dask: examples/dask.ipynb
+  - Spectra with multiple species: examples/Multiple_species.ipynb

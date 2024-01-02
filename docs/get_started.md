@@ -35,7 +35,7 @@ A basic example demonstrating how to simulate and fit a spectrum is as follows.
 
 3. Next prepare to fit this simulated spectrum. Create an `lmfit.Model`, by wrapping the `model_for_fit` function and passing in the database as well to the wrapper. 
 
-4. As initial guess and bounds for the fit parameters, create an `lmfit.Parameters` object. For simplicity you can set these with some default values using `Moose._default_params`.
+4. As initial guess and bounds for the fit parameters, create an `lmfit.Parameters` object. For simplicity you can set these with some default values using `Moose.default_params`.
 
 
 
@@ -44,7 +44,7 @@ import Moose
 import numpy as np
 import lmfit
 
-db = Moose.query_DB('N2CB', wl=(320,390)) # Restrict to wavelength between 320 and 330 nm
+db = Moose.query_DB('N2CB', wl=(320,390)) # Restrict to wavelength between 320 and 390 nm
 
 x = np.linspace(320,390,2000)
 
@@ -53,7 +53,7 @@ simulated = Moose.model_for_fit(x,sigma=0.01,gamma=0.01,mu=0.5,T_rot=1000, T_vib
 y = simulated + np.random.uniform(0,0.1,simulated.shape[0]) # add noise
 
 model = lmfit.Model(Moose.model_for_fit, sim_db=db)
-params = lmfit.create_params(**Moose._default_params)
+params = lmfit.create_params(**Moose.default_params)
 
 result = model.fit(y, x=x, params=params)
 

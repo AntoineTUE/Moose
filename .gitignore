@@ -170,3 +170,6 @@ cython_debug/
 
 # hatchling versio info
 _version.py
+
+# include the example notebooks
+!/docs/examples/*.ipynb

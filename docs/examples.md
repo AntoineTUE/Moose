@@ -16,13 +16,17 @@ Interactive viewing and fitting of data is a common scenario where `Moose` may b
 
 These examples demonstrate how you could use different plotting backends to achieve this.
 
+* [Interactive Bokeh](./bokeh)
 * [Interactive Plotly](./plotly)
 * [Interactive Matplotlib](./matplotlib)
+* [Different fitting backends](./Moose_fitting_backends)
+* [Parallel fitting with Dask](./dask)
+* [Spectra with multiple species](./Multiple_species)
 
 !!! note "Interactive features only work locally"
     While some degree of interaction is possible from your browser, these example notebooks must be run (locally) in a python environment to do everything.
     You can find these example notebooks and the used data in the `docs/examples` folder of the `git` repository.
 
-All of these examples rely on `lmfit` to perform the fitting of the spectra.
+Most of these examples rely on [`lmfit`](https://lmfit.github.io/lmfit-py/) to perform the fitting of the spectra.
 
-The fitting is started via the `cb_fit` function, which is a callback that is invoked when pressing the `Fit` button in the simple UI.
+The fitting is started via the `cb_fit` function, which is a callback that is invoked when pressing the `Fit` button in the simple UI that is created for most of the examples.

@@ -12,6 +12,8 @@ It is up to you to read and sanitize experimental data, that you would like to f
 
 Put differently, `Moose` is aimed at helping you: you can integrate and adapt it to your workflow, rather than the reverse.
 
+Additionally, it has only a few, common dependencies (`numpy`, `scipy`, `pandas`) by default.
+
 To get a better grasp of how it works under the hood, see the [code reference](reference/Moose)
 
 ## MassiveOES
@@ -25,9 +27,13 @@ The goal is not to provide the same functionality as `MassiveOES`, but instead p
 
 You may be better served using `MassiveOES` or other programs, because of the following:
 
-*   `Moose` lacks out-of-the-box fitting of multiple excited species not in equilibrium
-*   `Moose` simply recalculates the simulated spectrum for each fit iteration, which sacrifices some speed. 
-    *   The benefit is that it can be run in parallel with ease.
 *   `Moose` does not give you tools to read, correct, or plot spectra
     *   There are better, more feature complete libraries for that
+*   `Moose` lacks out-of-the-box fitting of multiple excited species not in equilibrium
+    *   See the [examples](./examples) pages to see how you could use `Moose` for fitting
+    *   Or simply build upon `Moose` for your own custom fitting routines
+*  The provided fitting examples simply recalculate the simulated spectrum for each fit iteration, which sacrifices some speed. 
+    *   The benefit is that it can be run in [parallel with ease](./examples/dask).
+    *   If you don't have a huge set of very similar data or complex fits, this should not be an issue
+
  

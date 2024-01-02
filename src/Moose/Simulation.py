@@ -1,9 +1,9 @@
 """
 Provides functionality to simulate and fit spectra, akin to MassiveOES.
 
-However (for now) it focusses on multiprocessing support and not introducing unneccesary package or package version dependencies.
+However (for now) it focusses on multiprocessing support and not introducing unnecessary package or package version dependencies.
 
-Inspired by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes/src/master/) and uses the underlying database files, compiled by J Vorac and P. Synek.
+Inspired by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes/src/master/) and uses the underlying database files, compiled by J. Vorac and P. Synek.
 """
 
 import sqlite3 as sql
@@ -82,14 +82,8 @@ def query_DB(db_name:str, wl:tuple=(0,np.inf), kind:str='emission',mode:Literal[
         q_kind='B'
         q_join = 'lower_states on lower_state=lower_states.id'
         
-    if not J_max:
-        q_j = ''
-    else:
-        q_j = f' and J <= {J_max}'
-    if not v_max:
-        q_v = ''
-    else:
-        q_v = f' and v <= {v_max}'
+    q_j = '' if not J_max else f' and J <= {J_max}'
+    q_v = '' if not v_max else f' and v <= {v_max}'
         
 
     q_mode='{}_wavelength'.format(mode) # vacuum vs air wavelength equivalent
@@ -106,7 +100,8 @@ def query_DB(db_name:str, wl:tuple=(0,np.inf), kind:str='emission',mode:Literal[
     return df
 
 def create_stick_spectrum(T_vib:float,T_rot:float,df_db:pd.DataFrame=None, kind:Literal['Absorption','Emission']='Emission', wl_mode: Literal['air', 'vacuum']='air'):
-    """Create a stick spectrum based on the data retrieved from a SQL database.
+    """Create a stick spectrum based on the data retrieved from a SQL database with the `query_DB` function.
+    Alternatively, can be provided with any pandas DataFrame that has the requisite columns for the calculation.
     
     Arguments:
         T_vib (float):          Vibrational temperature
@@ -120,7 +115,6 @@ def create_stick_spectrum(T_vib:float,T_rot:float,df_db:pd.DataFrame=None, kind:
         raise TypeError('No Dataframe with database data supplied as kwarg')
     kB=const.physical_constants['Boltzmann constant in inverse meters per kelvin'][0]/100
     pops = (2*df_db['J']+1)*np.exp(-df_db['E_v']/(kB*T_vib)-df_db['E_J']/(kB*T_rot))
-    # pops/= scipy.integrate.trapezoid(pops,df_db['{}_wavelength'.format(wl_mode)])
     pops /= pops.sum()
     if kind=='Emission':
         y = pops*df_db['A']
@@ -129,7 +123,7 @@ def create_stick_spectrum(T_vib:float,T_rot:float,df_db:pd.DataFrame=None, kind:
     return np.array([df_db['{}_wavelength'.format(wl_mode)], y]).T
 
 def equidistant_mesh(sim:np.array, wl_pad: float=10, resolution:int=100)-> np.ndarray:
-    '''Creates an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
+    """Creates an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
     
     The simulated line strengths are rebinned onto the equidistant mesh by summing their values, if multiple lines fall into the same bin.
     
@@ -140,8 +134,7 @@ def equidistant_mesh(sim:np.array, wl_pad: float=10, resolution:int=100)-> np.nd
         
     Returns:
         np.array:           A 2D array containing the mesh grid positions and corresponding stick values.
-    '''
-    # points = int((sim[-1,0]-sim[0,0]+2*wl_pad)/(sim[1,0]-sim[0,0])*factor+1)
+    """
     delta = sim[-1,0]-sim[0,0] +2*wl_pad
     points = int(delta*resolution)
     equid = np.linspace(sim[0,0].min()-wl_pad, sim[:,0].max()+wl_pad, points)
@@ -168,7 +161,7 @@ def vgt (x:np.array,sigma:float,gamma:float,mu:float,a:float,b:float)-> np.array
     return a*voigt_profile(x-mu,sigma,gamma)+b
 
 def apply_voigt(sim:np.array,sigma:float, gamma:float, norm:bool=False) -> np.array:
-    '''Applies Voigt broadening to a simulated stick spectrum, optionally normalizing the surface area to 1.
+    """Applies Voigt broadening to a simulated stick spectrum, optionally normalizing the surface area to 1.
     
     To avoid repeated (different) normalisations from being used while fitting, it defaults to False.
     
@@ -180,7 +173,7 @@ def apply_voigt(sim:np.array,sigma:float, gamma:float, norm:bool=False) -> np.ar
         
     Returns:
         np.array:           A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
-    '''
+    """
     x = sim[:,0]
     dim = int(len(x))
     if dim % 2 ==0:
@@ -195,8 +188,8 @@ def apply_voigt(sim:np.array,sigma:float, gamma:float, norm:bool=False) -> np.ar
     
     return np.array([x,conv]).T
 
-def match_spectra(meas: np.array, sim: np.array, method:Literal['interp','binned']='interp',**kwargs):
-    '''Matches a simulation to the same x-axis as the measurement using interpolation.
+def match_spectra(meas: np.array, sim: np.array):
+    """Matches a simulation to the same x-axis as the measurement using interpolation.
     
     Make sure the simulation spans a larger range, fully containing the experimental range.
     
@@ -208,7 +201,7 @@ def match_spectra(meas: np.array, sim: np.array, method:Literal['interp','binned
         
     Returns:
         np.array          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
-    '''
+    """
 
     interp=scipy.interpolate.interp1d(sim[:,0], sim[:,1])
     try:
@@ -227,19 +220,19 @@ def model_for_fit(x:np.array,sigma:float,gamma:float, mu:float, T_rot:float,T_vi
     Returns a spectrum normalized on the interval [b,A].
 
     Arguments:
-        x:              The x-axis of the (measured) data that we want to compare/fit against
-        sigma:          Gaussian broadening width of Voigt
-        gamma:          Lorentzian broadening width of Voigt
-        mu:             The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength
-        T_rot:          The rotational temperature in Kelvin
-        T_vib:          The vibrational temperature in Kelvin
-        A:              The amplitude scaling factor of the spectrum (default: 1)
-        b:              The offset w.r.t. 0 of the spectrum (default: 0)
-        sim_db:         The pandas.DataFrame containing the database used for the simulation.
-        wl_pad:         The amount of nanometer to pad the x-axis of the simulation with to avoid edge effects. Default: 10
-        resolution:     The resolution per nanometer of  the equidistant mesh compared to bin/sample simulation by (default: 100)
-        mode:           The mode of the spectrum, i.e. 'Emission' versus 'Absorption' (default: Emission)
-        wl_mode:        Whether to use 'air' vs 'vacuum' wavelength (default: air)
+        x (np.array):               The x-axis of the (measured) data that we want to compare/fit against
+        sigma (float):              Gaussian broadening width of Voigt
+        gamma (float):              Lorentzian broadening width of Voigt
+        mu (float):                 The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength
+        T_rot (float):              The rotational temperature in Kelvin
+        T_vib (float):              The vibrational temperature in Kelvin
+        A (float):                  The amplitude scaling factor of the spectrum (default: 1)
+        b (float):                  The offset w.r.t. 0 of the spectrum (default: 0)
+        sim_db (DataFrame):         The DataFrame containing the database used for the simulation.
+        wl_pad (float):             The amount of nanometer to pad the x-axis of the simulation with to avoid edge effects. Default: 10
+        resolution (int):           The resolution per nanometer of  the equidistant mesh compared to bin/sample simulation by (default: 100)
+        mode (str, optional):       The mode of the spectrum, i.e. 'Emission' versus 'Absorption' (default: Emission)
+        wl_mode (str, optional):    	Whether to use 'air' vs 'vacuum' wavelength (default: air)
         
     Returns:
         np.array:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.

@@ -5,13 +5,13 @@ build-backend = "hatchling.build"
 [project]
 name = "Moose"
 dynamic = ["version"]
-description = "A thin wrapper around MassiveOES to extend functionality and streamline workflow"
+description = "A package to simulate diatomic optical emission spectra relying on line-by-line databases compiled for MassiveOES"
 readme = "README.md"
 license = "MIT"
-license-files = { paths = ["LICENSE"] }
+# license-files = { paths = ["LICENSE"] }
 requires-python = ">=3.9"
 authors = [
-    { name = "Antoine Salden", email = "toine.salden@unitn.it" },
+    { name = "Antoine Salden", email = "t.p.w.salden@tue.nl" },
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -54,7 +54,12 @@ include =[
 [tool.hatch.build.targets.sdist]
 include = [
     "src/Moose",
+    "docs/",
+    "mkdocs.yml"
 ]
 exclude = [
-    "/docs"
+    "_version.py"
 ]
+
+[tool.ruff]
+extend-select = ["C4", "SIM", "TCH", "NPY", "PD"]
