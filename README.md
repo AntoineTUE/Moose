@@ -11,11 +11,11 @@ It is up to you to read and sanitize experimental data, that you would like to f
 
 Put differently, `Moose` is aimed at helping you: you can integrate and adapt it to your workflow, rather than the reverse.
 
-To get a better grasp of how it works under the hood, see the online documentation for code reference and examples.
+To get a better grasp of how it works under the hood, see the online documentation for [code reference](https://antoinetue.github.io/Moose/reference/Moose/Simulation/) and [examples](https://antoinetue.github.io/Moose/examples/).
 
 ## Supported bands
 Since `Moose` reuses the databases from [MassiveOES](https://bitbucket.org/OES_muni/massiveoes), it supports the same bands for fitting.
-Details can be found in [data_sources.txt](./Moose/data/data_sources.txt).
+Details can be found in [data_sources.txt](./Moose/data/data_sources.txt), and the [page with information on citing](https://antoinetue.github.io/Moose/citing/).
 
 | **Molecule** | **Band** |
 | --- | --- |
@@ -57,7 +57,7 @@ To simply install `Moose` itself, running the following suffices:
 pip install .
 ```
 
-Installing `Moose` with additional optional dependencies is described on the documentation page.
+Installing `Moose` with additional optional dependencies is described on the [documentation page on getting started](https://antoinetue.github.io/Moose/get_started/).
 
 ## Basic usage
 A basic example demonstrating the usage is as follows.
@@ -65,7 +65,7 @@ It assumes that there is a `pandas` DataFrame (called `data`) containing several
 It is important that the wavelength range over which we query the database (`wl_interval`), is larger than the experimental range plus the possible shift (`mu`) between simulation and experiment.
 
 Extending the fitting over multiple cores/processes can be done by using for instance the excellent [Dask](https://dask.org/) library, via i.e. `client.map`.
-More elaborate examples are available via the online documentation.
+More elaborate examples are available via the [online documentation](https://antoinetue.github.io/Moose/examples/).
 
 ```python
 import Moose, lmfit

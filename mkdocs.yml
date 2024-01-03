@@ -1,5 +1,8 @@
 site_name: "Moose Docs"
 site_author: Antoine Salden
+site_url: https://antoinetue.github.io/Moose/
+repo_name: AntoineTUE/Moose
+repo_url: https://github.com/AntoineTUE/Moose
 
 theme:
   name: material
@@ -33,10 +36,10 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
+      # custom_fences:
+      #   - name: mermaid
+      #     class: mermaid
+      #     format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences

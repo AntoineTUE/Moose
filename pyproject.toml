@@ -3,12 +3,11 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "Moose"
+name = "moose-spectra"
 dynamic = ["version"]
 description = "A package to simulate diatomic optical emission spectra relying on line-by-line databases compiled for MassiveOES"
 readme = "README.md"
 license = "MIT"
-# license-files = { paths = ["LICENSE"] }
 requires-python = ">=3.9"
 authors = [
     { name = "Antoine Salden", email = "t.p.w.salden@tue.nl" },
@@ -25,13 +24,14 @@ dependencies = [
 ]
 
 [project.urls]
-Source = "https://gitlab.com/pioneerco/analysis/moose"
+Source = "https://github.com/AntoineTUE/Moose"
+Documentation = "https://antoinetue.github.io/Moose/"
 
 [project.optional-dependencies]
 fit = ["lmfit"]
 docs = ["mkdocs-material","mkdocstrings", "mkdocstrings-python", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-section-index", "mkdocs-jupyter", "mkdocs-git-revision-date-localized-plugin"]
-examples = ["Moose[fit]", "matplotlib", "plotly", "ipywidgets", "panel"]
-all = ["Moose[fit]", "Moose[docs]", "Moose[examples]"]
+examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel"]
+all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]"]
 
 [tool.hatch.version]
 source = "vcs"
@@ -44,7 +44,7 @@ packages = [
     "src/Moose",
 ]
 include =[
-    "src/Moose"
+    "src/Moose/data"
 ]
 
 [tool.hatch.build.targets.wheel.sources]
