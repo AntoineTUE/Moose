@@ -29,7 +29,7 @@ pip install .[all]
 # How to use `Moose`
 A basic example demonstrating how to simulate and fit a spectrum is as follows.
 
-1. Query a database for the emission system of interest, which is done with `query_DB`. This function will look for databases in the location where `Moose` has been installed, but it can also be provided with a path to your own compatible database. See the [code reference](./reference/Moose) for more information.
+1. Query a database for the emission system of interest, which is done with `query_DB`. This function will look for databases in the location where `Moose` has been installed, but it can also be provided with a path to your own compatible database. See the [code reference](../reference/Moose) for more information.
 
 2.  Create a sample spectrum and add noise to it. To do this, first call the `model_for_fit` function, which is a high level function to calculate a spectrum, given line positions, temperatures, broadening parameters, and so forth.
 
