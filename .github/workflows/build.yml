@@ -39,8 +39,8 @@ jobs:
       - build
     runs-on: ubuntu-latest
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/moose-spectra
+      name: pypi
+      url: https://pypi.org/p/moose-spectra
     permissions:
       id-token: write
     steps:
@@ -52,5 +52,3 @@ jobs:
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
