@@ -1,5 +1,11 @@
 ![Logo](assets/moose.svg)
 # Moose: Molecular Optical Emission Simulation for python
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10454339.svg)](https://doi.org/10.5281/zenodo.10454339)
+![GitHub License](https://img.shields.io/github/license/AntoineTUE/Moose)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Documentation%20build)
+![PyPI - Version](https://img.shields.io/pypi/v/moose-spectra)
+
 Welcome to `Moose`, a python package for simulating optical emission spectra for diatomic molecules.
 
 `Moose` was born out of a need to fit rotational and vibrational temperatures for a large set of data.
