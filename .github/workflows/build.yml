@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Build wheel and source artefacts
+    name: Build wheel and source artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,7 +25,7 @@ jobs:
         run: python -m build
 
       - name: Upload artifacts
-        uses: actions/upload-artifacts@v3
+        uses: actions/upload-artifact@v3
         with:
           name: python-artifacts
           path: dist/*
@@ -45,7 +45,7 @@ jobs:
       id-token: write
     steps:
       - name: Download python artifacts
-        uses: actions/download-artifacts@v3
+        uses: actions/download-artifact@v3
         with:
           name: python-artifacts
           path: dist
