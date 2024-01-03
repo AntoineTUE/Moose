@@ -1,37 +1,27 @@
 # Citing Moose
-`Moose` is made publicly available via it's `git` repository.
+`Moose` is made publicly available via it's [`git` repository](https://github.com/AntoineTUE/Moose).
 
-To make it easier to cite and reference, it also has a `DOI`, provided via [Zenodo](https://zenodo.org).
+To make it easier to cite and reference, you can also use the following [Zenodo](https://zenodo.org) provided DOI link:
 
-Whenever a new version is released, this will be automatically updated to Zenodo.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10454339.svg)](https://doi.org/10.5281/zenodo.10454339)
 
-Therefore, the recommended way of citing it is as follows:
+This link will resolve to the latest release of the source code on that platform.
 
-```bibtex
-@software{
-    author = {Salden, Antoine},
-    title = {Moose: Molecular Optical Emission Simulation in python},
-    url = {https://doi.org/xxx-xxx},
-    version = {}
-}
-```
+Whenever a new version is released on GitHub, this will be automatically updated.
 
+Each individual release is associated with it's own DOI as well.
 
-## Copyright notice from MassiveOES
+On the Zenodo page for the project or each release, you can obtain the citation information for `Moose` itself.
 
-The original software is massiveOES developed by the Masaryk University available from: [https://bitbucket.org/OES_muni/massiveoes](https://bitbucket.org/OES_muni/massiveoes).
-
-
-### Publications introducing MassiveOES
-
-!!! info
-    VORÁČ, Jan; SYNEK, Petr; PROCHÁZKA, Vojtěch; HODER, Tomáš. State-by-state emission spectra fitting for non-equilibrium plasmas: OH spectra of surface barrier discharge at argon/water interface. Journal of Physics D: Applied Physics. 2017, 50(29), 294002. DOI: [10.1088/1361-6463/aa7570](https://doi.org/10.1088/1361-6463/aa7570).
-
-!!! info
-    VORÁČ, Jan; SYNEK, Petr; POTOČŇÁKOVÁ, Lucia; HNILICA, Jaroslav; KUDRLE, Vít. Batch processing of overlapping molecular spectra as a tool for spatio-temporal diagnostics of power modulated microwave plasma jet. Plasma Sources Science and Technology 26.2 (2017), 025010. DOI: [10.1088/1361-6595/aa51f0](https://doi.org/10.1088/1361-6595/aa51f0).
+Please also make sure to cite the original sources and authors of the databases that you use.
 
 
 # Original sources for databases
+The table below summarizes the data sources for the databases that can be used.
+
+The majority of these have been compiled into database files by the original authors of [MassiveOES](https://bitbucket.org/OES_muni/massiveoes).
+
+
 | Database | Source | DOI |
 | --- | --- | --- |
 | OHAX |J. Luque and D.R. Crosley, J. Chem. Phys., 109, 439 (1998) | <https://doi.org/10.1063/1.476582> |
@@ -50,3 +40,17 @@ The original software is massiveOES developed by the Masaryk University availabl
 | C$_2$ Swan | Carbone, Emile and D'Isa, Federico and Hecimovic, Ante and Fantz, Ursel; PSST; 2020; | <https://doi.org/10.1088/1361-6595/ab74b4> |
 | CNBX | Carbone, Emile and D'Isa, Federico and Hecimovic, Ante and Fantz, Ursel; PSST; 2020; | <https://doi.org/10.1088/1361-6595/ab74b4> |
 
+!!! info
+    The databases named `C2_swan_J300.db` and `CNBX.db` were compiled by Emile Carbone et al 2020 Plasma Sources Sci. Technol. 29 055003.
+
+## Publications introducing MassiveOES
+
+!!! info
+    VORÁČ, Jan; SYNEK, Petr; PROCHÁZKA, Vojtěch; HODER, Tomáš. State-by-state emission spectra fitting for non-equilibrium plasmas: OH spectra of surface barrier discharge at argon/water interface. Journal of Physics D: Applied Physics. 2017, 50(29), 294002. DOI: [10.1088/1361-6463/aa7570](https://doi.org/10.1088/1361-6463/aa7570).
+
+!!! info
+    VORÁČ, Jan; SYNEK, Petr; POTOČŇÁKOVÁ, Lucia; HNILICA, Jaroslav; KUDRLE, Vít. Batch processing of overlapping molecular spectra as a tool for spatio-temporal diagnostics of power modulated microwave plasma jet. Plasma Sources Science and Technology 26.2 (2017), 025010. DOI: [10.1088/1361-6595/aa51f0](https://doi.org/10.1088/1361-6595/aa51f0).
+
+## Copyright notice from MassiveOES
+
+The original software is massiveOES developed by the Masaryk University available from: [https://bitbucket.org/OES_muni/massiveoes](https://bitbucket.org/OES_muni/massiveoes).

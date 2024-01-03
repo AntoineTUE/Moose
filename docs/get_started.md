@@ -1,6 +1,12 @@
 # Installing `Moose`
 
-`Moose` can be installed with `pip`, after getting a copy of the source code by either downloading it, or cloning it via `git`.
+`Moose` can be installed with `pip` to get the latest release, note that on [PyPI](https://pypi.org/project/moose-spectra/) it is known as `moose-spectra`:
+
+```bash
+pip install moose-spectra
+```
+
+Alternatively you can grab a copy or clone the source code from the git repository.
 
 Simply execute the following command in the terminal, from the location were you stored the source code:
 
@@ -8,22 +14,22 @@ Simply execute the following command in the terminal, from the location were you
 pip install .
 ```
 
-Alternatively, you can also install several optional dependencies alongside `Moose` for fitting spectra, interactive plotting, or locally updating these documentation pages.
+You can also install several optional dependencies alongside `Moose` for fitting spectra, interactive plotting, or locally updating these documentation pages.
 
 To do that run one of the following commands:
 
 ```bash
 # installs lmfit dependency
-pip install .[fit]
+pip install moose-spectra[fit]
 
 # install doc page dependencies
-pip install .[docs]
+pip install moose-spectra[docs]
 
 # install dependencies for running the examples
-pip install .[examples]
+pip install moose-spectra[examples]
 
 # install the all the above dependencies
-pip install .[all] 
+pip install moose-spectra[all] 
 ```
 
 # How to use `Moose`

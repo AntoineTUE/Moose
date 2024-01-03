@@ -1,4 +1,14 @@
 # Moose: Molecular optical emission spectroscopy for Python
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10454339.svg)](https://doi.org/10.5281/zenodo.10454339)
+![GitHub License](https://img.shields.io/github/license/AntoineTUE/Moose)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Documentation%20build)
+![PyPI - Version](https://img.shields.io/pypi/v/moose-spectra)
+
+
+
+
 Welcome to `Moose`, a python package for simulating optical emission spectra for diatomic molecules.
 
 `Moose` was born out of a need to fit rotational and vibrational temperatures for a large set of data.
@@ -47,22 +57,27 @@ These dependencies will be installed when you install `Moose` using `pip`.
 
 
 ## Installation
-`Moose` can be installed by first downloading/cloning the package with `git`.
-
-Once you have a copy, you can install it using `pip` from the project directory.
-
 To simply install `Moose` itself, running the following suffices:
+
+```bash
+pip install moose-spectra
+```
+
+Installing `Moose` with additional optional dependencies is described on the [documentation page on getting started](https://antoinetue.github.io/Moose/get_started/).
+
+`Moose` can be installed by first downloading/cloning the package with `git` as well.
+
+Once you have a copy, you can install it using `pip` from the project directory by invoking:
 
 ```bash
 pip install .
 ```
 
-Installing `Moose` with additional optional dependencies is described on the [documentation page on getting started](https://antoinetue.github.io/Moose/get_started/).
-
 ## Basic usage
 A basic example demonstrating the usage is as follows.
 It assumes that there is a `pandas` DataFrame (called `data`) containing several spectra normalized on the interval (0,1), with the first column being a shared wavelength axis.
-It is important that the wavelength range over which we query the database (`wl_interval`), is larger than the experimental range plus the possible shift (`mu`) between simulation and experiment.
+It is important that the wavelength range over which we query the database (`wl_interval`) plus the padding range `wl_pad`, is larger than the experimental range plus the possible shift (`mu`) between simulation and experiment.
+
 
 Extending the fitting over multiple cores/processes can be done by using for instance the excellent [Dask](https://dask.org/) library, via i.e. `client.map`.
 More elaborate examples are available via the [online documentation](https://antoinetue.github.io/Moose/examples/).

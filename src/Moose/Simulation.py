@@ -150,7 +150,7 @@ def equidistant_mesh(
 ) -> np.ndarray:
     """Creates an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
 
-    The simulated line strengths are rebinned onto the equidistant mesh by summing their values, if multiple lines fall into the same bin.
+    The simulated line intensities are rebinned onto the equidistant mesh by summing their values, if multiple lines fall into the same bin.
 
     Arguments:
         sim (np.array):     The 2D numpy array containing a simulation
@@ -260,13 +260,13 @@ def model_for_fit(
     sim_db: pd.DataFrame = None,
     **kwargs,
 ):
-    """Model function with function signature compatible for usage with [lmfit](https://lmfit.github.io/lmfit-py/).
+    """Model function with function signature compatible for usage with [lmfit](https://lmfit.github.io/lmfit-py/).Model.
 
     Creates and broadens an equidistant stick spectrum from the provided simulation database.
 
     After broadening, resamples the simulation to the same coordinates as the (measured) data.
 
-    Returns a spectrum normalized on the interval [b,A].
+    Returns a spectrum normalized on the interval [b,A+b].
 
     Arguments:
         x (np.array):               The x-axis of the (measured) data that we want to compare/fit against
@@ -281,7 +281,7 @@ def model_for_fit(
         wl_pad (float):             The amount of nanometer to pad the x-axis of the simulation with to avoid edge effects. Default: 10
         resolution (int):           The resolution per nanometer of  the equidistant mesh compared to bin/sample simulation by (default: 100)
         mode (str, optional):       The mode of the spectrum, i.e. 'Emission' versus 'Absorption' (default: Emission)
-        wl_mode (str, optional):    	Whether to use 'air' vs 'vacuum' wavelength (default: air)
+        wl_mode (str, optional):    Whether to use 'air' vs 'vacuum' wavelength (default: air)
 
     Returns:
         np.array:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.
