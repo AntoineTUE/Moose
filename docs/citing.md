@@ -1,4 +1,5 @@
 # Citing Moose
+
 `Moose` is made publicly available via it's [`git` repository](https://github.com/AntoineTUE/Moose).
 
 To make it easier to cite and reference, you can also use the following [Zenodo](https://zenodo.org) provided DOI link:
@@ -15,19 +16,18 @@ On the Zenodo page for the project or each release, you can obtain the citation 
 
 Please also make sure to cite the original sources and authors of the databases that you use.
 
+## Original sources for databases
 
-# Original sources for databases
 The table below summarizes the data sources for the databases that can be used.
 
 The majority of these have been compiled into database files by the original authors of [MassiveOES](https://bitbucket.org/OES_muni/massiveoes).
-
 
 | Database | Source | DOI |
 | --- | --- | --- |
 | OHAX |J. Luque and D.R. Crosley, J. Chem. Phys., 109, 439 (1998) | <https://doi.org/10.1063/1.476582> |
 | OHAX | L.R. Williams and D.R. Crosley, J. Chem. Phys, 104, 6507 (1996) | <https://doi.org/10.1063/1.471371> |
 | OHAX | Kristen L. Steffens, Jorge Luque, Jay B. Jeffries, David R. Crosley;  J. Chem. Phys. 15 April 1997; 106 (15): 6262–6267.  | <https://doi.org/10.1063/1.473644> |
-| N$_2^+$BX |  J. Luque and D.R. Crosley, “LIFBASE: Database and Spectral Simulation Program (Version 1.5) ”, SRI International Report MP 99-009 (1999). |  | 
+| N$_2^+$BX |  J. Luque and D.R. Crosley, “LIFBASE: Database and Spectral Simulation Program (Version 1.5) ”, SRI International Report MP 99-009 (1999). |  |
 | NHAX | Western C 2016 PGOPHER—a program for simulating rotational structure, Version 9.0.100, University of Bristol |  |
 | NHAX |  Ram R and Bernath P 2010 J. Mol. Spectrosc. 260 115–9 | <https://doi.org/10.1016/j.jms.2010.01.006> |
 | NHAX | Lents J 1973 J. Quant. Spectrosc. Radiat. Transfer 13 297–310 | <https://doi.org/10.1016/0022-4073(73)90061-7> |

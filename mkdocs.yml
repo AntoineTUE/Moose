@@ -8,9 +8,9 @@ theme:
   name: material
   logo: assets/moose.svg
   favicon: assets/moose.svg
+  custom_dir: docs/overrides
   features:
     - navigation.list
-    # - navigation.instant
     - navigation.sections
     - navigation.footer
     - toc.integrate
@@ -36,10 +36,10 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.superfences:
-      # custom_fences:
-      #   - name: mermaid
-      #     class: mermaid
-      #     format: !!python/name:pymdownx.superfences.fence_code_format
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
@@ -50,9 +50,6 @@ markdown_extensions:
       alternate_style: true
   - admonition
   - pymdownx.details
-  # - pymdownx.emoji:
-  #     emoji_index: !!python/name:materialx.emoji.twemoji
-  #     emoji_generator: !!python/name:materialx.emoji.to_svg
   - def_list
   - pymdownx.tasklist:
       custom_checkbox: true
@@ -69,7 +66,9 @@ plugins:
     include_source: true
     include: ["*.ipynb"]
     ignore: ["*/.ipynb_checkpoints/*.ipynb"]
-- git-revision-date-localized
+- git-revision-date-localized:
+    exclude:
+      - reference/*
 - gen-files:
     scripts:
     - docs/gen_ref_pages.py
@@ -92,9 +91,10 @@ nav:
 - Code Reference: reference/
 - Examples:
   - examples.md
-  - Bokeh: examples/bokeh.ipynb
-  - Plotly: examples/plotly.ipynb
-  - Matplotlib: examples/matplotlib.ipynb
+  - Interactive plotting:
+    - Bokeh: examples/bokeh.ipynb
+    - Plotly: examples/plotly.ipynb
+    - Matplotlib: examples/matplotlib.ipynb
   - Fitting backends: examples/Moose_fitting_backends.ipynb
   - Parallel fitting with Dask: examples/dask.ipynb
   - Spectra with multiple species: examples/Multiple_species.ipynb

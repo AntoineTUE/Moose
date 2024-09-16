@@ -30,7 +30,7 @@ Documentation = "https://antoinetue.github.io/Moose/"
 [project.optional-dependencies]
 fit = ["lmfit"]
 docs = ["mkdocs-material","mkdocstrings", "mkdocstrings-python", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-section-index", "mkdocs-jupyter", "mkdocs-git-revision-date-localized-plugin","black"]
-examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel", "ipympl"]
+examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel", "ipympl", "dask"]
 all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]"]
 
 [tool.hatch.version]

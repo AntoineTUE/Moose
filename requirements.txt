@@ -1,0 +1,12 @@
+# Requirements file that includes the `fit` and `examples` features for support of e.g. Binder
+# If you only need a minimal install of `Moose` rely on pyproject.toml instead.
+numpy >= 1.24.2
+pandas >= 1.5.3 
+scipy >= 1.11.1
+lmfit >= 1.2.0
+matplotlib >= 3.7
+plotly >= 5.12
+ipywidgets >= 8.1
+panel >= 0.14.3
+ipympl >= 0.9.3
+dask >= 2023.2.1
