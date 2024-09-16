@@ -166,10 +166,14 @@ cython_debug/
 *.ipynb
 
 # testing files
-/test
+/testbench
 
 # hatchling versio info
 _version.py
 
 # include the example notebooks
 !/docs/examples/*.ipynb
+
+# Cache and config folders for dev tooling
+.ruff_cache
+.vscode
