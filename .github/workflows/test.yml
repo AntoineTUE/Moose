@@ -1,0 +1,30 @@
+name: test
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+    ci-test:
+      strategy:
+        matrix:
+            python-version: ["3.9","3.10","3.11"]
+      name: "Python ${{ matrix.python-version}}"
+      runs-on: "ubuntu-latest"
+      steps:
+        - uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+        - name: Install uv
+          uses: astral-sh/setup-uv@v2
+          with:
+            enable-cache: true
+            cache-dependency-glob: "pyproject.toml"
+        - name: Set up Python ${{ matrix.python-version}}
+          run: uv python install ${{ matrix.python-version}}
+        - name: Install build frontend
+          run: uv pip install hatch
+        - name: Run tests
+          run: hatch test -py ${{ matrix.python-version }}
+        
+
