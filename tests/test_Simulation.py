@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 from scipy.special import voigt_profile
-from sqlite3 import DatabaseError
+from sqlite3 import DatabaseError, OperationalError
 from importlib import resources
 from pandas.testing import assert_frame_equal
 from numpy.testing import (
@@ -57,6 +57,10 @@ class TestSimulation:
         invalid_db_path.write_text("Moose test file of invalid database format")
         with pytest.raises(DatabaseError):
             Simulation.query_DB(invalid_db_path.name, path=tmp_path)
+
+    def test_query_DB_invalid_kind(self):
+        with pytest.raises(ValueError):
+            Simulation.query_DB("OHAX", kind="invalid_kind")
 
     @pytest.mark.parametrize(
         "species",
@@ -188,6 +192,19 @@ class TestSimulation:
         assert_array_almost_equal(simulated, outcome)
         with pytest.raises(TypeError):
             Simulation.model_for_fit(np.linspace(300, 400, 10), T_rot=300, T_vib=300, sigma=1, gamma=1, mu=0, A=1, b=0)
+
+    def test_query_execution(self, temp_db):
+        df = Simulation.query_DB("test", path=temp_db.parent)
+        assert isinstance(df, pd.DataFrame)
+        assert not df.empty
+
+    def test_sql_injection(self, temp_db):
+        with pytest.raises(ValueError, match="could not convert.*"):
+            Simulation.query_DB("test", wl=("0; DROP TABLE lines;", "1e9"), path=temp_db.parent)
+        with pytest.raises(ValueError, match="Expected either 'emission' or 'absorption'.*"):
+            Simulation.query_DB("test", kind="emission DROP TABLE lines;", path=temp_db.parent)
+        with pytest.raises(ValueError, match=".*air.*vacuum.*"):
+            Simulation.query_DB("test", mode="air; DROP TABLE lines;", path=temp_db.parent)
 
 
 @pytest.mark.lmfit

@@ -46,7 +46,7 @@ thermal_default_params = {
 
 def query_DB(
     db_name: str,
-    wl: tuple = (0, np.inf),
+    wl: tuple = (0, 1e9),
     kind: str = "emission",
     mode: Literal["air", "vacuum"] = "air",
     v_max=None,
@@ -74,7 +74,7 @@ def query_DB(
     path = pathlib.Path(path) if path is not None else resources.files("Moose") / "data"
     if ".db" not in db_name:
         db_name += ".db"
-    wl_min, wl_max = wl
+    wl_min, wl_max = map(float, wl) if wl is not None else (0.0, 1e9)
     db_path = pathlib.Path(path).joinpath(db_name)
     if not db_path.exists():
         errmsg = f'No such database, the file "{db_path.as_posix()}" was not found...'
@@ -85,27 +85,36 @@ def query_DB(
         errmsg = "File does not contain a valid SQL3 database..."
         raise sql.DatabaseError(errmsg)
 
-    if kind == "emission":
+    if kind.lower() == "emission":
         q_kind = "A"
-        q_join = "upper_states on upper_state=upper_states.id"
-    elif kind == "absorption":
+        q_from_state = "upper"
+    elif kind.lower() == "absorption":
         q_kind = "B"
-        q_join = "lower_states on lower_state=lower_states.id"
-
-    q_j = "" if not J_max else f" and J <= {J_max}"
-    q_v = "" if not v_max else f" and v <= {v_max}"
-
-    q_mode = "{}_wavelength".format(mode)  # vacuum vs air wavelength equivalent
-
-    if wl_min != 0 and wl_max != np.inf:
-        q_wl = f" where lines.{q_mode} between {wl_min} and {wl_max}{q_j}{q_v}"
+        q_from_state = "lower"
     else:
         msg = f"Expected either 'emission' or 'absorption', got {kind}"
         raise ValueError(msg)
+    if mode.lower() not in ["air", "vacuum"]:
+        msg = f"`mode` should be either `air` or `vacuum`, got {mode}"
+        raise ValueError(msg)
 
-    query = f"SELECT lines.id, {q_kind}, upper_state, branch, vacuum_wavelength, air_wavelength, wavenumber, lower_state, E_J, J, component, E_v, v from lines inner join {q_join}{q_wl} ORDER BY {q_mode}"
-    df = pd.read_sql_query(query, conn)
-    conn.close()
+    query = f"""SELECT lines.id, {q_kind}, upper_state, branch, vacuum_wavelength, air_wavelength, wavenumber, lower_state, E_J, J, component, E_v, v 
+    FROM lines INNER JOIN {q_from_state}_states on {q_from_state}_state={q_from_state}_states.id
+    WHERE lines.{mode.lower()}_wavelength between :wl_min and :wl_max
+    """
+
+    params = {"wl_min": wl_min, "wl_max": wl_max}
+    if J_max is not None:
+        params["Jmax"] = J_max
+        query += " and J<=:Jmax"
+    if v_max is not None:
+        params["vmax"] = v_max
+        query += " and v<=:vmax "
+
+    query += f" ORDER BY {mode.lower()}_wavelength"
+
+    with sql.connect(db_path) as conn:
+        df = pd.read_sql_query(query, conn, params=params)
 
     return df
 
