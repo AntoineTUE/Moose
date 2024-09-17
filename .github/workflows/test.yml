@@ -28,7 +28,9 @@ jobs:
           with:
             python-version: ${{ matrix.python-version }}
         - name: Install build frontend
-          run: uv pip install hatch, -e .
+          run: |
+            uv pip install hatch
+            uv pip install -e .
         - name: Run tests
           run: hatch test -py ${{ matrix.python-version }}
         
