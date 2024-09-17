@@ -9,7 +9,7 @@ jobs:
       strategy:
         matrix:
             python-version: ["3.9","3.10","3.11"]
-      name: "Python ${{ matrix.python-version}}"
+      name: "Python ${{ matrix.python-version }}"
       runs-on: "ubuntu-latest"
       steps:
         - uses: actions/checkout@v4
@@ -20,10 +20,12 @@ jobs:
           with:
             enable-cache: true
             cache-dependency-glob: "pyproject.toml"
-        - name: Set up Python ${{ matrix.python-version}}
-          run: uv python install ${{ matrix.python-version}}
+        - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v5
+          with:
+            python-version: ${{ matrix.python-version }}
         - name: Install build frontend
-          run: uv pip install hatch
+          run: uv pip install hatch --system
         - name: Run tests
           run: hatch test -py ${{ matrix.python-version }}
         
