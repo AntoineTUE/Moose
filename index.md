@@ -5,6 +5,7 @@
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Documentation%20build)
 ![PyPI - Version](https://img.shields.io/pypi/v/moose-spectra)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/zenodo/10.5281/zenodo.10454339/)
 
 Welcome to `Moose`, a python package for simulating optical emission spectra for diatomic molecules.
 
