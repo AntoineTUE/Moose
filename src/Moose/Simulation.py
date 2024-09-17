@@ -51,7 +51,7 @@ def query_DB(
     mode: Literal["air", "vacuum"] = "air",
     v_max=None,
     J_max=None,
-    path: str = pkg.resource_filename("Moose", "data"),
+    path: Union[str, pathlib.Path] = None,
 ) -> pd.DataFrame:
     """Query a SQL database that must contain line-by-line information, compatible with the format used by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes).
 
