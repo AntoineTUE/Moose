@@ -9,7 +9,7 @@ Inspired by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes/src/master/) 
 import sqlite3 as sql
 import pandas as pd
 import numpy as np
-import pkg_resources as pkg
+from importlib import resources
 import pathlib
 from scipy.special import voigt_profile
 import scipy.integrate
@@ -17,7 +17,7 @@ import scipy.signal
 import scipy.interpolate
 import scipy.constants as const
 from scipy.stats import binned_statistic
-from typing import Literal, List
+from typing import Literal, Union
 
 default_params = {
     "sigma": {"value": 0.05, "min": 0.0001, "max": 0.3},
@@ -36,7 +36,7 @@ thermal_default_params = {
     "gamma": {"value": 0.05, "min": 0.0001, "max": 0.3},
     "mu": {"value": 0, "min": -2, "max": 2},
     "T_rot": {"value": 1000, "min": 250, "max": 10000},
-    "T_vib": {"expr": "T_rot", "min": 250, "max": 10000},
+    "T_vib": {"value": 1000, "expr": "T_rot"},
     "A": {"value": 1, "min": 0.2, "max": 2},
     "b": {"value": 0, "min": -0.05, "max": 0.05},
     "resolution": {"value": 100, "vary": False},
@@ -53,7 +53,7 @@ def query_DB(
     J_max=None,
     path: str = pkg.resource_filename("Moose", "data"),
 ) -> pd.DataFrame:
-    """Queries a SQL database that must contain line-by-line information, compatible with the format used by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes).
+    """Query a SQL database that must contain line-by-line information, compatible with the format used by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes).
 
     Args:
         db_name (str): The name of the database file to query.
@@ -71,20 +71,19 @@ def query_DB(
     Returns:
         pd.DataFrame: A pandas DataFrame object containing the result of the query.
     """
+    path = pathlib.Path(path) if path is not None else resources.files("Moose") / "data"
     if ".db" not in db_name:
         db_name += ".db"
     wl_min, wl_max = wl
     db_path = pathlib.Path(path).joinpath(db_name)
     if not db_path.exists():
-        raise FileNotFoundError(
-            'No such database, the file "{}" was not found...'.format(db_path)
-        )
+        errmsg = f'No such database, the file "{db_path.as_posix()}" was not found...'
+        raise FileNotFoundError(errmsg)
     with db_path.open("rb") as f:
         header = f.read(100)
     if header[:16] != b"SQLite format 3\x00":
-        raise sql.DatabaseError("File does not contain a valid SQL3 database...")
-    else:
-        conn = sql.connect(db_path)
+        errmsg = "File does not contain a valid SQL3 database..."
+        raise sql.DatabaseError(errmsg)
 
     if kind == "emission":
         q_kind = "A"
@@ -101,7 +100,8 @@ def query_DB(
     if wl_min != 0 and wl_max != np.inf:
         q_wl = f" where lines.{q_mode} between {wl_min} and {wl_max}{q_j}{q_v}"
     else:
-        q_wl = ""
+        msg = f"Expected either 'emission' or 'absorption', got {kind}"
+        raise ValueError(msg)
 
     query = f"SELECT lines.id, {q_kind}, upper_state, branch, vacuum_wavelength, air_wavelength, wavenumber, lower_state, E_J, J, component, E_v, v from lines inner join {q_join}{q_wl} ORDER BY {q_mode}"
     df = pd.read_sql_query(query, conn)
@@ -116,8 +116,9 @@ def create_stick_spectrum(
     df_db: pd.DataFrame = None,
     kind: Literal["Absorption", "Emission"] = "Emission",
     wl_mode: Literal["air", "vacuum"] = "air",
-):
+) -> np.ndarray:
     """Create a stick spectrum based on the data retrieved from a SQL database with the `query_DB` function.
+
     Alternatively, can be provided with any pandas DataFrame that has the requisite columns for the calculation.
 
     Arguments:
@@ -126,29 +127,24 @@ def create_stick_spectrum(
         df_db (pd.DataFrame):   A pandas DataFrame containing the database data
         kind (str):             Either 'Absorption' or 'Emission' depending on the kind of spectrum to simulate.
         wl_mode (str):          Either 'air' or 'vacuum' depending which equivalent we want for the wavelength.
-    """
 
-    if type(df_db) == type(None):
-        raise TypeError("No Dataframe with database data supplied as kwarg")
-    kB = (
-        const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0]
-        / 100
-    )
-    pops = (2 * df_db["J"] + 1) * np.exp(
-        -df_db["E_v"] / (kB * T_vib) - df_db["E_J"] / (kB * T_rot)
-    )
+    """
+    # if not isinstance(df_db, pd.DataFrame):
+    if not hasattr(df_db, "__dataframe__"):  # accept objects implementing dataframe interchange protocol
+        errmsg = "No Dataframe with database data supplied as kwarg"
+        raise TypeError(errmsg)
+    kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
+    pops = (2 * df_db["J"] + 1) * np.exp(-df_db["E_v"] / (kB * T_vib) - df_db["E_J"] / (kB * T_rot))
     pops /= pops.sum()
     if kind == "Emission":
         y = pops * df_db["A"]
     elif kind == "Absorption":
         y = pops * df_db["B"]
-    return np.array([df_db["{}_wavelength".format(wl_mode)], y]).T
+    return np.array([df_db[f"{wl_mode}_wavelength"], y]).T
 
 
-def equidistant_mesh(
-    sim: np.array, wl_pad: float = 10, resolution: int = 100
-) -> np.ndarray:
-    """Creates an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
+def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -> np.ndarray:
+    """Create an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
 
     The simulated line intensities are rebinned onto the equidistant mesh by summing their values, if multiple lines fall into the same bin.
 
@@ -171,9 +167,7 @@ def equidistant_mesh(
     return np.array([wl_grid, binned]).T
 
 
-def vgt(
-    x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float
-) -> np.array:
+def vgt(x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float) -> np.ndarray:
     """Voigt profile implementation, thinly wraps the scipy implementation.
 
     Args:
@@ -185,15 +179,13 @@ def vgt(
         b (float): Offset with respect to 0 of the values.
 
     Returns:
-        np.array: Voigt profile as a function of `x`
+        np.ndarray: Voigt profile as a function of `x`
     """
     return a * voigt_profile(x - mu, sigma, gamma) + b
 
 
-def apply_voigt(
-    sim: np.array, sigma: float, gamma: float, norm: bool = False
-) -> np.array:
-    """Applies Voigt broadening to a simulated stick spectrum, optionally normalizing the surface area to 1.
+def apply_voigt(sim: np.array, sigma: float, gamma: float, norm: bool = False) -> np.ndarray:
+    """Apply Voigt broadening to a simulated stick spectrum, optionally normalizing the surface area to 1.
 
     To avoid repeated (different) normalisations from being used while fitting, it defaults to False.
 
@@ -204,14 +196,11 @@ def apply_voigt(
         norm (bool):        Boolean to toggle normalizing (default: False)
 
     Returns:
-        np.array:           A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
+        np.ndarray:           A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
     """
     x = sim[:, 0]
     dim = int(len(x))
-    if dim % 2 == 0:
-        mu = (x[int(dim / 2) - 1] + x[int(dim / 2)]) / 2
-    else:
-        mu = x[int(dim / 2)]
+    mu = (x[int(dim / 2) - 1] + x[int(dim / 2)]) / 2 if dim % 2 == 0 else x[int(dim / 2)]
 
     v = vgt(x, sigma, gamma, mu, 1, 0)
     conv = scipy.signal.fftconvolve(sim[:, 1], v, mode="same")
@@ -221,8 +210,8 @@ def apply_voigt(
     return np.array([x, conv]).T
 
 
-def match_spectra(meas: np.array, sim: np.array):
-    """Matches a simulation to the same x-axis as the measurement using interpolation.
+def match_spectra(meas: np.array, sim: np.array) -> np.ndarray:
+    """Match a simulation to the same x-axis as the measurement using interpolation.
 
     Make sure the simulation spans a larger range, fully containing the experimental range.
 
@@ -233,16 +222,16 @@ def match_spectra(meas: np.array, sim: np.array):
         sim  (np.array)   :   A 2D array containing a simulated spectrum.
 
     Returns:
-        np.array          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
+        np.ndarray          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
+
     """
 
     interp = scipy.interpolate.interp1d(sim[:, 0], sim[:, 1])
     try:
         matched_y = interp(meas[:, 0])
     except ValueError as e:
-        raise ValueError(
-            f"Wavelength outside of interpolation range, try setting a larger value for `wl_pad` kwarg:\n{e.args}"
-        )
+        errmsg = f"Wavelength padding to low, adjust `wl_pad`\n{e.args}"
+        raise ValueError(errmsg) from e
     return np.array([meas[:, 0], matched_y]).T
 
 
@@ -259,7 +248,7 @@ def model_for_fit(
     wl_pad: float = 10,
     sim_db: pd.DataFrame = None,
     **kwargs,
-):
+) -> np.ndarray:
     """Model function with function signature compatible for usage with [lmfit](https://lmfit.github.io/lmfit-py/).Model.
 
     Creates and broadens an equidistant stick spectrum from the provided simulation database.
@@ -284,7 +273,8 @@ def model_for_fit(
         wl_mode (str, optional):    Whether to use 'air' vs 'vacuum' wavelength (default: air)
 
     Returns:
-        np.array:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.
+        np.ndarray:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.
+
     """
     sticks = create_stick_spectrum(
         T_vib,

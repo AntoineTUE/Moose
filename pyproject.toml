@@ -68,7 +68,7 @@ exclude = ["test", "docs/examples"]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F","C4", "SIM", "TCH", "NPY", "PD","B","UP","D"]
-ignore = ["PD901"]
+ignore = ["PD901","F401"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
@@ -84,6 +84,9 @@ fragments = [
 
 [tool.pytest.ini_options]
 markers = ["lmfit: mark test to run when lmfit is present" ]
+
+[tool.hatch.envs.default]
+installer = "uv"
 
 [tool.hatch.envs.docs]
 skip-install = true

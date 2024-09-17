@@ -20,14 +20,12 @@ def set_param(
     max: float = np.inf,
     vary: bool = True,
 ):
-    """Function to set/modify a single parameter in `lmfit.Parameters` object"""
+    """Set or modify a single parameter in `lmfit.Parameters` object."""
     params[param_name].set(value=value, min=min, max=max, vary=vary)
 
 
-def set_params(
-    params: lmfit.Parameters, param_dict: dict = default_params, print: bool = False
-):
-    """Function to set/modify a bunch of parameters using a dict in a `lmfit.Parameters` object."""
+def set_params(params: lmfit.Parameters, param_dict: dict = default_params, print: bool = False):
+    """Set or modify a bunch of parameters using a dict in a `lmfit.Parameters` object."""
     for param in param_dict:
         set_param(params, param, **param_dict[param])
     if print:
@@ -41,13 +39,16 @@ def make_model(
     wl_pad: float = 10,
     **kwargs,
 ):
-    """Convenience function to create a `lmfit.Model` instance already prepared with the line-by-line database for fitting.
+    """Create a `lmfit.Model` instance already prepared with the line-by-line database for fitting.
 
     Args:
         species (str): The name of the species database to query.
         range (tuple[float,float]): The wavelength range in nanometer to restric the database query to. Defaults to (0,np.inf)
         resolution (int):   The resolution per nanometer of  the equidistant mesh compared to bin/sample simulation by (default: 100)
         wl_pad (float): The amount of nanometer to pad the x-axis of the simulation with to avoid edge effects. Default: 10
+
+    Kwargs:
+        params (lmfit.Parameters, Optional): A `Parameters` object with appropriate fit parameters for the model. Defaults to `Moose.default_params`
 
     Returns:
         model (lmfit.Model): A `Model` object that can be used for fitting

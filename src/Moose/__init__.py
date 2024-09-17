@@ -13,8 +13,30 @@ If so, it will import some additional functions in the `Moose` namespace for you
 To see `Moose` in action, check out the [examples](../../examples)
 """
 
-from .Simulation import *
 import importlib.util
+from .Simulation import (
+    default_params,
+    thermal_default_params,
+    query_DB,
+    create_stick_spectrum,
+    equidistant_mesh,
+    apply_voigt,
+    match_spectra,
+    model_for_fit,
+)
+
+__all__ = [
+    "default_params",
+    "thermal_default_params",
+    "query_DB",
+    "create_stick_spectrum",
+    "equidistant_mesh",
+    "apply_voigt",
+    "match_spectra",
+    "model_for_fit",
+]
 
 if importlib.util.find_spec("lmfit") is not None:
-    from .FitUtil import *
+    from .FitUtil import set_param, set_params, make_model
+
+    __all__ += ["set_param", "set_params", "make_model"]

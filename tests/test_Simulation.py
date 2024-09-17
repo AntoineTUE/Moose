@@ -189,11 +189,12 @@ class TestSimulation:
         with pytest.raises(TypeError):
             Simulation.model_for_fit(np.linspace(300, 400, 10), T_rot=300, T_vib=300, sigma=1, gamma=1, mu=0, A=1, b=0)
 
+
 @pytest.mark.lmfit
 class TestParameters:
-    
     def test_default_parameters(self):
         import lmfit
+
         params = lmfit.create_params(**Simulation.default_params)
         assert isinstance(params, lmfit.Parameters)
         assert params["T_vib"].expr is None
@@ -201,6 +202,7 @@ class TestParameters:
 
     def test_thermal_parameters(self):
         import lmfit
+
         params = lmfit.create_params(**Simulation.thermal_default_params)
         assert isinstance(params, lmfit.Parameters)
         assert params["T_vib"].expr == "T_rot"

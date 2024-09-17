@@ -1,4 +1,5 @@
 # Requirements file that includes the `fit` and `examples` features for support of e.g. Binder
+# It installs the current state of the package from the `main` Git branch
 # If you only need a minimal install of `Moose` rely on pyproject.toml instead.
 numpy >= 1.24.2
 pandas >= 1.5.3 
@@ -10,3 +11,4 @@ ipywidgets >= 8.1
 panel >= 0.14.3
 ipympl >= 0.9.3
 dask >= 2023.2.1
+moose-spectra @git+https://github.com/AntoineTUE/Moose@main
