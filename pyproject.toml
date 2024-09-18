@@ -40,6 +40,8 @@ fallback-version = "0.0.1dev"
 [tool.hatch.build.hooks.vcs]
 version-file = "_version.py"
 
+[tool.setuptools_scm]
+
 [tool.hatch.build.targets.wheel]
 packages = [
     "src/Moose",
@@ -107,3 +109,6 @@ matrix.feature.dependencies = [
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.9","3.10", "3.11"]
 feature = ["pandas-legacy","pandas-2.0"]
+
+[tool.uv]
+cache-keys = [{ git = true }]
