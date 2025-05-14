@@ -35,12 +35,15 @@ markdown_extensions:
       generic: true
   - pymdownx.highlight:
       anchor_linenums: true
+      use_pygments: true
+      pygments_lang_class: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.inlinehilite
+  - codehilite
   - pymdownx.snippets
   - pymdownx.superfences
   - abbr
@@ -53,19 +56,27 @@ markdown_extensions:
   - def_list
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.magiclink:
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      provider: github
+      user: AntoineTUE
+      repo: Moose
+
 
 extra_javascript:
   - javascripts/mathjax.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/mml-chtml.min.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js
 
 plugins:
 - search
+- autorefs
 - mkdocs-jupyter:
     include_requirejs: true
     include_source: true
     include: ["*.ipynb"]
     ignore: ["*/.ipynb_checkpoints/*.ipynb"]
+    custom_mathjax_url: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe" #https://github.com/danielfrg/mkdocs-jupyter/issues/227
 - git-revision-date-localized:
     exclude:
       - reference/*
@@ -79,8 +90,31 @@ plugins:
     handlers:
       python:
         paths: [src]
-
-
+        options:
+          heading_level: 2
+          summary: true
+          docstring_style: google
+          docstring_options:
+            ignore_init_summary: no
+          merge_init_into_class: no
+          show_submodules: no
+          # Headings
+          show_root_heading: true
+          show_root_full_path: true
+          show_root_members_full_path: false
+          #Docstrings
+          show_if_no_docstring: true
+          show_docstring_attributes: false
+          show_docstring_functions: true
+          #Signatures/Annotations
+          annotations_path: brief
+          separate_signature: true
+          line_length: 100
+          show_signature_annotations: true
+          # Other
+          show_bases: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
 
 nav:
 - index.md
@@ -98,3 +132,6 @@ nav:
   - Fitting backends: examples/Moose_fitting_backends.ipynb
   - Parallel fitting with Dask: examples/dask.ipynb
   - Spectra with multiple species: examples/Multiple_species.ipynb
+
+watch:
+- src/Moose

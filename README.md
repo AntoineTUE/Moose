@@ -1,11 +1,15 @@
+![Logo](./docs/assets/moose.svg)
 # Moose: Molecular optical emission spectroscopy for Python
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10454339.svg)](https://doi.org/10.5281/zenodo.10454339)
 ![GitHub License](https://img.shields.io/github/license/AntoineTUE/Moose)
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Documentation%20build)
-![PyPI - Version](https://img.shields.io/pypi/v/moose-spectra)
+![PyPI python versions](https://img.shields.io/pypi/pyversions/moose-spectra.svg)
+![PyPI Downloads](https://img.shields.io/pypi/dm/moose-spectra)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/zenodo/10.5281/zenodo.10454339/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 
 Welcome to `Moose`, a python package for simulating optical emission spectra for diatomic molecules.
 
@@ -16,6 +20,8 @@ For this it uses *line-by-line databases*, assuming a Boltzmann distribution for
 On top of that `Moose` is intended to be *minimal*: it provides you some basic tools to do just that, simulate some spectra.
 
 It is up to you to read and sanitize experimental data, that you would like to fit based on these simulations, for instance.
+
+In addition, `Moose` is quite *adaptable*: you can use it as a foundation for more elaborate models and analysis.
 
 Put differently, `Moose` is aimed at helping you: you can integrate and adapt it to your workflow, rather than the reverse.
 
@@ -38,18 +44,15 @@ Details can be found in [data_sources.txt](./Moose/data/data_sources.txt), and t
 
 ## Dependencies
 
-Dependencies are mainly specified in the [pyproject.toml](./pyproject.toml), the requirements file is there solely to aid in deploying to Binder.
-
-The table below lists the packages that are dependencies to be able to use `Moose`, see also [requirements.txt](./requirements.txt).
-Version numbers are just indications of the package versions that were used to develop the code, your mileage may vary using either older or newer versions.
-
-Some tests are performed to check compatibility of numpy and pandas version `<= 2.0` and `>= 2.0`.
+Dependencies are mainly specified in the [pyproject.toml](./pyproject.toml), the [requirements.txt](./requirements.txt) file is there solely to aid in deploying to Binder.
+See below for a table of these dependencies, which will be installed along with `Moose` if they are not present yet.
+Version numbers are just indications of the package versions that were used to develop the code, your mileage may vary using either older versions.
+Part of the automated test suite checks for compatibility of `numpy` and `pandas` version `<= 2.0` and `>= 2.0`, to ensure these older versions remain supported.
 
 Furthermore, even though the project does not import by default `lmfit` and contains no functions that specifically rely on it, the code contains convenience functions that were specifically written for usage with the `lmfit.Model` and `lmfit.Parameters` classes.
-
 If `lmfit` is installed in the active environment, some additional convenience function will be imported.
 
-These dependencies will be installed when you install `Moose` using `pip`.
+These dependencies will be installed when you install `Moose` using `pip` or `uv`.
 
 | **Package**  | **Version**  |
 |---|---|
@@ -68,12 +71,10 @@ pip install moose-spectra
 
 Installing `Moose` with additional optional dependencies is described on the [documentation page on getting started](https://antoinetue.github.io/Moose/get_started/).
 
-`Moose` can be installed by first downloading/cloning the package with `git` as well.
-
-Once you have a copy, you can install it using `pip` from the project directory by invoking:
+You can also install the lastest development version of `Moose`, which may not be released to PyPI yet, using this git repository directly:
 
 ```bash
-pip install .
+pip install git+https://github.com/AntoineTUE/Moose.git
 ```
 
 ## Basic usage

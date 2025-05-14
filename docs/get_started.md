@@ -2,23 +2,21 @@
 
 `Moose` can be installed with `pip` to get the latest release, note that on [PyPI](https://pypi.org/project/moose-spectra/) it is known as `moose-spectra`:
 
-```bash
+``` bash
 pip install moose-spectra
 ```
 
-Alternatively you can grab a copy or clone the source code from the git repository.
-
-Simply execute the following command in the terminal, from the location were you stored the source code:
+You can also install the lastest development version of `Moose`, which may not be released to PyPI yet, using this git repository directly:
 
 ```bash
-pip install .
+pip install git+https://github.com/AntoineTUE/Moose.git
 ```
 
 You can also install several optional dependencies alongside `Moose` for fitting spectra, interactive plotting, or locally updating these documentation pages.
 
 To do that run one of the following commands:
 
-```bash
+``` bash
 # installs lmfit dependency
 pip install moose-spectra[fit]
 
@@ -50,20 +48,22 @@ import Moose
 import numpy as np
 import lmfit
 
+rng = np.random.default_rng(100)
+
 db = Moose.query_DB('N2CB', wl=(320,390)) # Restrict to wavelength between 320 and 390 nm
 
 x = np.linspace(320,390,2000)
 
 simulated = Moose.model_for_fit(x,sigma=0.01,gamma=0.01,mu=0.5,T_rot=1000, T_vib=5000, sim_db=db)
 
-y = simulated + np.random.uniform(0,0.1,simulated.shape[0]) # add noise
+y = rng.normal(simulated, 0.01)# add noise
 
-model = lmfit.Model(Moose.model_for_fit, sim_db=db)
+model = lmfit.Model(Moose.model_for_fit, sim_db=db, independent_vars=["x"])
 params = lmfit.create_params(**Moose.default_params)
 
 result = model.fit(y, x=x, params=params)
 
-result.plot()
+result.plot(title='N2CB fit', datafmt='x')
 
 ```
 
