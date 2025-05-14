@@ -14,6 +14,7 @@ To see `Moose` in action, check out the [examples](../../examples)
 """
 
 import importlib.util
+from importlib import resources
 from .Simulation import (
     default_params,
     thermal_default_params,
@@ -24,6 +25,9 @@ from .Simulation import (
     match_spectra,
     model_for_fit,
 )
+
+database_path = resources.files("Moose").joinpath("data")
+database_files = [p.stem for p in database_path.glob("*.db")]  # + [p.stem for p in database_path.glob("*.par")]
 
 __all__ = [
     "default_params",
