@@ -24,15 +24,20 @@ def temp_db(tmp_path_factory):
     db_path = tmp_path_factory.mktemp("test-db").joinpath("test.db")
     with sql.connect(db_path) as conn:
         cursor = conn.cursor()
+        # mimic the database structure
         cursor.execute(
-            "CREATE TABLE lines (id INTEGER PRIMARY KEY, A REAL, B REAL, upper_state INTEGER, lower_state INTEGER, air_wavelength REAL, vacuum_wavelength REAL, wavenumber REAL, E_J REAL, J REAL, component TEXT, E_v REAL, v REAL, branch TEXT)"
+            "CREATE TABLE lines (id INTEGER PRIMARY KEY, A REAL, B REAL, upper_state INTEGER, lower_state INTEGER, air_wavelength REAL, vacuum_wavelength REAL, wavenumber REAL, branch TEXT)"
         )
-        cursor.execute("CREATE TABLE upper_states (id INTEGER PRIMARY KEY)")
-        cursor.execute("CREATE TABLE lower_states (id INTEGER PRIMARY KEY)")
         cursor.execute(
-            "INSERT INTO lines (A, B, upper_state, lower_state, air_wavelength, vacuum_wavelength, wavenumber, E_J, J, component, E_v, v) VALUES (1.0, 2.0, 1, 2, 500.0, 600.0, 700.0, 0.1, 1, 'comp', 0.2, 3)"
+            "CREATE TABLE upper_states (id INTEGER PRIMARY KEY, E_J REAL, J INTEGER, component INTEGER, E_V FLOAT, v INTEGER)"
         )
-        cursor.execute("INSERT INTO upper_states (id) VALUES (1)")
-        cursor.execute("INSERT INTO lower_states (id) VALUES (2)")
+        cursor.execute(
+            "CREATE TABLE lower_states (id INTEGER PRIMARY KEY, E_J REAL, J INTEGER, component INTEGER, E_V FLOAT, v INTEGER)"
+        )
+        cursor.execute(
+            "INSERT INTO lines (A, B, upper_state, lower_state, air_wavelength, vacuum_wavelength, wavenumber) VALUES (1.0, 2.0, 1, 2, 500.0, 600.0, 700.0)"
+        )
+        cursor.execute("INSERT INTO upper_states (id, E_J,J,E_v,v) VALUES (1, 10,1,100,0)")
+        cursor.execute("INSERT INTO lower_states (id, E_J,J,E_v,v) VALUES (2,10,1,100,0)")
         conn.commit()
     return db_path

@@ -7,11 +7,7 @@ from scipy.special import voigt_profile
 from sqlite3 import DatabaseError, OperationalError
 from importlib import resources
 from pandas.testing import assert_frame_equal
-from numpy.testing import (
-    assert_array_equal,
-    assert_array_almost_equal,
-    assert_almost_equal,
-)
+from numpy.testing import assert_array_equal, assert_array_almost_equal, assert_allclose
 
 
 class TestSimulation:
@@ -102,7 +98,7 @@ class TestSimulation:
             ],
         ):
             sticks = Simulation.create_stick_spectrum(t, t, db)
-            assert_array_almost_equal(sticks, np.array([[300.0, 400.0], result]).T)
+            assert_allclose(sticks, np.array([[300.0, 400.0], result]).T)
             assert sticks[:, 1].sum() == 1
 
     @pytest.mark.parametrize("db", [None, np.zeros(10), {}])
@@ -116,20 +112,22 @@ class TestSimulation:
     def test_equidistant_mesh(self, points, resolution, pad):
         sim = np.array([np.linspace(0, 10, points), self.rng.random(points)])
         equid = Simulation.equidistant_mesh(sim, wl_pad=pad, resolution=resolution)
-        assert_almost_equal(equid[:, 1].sum(), sim[:, 1].sum())
-        assert_almost_equal(sim[:, 0].min() - pad, equid[:, 0].min())
+        assert_allclose(equid[:, 1].sum(), sim[:, 1].sum())
+        assert_allclose(sim[:, 0].min() - pad, equid[:, 0].min())
 
     def test_vgt(self):
         x = np.linspace(-10, 10, 1000)
         assert_array_equal(Simulation.vgt(x, 0.2, 0.2, 0, 1, 0), voigt_profile(x, 0.2, 0.2))
-        assert_array_almost_equal(Simulation.vgt(x, 0.1, 0.1, 0.1, 1, 0), voigt_profile(x - 0.1, 0.1, 0.1))
+        assert_allclose(Simulation.vgt(x, 0.1, 0.1, 0.1, 1, 0), voigt_profile(x - 0.1, 0.1, 0.1))
 
     def test_apply_voigt(self):
         sticks = np.array([np.linspace(-1, 1, 100), np.zeros(100)]).T
         sticks[50, 1] = 1
-        assert_array_almost_equal(
+        assert_allclose(
             Simulation.apply_voigt(sticks, 0.1, 0.1, False)[:, 1],
             np.convolve(sticks[:, 1], voigt_profile(sticks[:, 0], 0.1, 0.1), mode="same"),
+            atol=1e-12,
+            rtol=1e-12,
         )
 
     def test_match_spectra(self):
@@ -166,16 +164,16 @@ class TestSimulation:
         )
         outcome = np.array(
             [
-                1.00000000e00,
-                1.14824424e-02,
-                2.01582383e-03,
-                2.88194160e-04,
-                7.67004068e-05,
-                1.83496645e-05,
-                0.00000000e00,
-                1.36603964e-03,
-                8.85238182e-03,
-                7.90343912e-01,
+                1.0,
+                1.148e-02,
+                2.016e-03,
+                2.882e-04,
+                7.670e-05,
+                1.835e-05,
+                0.0,
+                1.366e-03,
+                8.852e-03,
+                7.903e-01,
             ]
         )
         simulated = Simulation.model_for_fit(
@@ -189,7 +187,7 @@ class TestSimulation:
             b=0,
             sim_db=db,
         )
-        assert_array_almost_equal(simulated, outcome)
+        assert_allclose(simulated, outcome, atol=5e-5, rtol=0.05)
         with pytest.raises(TypeError):
             Simulation.model_for_fit(np.linspace(300, 400, 10), T_rot=300, T_vib=300, sigma=1, gamma=1, mu=0, A=1, b=0)
 

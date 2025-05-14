@@ -15,7 +15,12 @@ authors = [
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
 ]
 dependencies = [
     "numpy",
@@ -29,7 +34,7 @@ Documentation = "https://antoinetue.github.io/Moose/"
 
 [project.optional-dependencies]
 fit = ["lmfit"]
-docs = ["mkdocs-material","mkdocstrings", "mkdocstrings-python", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-section-index", "mkdocs-jupyter", "mkdocs-git-revision-date-localized-plugin","black"]
+docs = ["mkdocs-material","mkdocstrings", "mkdocstrings-python", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-section-index", "mkdocs-jupyter", "mkdocs-git-revision-date-localized-plugin","black", "pygments"]
 examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel", "ipympl", "dask"]
 all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]"]
 
@@ -69,7 +74,7 @@ line-length = 120
 exclude = ["test", "docs/examples"]
 
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F","C4", "SIM", "TCH", "NPY", "PD","B","UP","D"]
+select = ["E4", "E7", "E9", "F","C4", "SIM", "TC", "NPY", "PD","B","UP","D"]
 ignore = ["PD901","F401"]
 
 [tool.ruff.lint.pydocstyle]
@@ -89,6 +94,9 @@ markers = ["lmfit: mark test to run when lmfit is present" ]
 
 [tool.hatch.envs.default]
 installer = "uv"
+features = ["examples"]
+post-install-commands = ["pre-commit install"]
+dependencies = ["ruff"]
 
 [tool.hatch.envs.docs]
 skip-install = true

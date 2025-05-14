@@ -19,6 +19,8 @@ import scipy.constants as const
 from scipy.stats import binned_statistic
 from typing import Literal, Union
 
+kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
+
 default_params = {
     "sigma": {"value": 0.05, "min": 0.0001, "max": 0.3},
     "gamma": {"value": 0.05, "min": 0.0001, "max": 0.3},
@@ -70,6 +72,8 @@ def query_DB(
 
     Returns:
         pd.DataFrame: A pandas DataFrame object containing the result of the query.
+
+    See also [create_stick_spectrum][Moose.Simulation.create_stick_spectrum]
     """
     path = pathlib.Path(path) if path is not None else resources.files("Moose") / "data"
     if ".db" not in db_name:
@@ -88,9 +92,11 @@ def query_DB(
     if kind.lower() == "emission":
         q_kind = "A"
         q_from_state = "upper"
+        q_to_state = "lower"
     elif kind.lower() == "absorption":
         q_kind = "B"
         q_from_state = "lower"
+        q_to_state = "upper"
     else:
         msg = f"Expected either 'emission' or 'absorption', got {kind}"
         raise ValueError(msg)
@@ -98,18 +104,23 @@ def query_DB(
         msg = f"`mode` should be either `air` or `vacuum`, got {mode}"
         raise ValueError(msg)
 
-    query = f"""SELECT lines.id, {q_kind}, upper_state, branch, vacuum_wavelength, air_wavelength, wavenumber, lower_state, E_J, J, component, E_v, v 
-    FROM lines INNER JOIN {q_from_state}_states on {q_from_state}_state={q_from_state}_states.id
+    query = f"""SELECT {q_kind}, upper_state, branch, vacuum_wavelength, air_wavelength, wavenumber, lower_state, 
+    upper_states.E_J as E_J, upper_states.J as J, upper_states.component as component, upper_states.E_v as E_v, upper_states.v as v,
+    lower_states.J as J_lower, lower_states.v as v_lower, lower_states.component as component_lower,
+    (lower_states.v-upper_states.v) as Dv, (lower_states.J-upper_states.J) as DJ 
+    FROM lines 
+    INNER JOIN {q_from_state}_states on lines.{q_from_state}_state={q_from_state}_states.id
+    INNER JOIN {q_to_state}_states on lines.{q_to_state}_state={q_to_state}_states.id
     WHERE lines.{mode.lower()}_wavelength between :wl_min and :wl_max
     """
 
     params = {"wl_min": wl_min, "wl_max": wl_max}
     if J_max is not None:
         params["Jmax"] = J_max
-        query += " and J<=:Jmax"
+        query += f" and {q_from_state}_states.J<=:Jmax"
     if v_max is not None:
         params["vmax"] = v_max
-        query += " and v<=:vmax "
+        query += f" and {q_from_state}_states.v<=:vmax "
 
     query += f" ORDER BY {mode.lower()}_wavelength"
 
@@ -126,30 +137,31 @@ def create_stick_spectrum(
     kind: Literal["Absorption", "Emission"] = "Emission",
     wl_mode: Literal["air", "vacuum"] = "air",
 ) -> np.ndarray:
-    """Create a stick spectrum based on the data retrieved from a SQL database with the `query_DB` function.
+    """Create a stick spectrum based on the data retrieved from a SQL database with the [query_DB][Moose.Simulation.query_DB] function.
 
     Alternatively, can be provided with any pandas DataFrame that has the requisite columns for the calculation.
 
-    Arguments:
+    Args:
         T_vib (float):          Vibrational temperature
         T_rot (float):          Rotational temperature
         df_db (pd.DataFrame):   A pandas DataFrame containing the database data
         kind (str):             Either 'Absorption' or 'Emission' depending on the kind of spectrum to simulate.
         wl_mode (str):          Either 'air' or 'vacuum' depending which equivalent we want for the wavelength.
 
+    See also [query_DB][Moose.Simulation.query_DB] and [equidistant_mesh][Moose.Simulation.equidistant_mesh]
     """
     # if not isinstance(df_db, pd.DataFrame):
     if not hasattr(df_db, "__dataframe__"):  # accept objects implementing dataframe interchange protocol
         errmsg = "No Dataframe with database data supplied as kwarg"
         raise TypeError(errmsg)
-    kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
+
     pops = (2 * df_db["J"] + 1) * np.exp(-df_db["E_v"] / (kB * T_vib) - df_db["E_J"] / (kB * T_rot))
     pops /= pops.sum()
-    if kind == "Emission":
+    if kind.capitalize() == "Emission":
         y = pops * df_db["A"]
-    elif kind == "Absorption":
+    elif kind.capitalize() == "Absorption":
         y = pops * df_db["B"]
-    return np.array([df_db[f"{wl_mode}_wavelength"], y]).T
+    return np.column_stack((df_db[f"{wl_mode}_wavelength"], y))
 
 
 def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -> np.ndarray:
@@ -157,23 +169,44 @@ def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -
 
     The simulated line intensities are rebinned onto the equidistant mesh by summing their values, if multiple lines fall into the same bin.
 
-    Arguments:
+    In fact, each line contribution is binned to the two nearest bins, weighted by the inverse distance between the line position and bins.
+
+    This avoids discontinuities caused by lines jumping between bins for high resolution spectra and somewhat 'preserves' the information of the line position w.r.t. the bins.
+
+    The operation preserves the sum of the intensities.
+
+    Edge effects are avoided by extending the mesh beyond the input spectrum, with zero-padding for the intensities.
+
+    This is controlled with the `wl_pad` argument, which specifies the amount of nanomter to pad.
+
+    Args:
         sim (np.array):     The 2D numpy array containing a simulation
         wl_pad (float):     The padding of the wavelength axis in nm to avoid edge effects
         resolution (int):   The resolution at which to construct the equidistant mesh (per nanometer) compared to the simulation (default: 100)
 
     Returns:
         np.array:           A 2D array containing the mesh grid positions and corresponding stick values.
+
+    See also [create_stick_spectrum][Moose.Simulation.create_stick_spectrum]
     """
     delta = sim[-1, 0] - sim[0, 0] + 2 * wl_pad
     points = int(delta * resolution)
-    equid = np.linspace(sim[0, 0].min() - wl_pad, sim[:, 0].max() + wl_pad, points)
-    binned, _, _ = binned_statistic(sim[:, 0], sim[:, 1], statistic="sum", bins=equid)
-    wl_grid = (
-        equid[:-1] + (equid[1] - equid[0]) / 2
-    )  # grid at middle points of intervals
+    equid = np.linspace(sim[0, 0] - wl_pad, sim[-1, 0] + wl_pad, points)
 
-    return np.array([wl_grid, binned]).T
+    idx = np.searchsorted(equid, sim[:, 0], side="left")  # if `side`=left => finds: a[i-1] < v <= a[i]
+    indices = np.vstack(
+        (
+            idx - 1,
+            idx,
+        )
+    )
+    inv_dists = np.reciprocal(np.abs(sim[:, 0, np.newaxis] - equid[indices.T]))
+    inv_dists /= inv_dists.sum(axis=1, keepdims=True)
+
+    intens = np.zeros_like(equid)
+    np.add.at(intens, indices, (sim[:, 1, np.newaxis] * inv_dists).T)
+
+    return np.column_stack((equid, intens))
 
 
 def vgt(x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float) -> np.ndarray:
@@ -208,15 +241,15 @@ def apply_voigt(sim: np.array, sigma: float, gamma: float, norm: bool = False) -
         np.ndarray:           A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
     """
     x = sim[:, 0]
-    dim = int(len(x))
-    mu = (x[int(dim / 2) - 1] + x[int(dim / 2)]) / 2 if dim % 2 == 0 else x[int(dim / 2)]
+    dim = x.shape[0]
+    mu = (x[dim // 2 - 1] + x[dim // 2]) / 2 if dim % 2 == 0 else x[dim // 2]
 
     v = vgt(x, sigma, gamma, mu, 1, 0)
     conv = scipy.signal.fftconvolve(sim[:, 1], v, mode="same")
     if norm:
         conv /= scipy.integrate.trapezoid(conv, x)
 
-    return np.array([x, conv]).T
+    return np.column_stack((x, conv))
 
 
 def match_spectra(meas: np.array, sim: np.array) -> np.ndarray:
@@ -224,7 +257,7 @@ def match_spectra(meas: np.array, sim: np.array) -> np.ndarray:
 
     Make sure the simulation spans a larger range, fully containing the experimental range.
 
-    Effectively downsamples the simulation to the measurement x data points, interpolating the y values, for residual minimization
+    Effectively downsamples the simulation to the measurement x data points, interpolating the y values, for residual minimization.
 
     Arguments:
         meas (np.array)   :   A 2D array containing a single measurement of emission as function of wavelength
@@ -232,16 +265,14 @@ def match_spectra(meas: np.array, sim: np.array) -> np.ndarray:
 
     Returns:
         np.ndarray          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
-
     """
-
     interp = scipy.interpolate.interp1d(sim[:, 0], sim[:, 1])
     try:
         matched_y = interp(meas[:, 0])
     except ValueError as e:
         errmsg = f"Wavelength padding to low, adjust `wl_pad`\n{e.args}"
         raise ValueError(errmsg) from e
-    return np.array([meas[:, 0], matched_y]).T
+    return np.column_stack((meas[:, 0], matched_y))
 
 
 def model_for_fit(
@@ -283,8 +314,8 @@ def model_for_fit(
 
     Returns:
         np.ndarray:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.
-
     """
+    normalize = kwargs.pop("normalize", True)
     sticks = create_stick_spectrum(
         T_vib,
         T_rot,
@@ -295,9 +326,8 @@ def model_for_fit(
     refined = equidistant_mesh(sticks, wl_pad=wl_pad, resolution=resolution)
     simulation = apply_voigt(refined, sigma, gamma)
     sim_matched = match_spectra((x - mu).reshape(-1, 1), simulation)
-
-    # normalize to [0,1] rather than integral=1
-    val = sim_matched[:, 1]
-    sim_matched[:, 1] = (val - val.min()) / (val.max() - val.min())
-
+    if normalize is True:
+        # normalize to [0,1] rather than integral=1
+        val = sim_matched[:, 1]
+        sim_matched[:, 1] = (val - val.min()) / (val.max() - val.min())
     return A * sim_matched[:, 1] + b
