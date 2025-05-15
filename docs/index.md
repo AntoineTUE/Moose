@@ -2,15 +2,15 @@
 # Moose: Molecular Optical Emission Simulation for python
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10454339.svg)](https://doi.org/10.5281/zenodo.10454339)
+[![PyPI - Version](https://img.shields.io/pypi/v/moose-spectra)](https://pypi.org/project/moose-spectra/)
 ![GitHub License](https://img.shields.io/github/license/AntoineTUE/Moose)
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Documentation%20build)
+[![GitHub Workflow Status docs](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Docs)](https://antoinetue.github.io/Moose/)
 ![PyPI python versions](https://img.shields.io/pypi/pyversions/moose-spectra.svg)
 ![PyPI Downloads](https://img.shields.io/pypi/dm/moose-spectra)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/zenodo/10.5281/zenodo.10454339/)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/AntoineTUE/Moose/main)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
-
 
 Welcome to `Moose`, a python package for simulating optical emission spectra for diatomic molecules.
 

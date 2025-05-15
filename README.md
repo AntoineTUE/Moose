@@ -2,12 +2,13 @@
 # Moose: Molecular optical emission spectroscopy for Python
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10454339.svg)](https://doi.org/10.5281/zenodo.10454339)
+[![PyPI - Version](https://img.shields.io/pypi/v/moose-spectra)](https://pypi.org/project/moose-spectra/)
 ![GitHub License](https://img.shields.io/github/license/AntoineTUE/Moose)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Documentation%20build)
+![GitHub Workflow Status build](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
+[![GitHub Workflow Status docs](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Docs)](https://antoinetue.github.io/Moose/)
 ![PyPI python versions](https://img.shields.io/pypi/pyversions/moose-spectra.svg)
 ![PyPI Downloads](https://img.shields.io/pypi/dm/moose-spectra)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/zenodo/10.5281/zenodo.10454339/)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/AntoineTUE/Moose/main)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 
@@ -44,13 +45,15 @@ Details can be found in [data_sources.txt](./Moose/data/data_sources.txt), and t
 
 ## Dependencies
 
-Dependencies are mainly specified in the [pyproject.toml](./pyproject.toml), the [requirements.txt](./requirements.txt) file is there solely to aid in deploying to Binder.
-See below for a table of these dependencies, which will be installed along with `Moose` if they are not present yet.
+Dependencies are mainly specified in the [pyproject.toml](./pyproject.toml).
+See below for a table of the core dependencies, which will be installed along with `Moose` if they are not present yet.
 Version numbers are just indications of the package versions that were used to develop the code, your mileage may vary using either older versions.
 Part of the automated test suite checks for compatibility of `numpy` and `pandas` version `<= 2.0` and `>= 2.0`, to ensure these older versions remain supported.
 
 Furthermore, even though the project does not import by default `lmfit` and contains no functions that specifically rely on it, the code contains convenience functions that were specifically written for usage with the `lmfit.Model` and `lmfit.Parameters` classes.
 If `lmfit` is installed in the active environment, some additional convenience function will be imported.
+
+Further optional dependecies can be installed by specifying the appropriate feature flags when installing `Moose`, see also [this doc page](https://antoinetue.github.io/Moose/get_started/).
 
 These dependencies will be installed when you install `Moose` using `pip` or `uv`.
 
@@ -63,7 +66,7 @@ These dependencies will be installed when you install `Moose` using `pip` or `uv
 
 ## Installation
 
-To simply install `Moose` itself, running the following suffices:
+To simply install `Moose` itself, running the following suffices (note that on PyPI it is known as `moose-spectra`):
 
 ```bash
 pip install moose-spectra
@@ -105,6 +108,9 @@ for col in data.columns[1:]:
     fits.append(model.Fit(data[col].values, x=data['Wavelength'].values, params=params))
 
 ```
+
+You can also try a cloud instance provided by Binder to run the Moose examples, or try it with your own data: [![Try Moose](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/AntoineTUE/Moose/main?urlpath=%2Fdoc%2Ftree%2F.%2Fdocs%2Fexamples%2Fmatplotlib.ipynb).
+
 
 ## Copyright notice from MassiveOES
 
