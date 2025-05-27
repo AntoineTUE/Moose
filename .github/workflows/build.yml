@@ -18,10 +18,8 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "pyproject.toml"
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: "pyproject.toml"
+          version: "latest"
+          activate-environment: true
       - name: Install build frontend
         run: uv pip install hatch
       - name: Build
