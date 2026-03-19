@@ -16,7 +16,7 @@ import scipy.integrate
 import scipy.signal
 import scipy.interpolate
 import scipy.constants as const
-from scipy.stats import binned_statistic
+from functools import lru_cache
 from typing import Literal, Union
 
 kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
@@ -46,6 +46,7 @@ thermal_default_params = {
 }
 
 
+@lru_cache(maxsize=32)
 def query_DB(
     db_name: str,
     wl: tuple = (0, 1e9),
