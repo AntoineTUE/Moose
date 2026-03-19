@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   # - id: trailing-whitespace
   - id: check-added-large-files
@@ -18,7 +18,7 @@ repos:
     args: ['--fix=auto']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: 'v0.11.9'  # make sure this is always consistent with hatch configs
+  rev: 'v0.15.6'  # make sure this is always consistent with hatch configs
   hooks:
     - id: ruff
     - id: ruff-format
