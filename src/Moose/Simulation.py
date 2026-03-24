@@ -154,11 +154,9 @@ def create_stick_spectrum(
 
     See also [query_DB][Moose.Simulation.query_DB] and [equidistant_mesh][Moose.Simulation.equidistant_mesh]
     """
-    # if not isinstance(df_db, pd.DataFrame):
-    if not hasattr(df_db, "__dataframe__"):  # accept objects implementing dataframe interchange protocol
-        errmsg = "No Dataframe with database data supplied as kwarg"
-        raise TypeError(errmsg)
-
+    # Simply check for None, so other compatible objects can be passed in that don't look like a dataframe at first (dask delayed)
+    if df_db is None:
+        raise TypeError("No Dataframe with line-by-line data supplied.")
     pops = (2 * df_db["J"] + 1) * np.exp(-df_db["E_v"] / (kB * T_vib) - df_db["E_J"] / (kB * T_rot))
     pops /= pops.sum()
     if kind.capitalize() == "Emission":
