@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "A package to simulate diatomic optical emission spectra relying on line-by-line databases compiled for MassiveOES"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     { name = "Antoine Salden", email = "t.p.w.salden@tue.nl" },
 ]
@@ -39,14 +39,15 @@ docs = [
     "mkdocs-material==9.7.0",
     "mkdocstrings", 
     "mkdocstrings-python",
-    "mkdocs-api-autonav", 
+    "mkdocs-gen-files", 
+    "mkdocs-literate-nav",
+    # "mkdocs-api-autonav", 
     "mkdocs-section-index", 
     "mkdocs-jupyter", 
     "mkdocs-git-revision-date-localized-plugin",
     "mkdocs-include-markdown-plugin",
     "mkdocstrings-python-xref",
     "mkdocs-github-admonitions-plugin",
-    "mike",
     "ruff>=0.14.2", 
     "pygments",
 ]
@@ -115,11 +116,13 @@ dependencies = ["ruff","ipykernel","ipython"]
 
 [tool.hatch.envs.docs]
 skip-install = true
+dependencies = ["mike==2.1.4"]
 features = ["docs"]
 
 [tool.hatch.envs.docs.scripts]
 serve = "mkdocs serve -f mkdocs.yml {args}"
 build = "mkdocs build --clean -f mkdocs.yml {args}"
+ci-build = "mike deploy --config-file mkdocs.yml --update-aliases {args}"
 
 [tool.hatch.envs.hatch-test.overrides]
 matrix.feature.dependencies = [

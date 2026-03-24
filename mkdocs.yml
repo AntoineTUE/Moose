@@ -91,10 +91,16 @@ plugins:
       - reference/*
     fallback_to_build_date: true
     enable_creation_date: true
-  api-autonav:
-    modules: ["src/Moose"]
-    exclude_private: true
-    nav_section_title: API Reference
+  # Does not work with mkdocs-jupyter due to virtual files created, which have no source dir
+  # api-autonav:
+  #   modules: ["src/Moose"]
+  #   exclude_private: true
+  #   nav_section_title: API Reference
+  gen-files:
+    scripts:
+    - docs/gen_ref_pages.py
+  literate-nav:
+    nav_file: SUMMARY.md
   section-index: {}
   mkdocstrings:
     default_handler: python_xref
@@ -142,7 +148,7 @@ nav:
 # - Principles: Theory.md
 - Citing: citing.md
 # defer to gen-files + literate-nav
-- API Reference
+- API Reference: reference/
 - Examples:
   - examples.md
   - Interactive plotting:

@@ -3,28 +3,39 @@ on:
   push:
     branches:
       - main
+    tags-ignore:
+      - v*
 permissions:
   contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-  deploy:
+  deploy_docs_dev:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
-      - uses: actions/cache@v3
+          python-version: '3.13'
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
-      - run: pip install mkdocs-material mkdocstrings mkdocstrings-python mkdocs-gen-files mkdocs-literate-nav mkdocs-section-index mkdocs-jupyter mkdocs-git-revision-date-localized-plugin 
-      - run: mkdocs gh-deploy --force
+          version: "latest"
+          enable-cache: true
+          python-version: '3.13'
+          activate-environment: true
+      - name: Install Hatch
+        run: uv pip install --upgrade --system hatch
+      - name: Deploy latest dev version docs
+        run: hatch run docs:ci-build --push dev
+      
