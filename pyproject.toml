@@ -34,6 +34,7 @@ Source = "https://github.com/AntoineTUE/Moose"
 Documentation = "https://antoinetue.github.io/Moose/"
 
 [project.optional-dependencies]
+fit = ["lmfit"]
 docs = [
     "mkdocs==1.6.1",
     "mkdocs-material==9.7.0",
