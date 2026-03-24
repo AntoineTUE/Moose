@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if page.nb_url %}
+    <a href="https://mybinder.org/v2/gh/AntoineTUE/Moose/main/?labpath=docs/examples/{{ page.nb_url.rsplit('/',1)[1] }}" title="Launch live Notebook" class="md-content__button md-icon">
+        <img src="https://mybinder.org/badge_logo.svg"/>
+    </a>
+{% endif %}
+
+{{ super() }}
+{% endblock content %}
