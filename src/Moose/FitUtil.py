@@ -1,5 +1,4 @@
-"""
-Contains convenience functions, to streamline the workflow a bit when using `lmfit` as a fitting library.
+"""Contains convenience functions, to streamline the workflow a bit when using `lmfit` as a fitting library.
 
 Whenever `lmfit` is installed in the currently active environment, these functions are imported into the `Moose` namespace as well.
 
@@ -11,7 +10,12 @@ import lmfit
 import numpy as np
 from .Simulation import default_params, thermal_default_params, model_for_fit, query_DB
 
+from .maintenance import deprecated
 
+from numpy.typing import NDArray
+
+
+@deprecated("Use built-in features of lmfit to set or update a Parameter on a Parameters container-object.")
 def set_param(
     params: lmfit.Parameters,
     param_name: str,
@@ -24,6 +28,7 @@ def set_param(
     params[param_name].set(value=value, min=min, max=max, vary=vary)
 
 
+@deprecated("Use built-in features of lmfit to update many parameters of a Parameters object.")
 def set_params(params: lmfit.Parameters, param_dict: dict = default_params, print: bool = False):
     """Set or modify a bunch of parameters using a dict in a `lmfit.Parameters` object."""
     for param in param_dict:

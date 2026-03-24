@@ -17,7 +17,11 @@ import scipy.signal
 import scipy.interpolate
 import scipy.constants as const
 from functools import lru_cache
-from typing import Literal, Union
+from typing import Literal
+
+from numpy.typing import NDArray
+
+from .maintenance import deprecated_keywords
 
 kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
 
@@ -54,7 +58,7 @@ def query_DB(
     mode: Literal["air", "vacuum"] = "air",
     v_max=None,
     J_max=None,
-    path: Union[str, pathlib.Path] = None,
+    path: str | pathlib.Path | None = None,
 ) -> pd.DataFrame:
     """Query a SQL database that must contain line-by-line information, compatible with the format used by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes).
 
@@ -137,7 +141,7 @@ def create_stick_spectrum(
     df_db: pd.DataFrame = None,
     kind: Literal["Absorption", "Emission"] = "Emission",
     wl_mode: Literal["air", "vacuum"] = "air",
-) -> np.ndarray:
+) -> NDArray:
     """Create a stick spectrum based on the data retrieved from a SQL database with the [query_DB][Moose.Simulation.query_DB] function.
 
     Alternatively, can be provided with any pandas DataFrame that has the requisite columns for the calculation.
@@ -227,6 +231,7 @@ def vgt(x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float) 
     return a * voigt_profile(x - mu, sigma, gamma) + b
 
 
+@deprecated_keywords("norm")
 def apply_voigt(sim: np.array, sigma: float, gamma: float, norm: bool = False) -> np.ndarray:
     """Apply Voigt broadening to a simulated stick spectrum, optionally normalizing the surface area to 1.
 
