@@ -10,24 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.13
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: "pyproject.toml"
           version: "latest"
           activate-environment: true
       - name: Install build frontend
-        run: uv pip install hatch
+        run: uv pip install --system --upgrade hatch
       - name: Build
         run: hatch build
       - name: Minimize uv cache
         run: uv cache prune --ci
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-artifacts
           path: dist/*
@@ -47,7 +51,7 @@ jobs:
       id-token: write
     steps:
       - name: Download python artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: python-artifacts
           path: dist
