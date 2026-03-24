@@ -34,6 +34,22 @@ Source = "https://github.com/AntoineTUE/Moose"
 Documentation = "https://antoinetue.github.io/Moose/"
 
 [project.optional-dependencies]
+docs = [
+    "mkdocs==1.6.1",
+    "mkdocs-material==9.7.0",
+    "mkdocstrings", 
+    "mkdocstrings-python",
+    "mkdocs-api-autonav", 
+    "mkdocs-section-index", 
+    "mkdocs-jupyter", 
+    "mkdocs-git-revision-date-localized-plugin",
+    "mkdocs-include-markdown-plugin",
+    "mkdocstrings-python-xref",
+    "mkdocs-github-admonitions-plugin",
+    "mike",
+    "ruff>=0.14.2", 
+    "pygments",
+]
 examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel", "ipympl", "dask[distributed]"]
 all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]"]
 

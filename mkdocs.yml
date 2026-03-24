@@ -1,9 +1,13 @@
 site_name: "Moose Docs"
+site_description : "Simulate diatomic spectra in python based on line-by-line databases."
 site_author: Antoine Salden
 site_url: https://antoinetue.github.io/Moose/
 repo_name: AntoineTUE/Moose
 repo_url: https://github.com/AntoineTUE/Moose
+copyright: 'Copyright &copy; Antoine Salden 2024-present'
 
+docs_dir: docs
+site_dir: site
 theme:
   name: material
   logo: assets/moose.svg
@@ -21,8 +25,8 @@ theme:
       primary: green
       accent: pink
       toggle:
-         icon: material/brightness-7 
-         name: Switch to dark mode
+        icon: material/brightness-7 
+        name: Switch to dark mode
     - scheme: slate
       primary: indigo
       accent: pink
@@ -69,28 +73,43 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js
 
 plugins:
-- search
-- autorefs
-- mkdocs-jupyter:
+  search: {}
+  autorefs: {}
+  gh-admonitions: {}
+  mike:
+    alias_type: copy
+    canonical_version: "latest"
+    version_selector: true
+  mkdocs-jupyter:
     include_requirejs: true
     include_source: true
     include: ["*.ipynb"]
     ignore: ["*/.ipynb_checkpoints/*.ipynb"]
     custom_mathjax_url: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe" #https://github.com/danielfrg/mkdocs-jupyter/issues/227
-- git-revision-date-localized:
+  git-revision-date-localized:
     exclude:
       - reference/*
-- gen-files:
-    scripts:
-    - docs/gen_ref_pages.py
-- literate-nav:
-    nav_file: SUMMARY.md
-- section-index
-- mkdocstrings:
+    fallback_to_build_date: true
+    enable_creation_date: true
+  api-autonav:
+    modules: ["src/Moose"]
+    exclude_private: true
+    nav_section_title: API Reference
+  section-index: {}
+  mkdocstrings:
+    default_handler: python_xref
     handlers:
-      python:
-        paths: [src]
+      python_xref:
+        inventories:
+          - https://numpy.org/doc/stable/objects.inv
+          - https://lmfit.github.io/lmfit-py/objects.inv
+          - http://pandas.pydata.org/pandas-docs/stable/objects.inv
+        paths: 
+          - src
         options:
+          members_order: source
+          relative_crossrefs: true
+          signature_crossrefs: true
           heading_level: 2
           summary: true
           docstring_style: google
@@ -98,13 +117,12 @@ plugins:
             ignore_init_summary: no
           merge_init_into_class: no
           show_submodules: no
-          # Headings
           show_root_heading: true
           show_root_full_path: true
           show_root_members_full_path: false
           #Docstrings
           show_if_no_docstring: true
-          show_docstring_attributes: false
+          show_docstring_attributes: true
           show_docstring_functions: true
           #Signatures/Annotations
           annotations_path: brief
@@ -115,6 +133,8 @@ plugins:
           show_bases: true
           show_symbol_type_heading: true
           show_symbol_type_toc: true
+          extra:
+            show_docstrings_modules: true
 
 nav:
 - index.md
@@ -122,7 +142,7 @@ nav:
 # - Principles: Theory.md
 - Citing: citing.md
 # defer to gen-files + literate-nav
-- Code Reference: reference/
+- API Reference
 - Examples:
   - examples.md
   - Interactive plotting:
@@ -135,3 +155,10 @@ nav:
 
 watch:
 - src/Moose
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/AntoineTUE/Moose
