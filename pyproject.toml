@@ -17,10 +17,11 @@ classifiers = [
     "Operating System :: OS Independent",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14"
 ]
 dependencies = [
     "numpy",
@@ -33,9 +34,7 @@ Source = "https://github.com/AntoineTUE/Moose"
 Documentation = "https://antoinetue.github.io/Moose/"
 
 [project.optional-dependencies]
-fit = ["lmfit"]
-docs = ["mkdocs-material","mkdocstrings", "mkdocstrings-python", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-section-index", "mkdocs-jupyter", "mkdocs-git-revision-date-localized-plugin","black", "pygments"]
-examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel", "ipympl", "dask"]
+examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel", "ipympl", "dask[distributed]"]
 all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]"]
 
 [tool.hatch.version]
@@ -43,7 +42,7 @@ source = "vcs"
 fallback-version = "0.0.1dev"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "_version.py"
+version-file = "./src/Moose/_version.py"
 
 [tool.setuptools_scm]
 
@@ -75,7 +74,7 @@ exclude = ["test", "docs/examples"]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F","C4", "SIM", "TC", "NPY", "PD","B","UP","D"]
-ignore = ["PD901","F401"]
+ignore = ["F401"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
@@ -96,7 +95,7 @@ markers = ["lmfit: mark test to run when lmfit is present" ]
 installer = "uv"
 features = ["examples"]
 post-install-commands = ["pre-commit install"]
-dependencies = ["ruff"]
+dependencies = ["ruff","ipykernel","ipython"]
 
 [tool.hatch.envs.docs]
 skip-install = true
@@ -112,11 +111,17 @@ matrix.feature.dependencies = [
   { value = "numpy<2.0", if = ["pandas-legacy"]},
   { value = "pandas>=2.0.0", if = ["pandas-2.0"] },
   { value = "numpy>=2.0", if = ["pandas-2.0"] },
+    { value = "pandas>=3.0.0", if = ["pandas-3.0"] },
+    { value = "numpy>=2.0", if = ["pandas-3.0"] },
 ]
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.9","3.10", "3.11","3.12"]
+python = ["3.10","3.11"]
 feature = ["pandas-legacy","pandas-2.0"]
+
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.11","3.12","3.13","3.14"]
+feature = ["pandas-2.0","pandas-3.0"]
 
 [tool.uv]
 cache-keys = [{ git = true }]
