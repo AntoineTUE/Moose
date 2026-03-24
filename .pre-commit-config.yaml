@@ -17,9 +17,10 @@ repos:
   - id: mixed-line-ending
     args: ['--fix=auto']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
 
-- repo: https://github.com/charliermarsh/ruff-pre-commit
+- repo: https://github.com/astral-sh/ruff-pre-commit
   rev: 'v0.15.6'  # make sure this is always consistent with hatch configs
   hooks:
-    - id: ruff
+    - id: ruff-check
+      types_or: [ python, pyi ]
     - id: ruff-format
-      args: [--check, --config, ./pyproject.toml]
+      types_or: [ python, pyi ]
