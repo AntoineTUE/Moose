@@ -83,7 +83,7 @@ include = [
     "mkdocs.yml"
 ]
 exclude = [
-    "_version.py"
+    "src/Moose/_version.py"
 ]
 
 [tool.ruff]

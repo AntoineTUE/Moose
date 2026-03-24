@@ -96,6 +96,7 @@ class TestSimulation:
                 [0.55848119, 0.44151881],
                 [0.50587474, 0.49412526],
             ],
+            strict=True,
         ):
             sticks = Simulation.create_stick_spectrum(t, t, db)
             assert_allclose(sticks, np.array([[300.0, 400.0], result]).T)
@@ -137,9 +138,12 @@ class TestSimulation:
         matched = Simulation.match_spectra(meas, sim)
         assert matched.shape == meas.shape
 
-        meas = np.array([np.linspace(-200, 200, 70), self.rng.random(70)]).T
-        with pytest.raises(ValueError):
-            Simulation.match_spectra(meas, sim)
+    def test_match_spectra_measurement_beyond_simulation(self):
+        sim = np.array([np.linspace(0, 100, 100), np.ones(100)]).T
+        meas = np.array([np.linspace(-200, 100, 50), self.rng.random(50) * 100]).T
+        matched = Simulation.match_spectra(meas, sim)
+        idx_0 = np.abs(meas[:, 0]).argmin()
+        assert_allclose(matched[: idx_0 - 1, 1], np.zeros(idx_0 - 1))
 
     def test_match_with_equidistant_mesh_padding(self):
         sticks = np.array([np.linspace(100, 200, 1000), self.rng.random(1000)]).T
@@ -148,9 +152,42 @@ class TestSimulation:
         matched = Simulation.match_spectra(meas, equid)
         assert matched[0, 0] > sticks[0, 0] - 10
         assert matched[-1, 0] < sticks[-1, 0] + 10
-        equid = Simulation.equidistant_mesh(sticks, wl_pad=8)
-        with pytest.raises(ValueError):
-            matched = Simulation.match_spectra(meas, equid)
+
+    #     equid = Simulation.equidistant_mesh(sticks, wl_pad=8)
+    #     with pytest.raises(ValueError):
+    #         matched = Simulation.match_spectra(meas, equid)
+
+    def test_match_spectra_with_exact_points(self):
+        """Test if matching works when coordinates are exact matches"""
+        meas = np.array([[0.0, 10.0], [1.0, 20.0], [2.0, 30.0]])
+        sim = np.array([[0.0, 100.0], [1.0, 200.0], [2.0, 300.0]])
+
+        output = Simulation.match_spectra(meas, sim)
+        assert output.shape == sim.shape
+        assert_allclose(output, sim)
+
+    def test_match_spectra_in_between(self):
+        """Test if matching works when coordinates are exact matches"""
+        meas = np.array([[0.5, 0], [1.5, 0]])
+        sim = np.array([[0.0, 100.0], [1.0, 200.0], [2.0, 300.0]])
+
+        output = Simulation.match_spectra(meas, sim)
+        expected = np.array([[0.5, 150], [1.5, 250]])
+        assert output.shape == expected.shape
+        assert_allclose(output, expected)
+
+    def test_match_spectra_raise_when_not_strictly_increasing(self):
+        """numpy.interp only works with a strictly increasing grid.
+
+        Though numpy does not enforce this by a check, the docs warn that result will be meaningless and provide a check.
+        """
+        meas = np.array([[0.5, 0], [1.5, 0]])
+        sim = np.array([[0.0, 100.0], [-1.0, 200.0], [2.0, 300.0]])
+        with pytest.raises(ValueError, match=".*strictly increasing.*"):
+            Simulation.match_spectra(meas, sim, 0)
+
+    # def test_match_spectra_not_middle(self):
+    #     """Test when the measured coordinates don't align nicely with simulated ones."""
 
     def test_model_for_fit(self):
         db = pd.DataFrame(

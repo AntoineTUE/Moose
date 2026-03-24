@@ -14,7 +14,6 @@ import pathlib
 from scipy.special import voigt_profile
 import scipy.integrate
 import scipy.signal
-import scipy.interpolate
 import scipy.constants as const
 from functools import lru_cache
 from typing import Literal
@@ -258,27 +257,33 @@ def apply_voigt(sim: np.array, sigma: float, gamma: float, norm: bool = False) -
     return np.column_stack((x, conv))
 
 
-def match_spectra(meas: np.array, sim: np.array) -> np.ndarray:
-    """Match a simulation to the same x-axis as the measurement using interpolation.
+def match_spectra(meas: np.array, sim: np.array, shift=0) -> np.ndarray:
+    """Match a simulation to the same x-axis as the measurement using interpolation, with an optional shift.
 
     Make sure the simulation spans a larger range, fully containing the experimental range.
+
+    If this is not the case, the missing data is assumed 0.
+
+    Additionally, the x-axis of the simulation must be strictly increasing (see [numpy.interp][])
 
     Effectively downsamples the simulation to the measurement x data points, interpolating the y values, for residual minimization.
 
     Arguments:
-        meas (np.array)   :   A 2D array containing a single measurement of emission as function of wavelength
-        sim  (np.array)   :   A 2D array containing a simulated spectrum.
+        meas (np.array):    A 2D array containing a single measurement of emission as function of wavelength
+        sim  (np.array):    A 2D array containing a simulated spectrum.
+        shift (float):      Wavelength shift to apply in nanometer, default: 0.
 
     Returns:
         np.ndarray          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
     """
-    interp = scipy.interpolate.interp1d(sim[:, 0], sim[:, 1])
-    try:
-        matched_y = interp(meas[:, 0])
-    except ValueError as e:
-        errmsg = f"Wavelength padding to low, adjust `wl_pad`\n{e.args}"
-        raise ValueError(errmsg) from e
-    return np.column_stack((meas[:, 0], matched_y))
+    # TODO: implement first/second order corrections on the measured x data
+    x_meas = meas if np.ndim(meas) == 1 else meas[:, 0]
+    x_meas = x_meas - shift
+    # Check that arg `xp` (of np.interp) is strictly increasing first, this is required but not checked by numpy.
+    if np.diff(sim[:, 0]).min() < 0:
+        raise ValueError("The x-axis of `sim` must be strictly increasing")
+    matched_y = np.interp(x_meas, sim[:, 0], sim[:, 1], left=0, right=0)
+    return np.column_stack((x_meas, matched_y))
 
 
 def model_for_fit(
@@ -331,7 +336,7 @@ def model_for_fit(
     )
     refined = equidistant_mesh(sticks, wl_pad=wl_pad, resolution=resolution)
     simulation = apply_voigt(refined, sigma, gamma)
-    sim_matched = match_spectra((x - mu).reshape(-1, 1), simulation)
+    sim_matched = match_spectra(x, simulation, shift=mu)
     if normalize is True:
         # normalize to [0,1] rather than integral=1
         val = sim_matched[:, 1]
