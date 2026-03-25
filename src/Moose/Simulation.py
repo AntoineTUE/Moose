@@ -229,29 +229,43 @@ def vgt(x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float) 
 
 
 @deprecated_keywords("norm")
-def apply_voigt(sim: np.array, sigma: float, gamma: float, norm: bool = False) -> np.ndarray:
-    """Apply Voigt broadening to a simulated stick spectrum, optionally normalizing the surface area to 1.
+def apply_voigt(
+    sim: NDArray, sigma: float, gamma: float, resolution: float | int = 100, norm: bool | None = None
+) -> NDArray:
+    """Apply Voigt broadening to a simulated equidistant spectrum, preserving the integral.
 
-    To avoid repeated (different) normalisations from being used while fitting, it defaults to False.
+    The x-axis of the simulation `sim` must be an equidistant grid, where `resolution` is the inverse of the grid-spacing.
+
+    See also [equidistant_mesh][Moose.Simulation.equidistant_mesh].
+
+    Note that `sigma` is defined as the Gaussian standard deviation, while `gamma` is the Lorentzian Half-Width-at-Half-Maximum.
+
+    That means these widths are not one-to-one comparable but should be converted to HWHM of FHWM.
+
+    Warning:
+        Though the function accepts a "norm=True" keyword argument, this is considered deprecated behaviour and will not do anything.
+
+        It will be removed in the future, which will cause an error to be thrown.
 
     Arguments:
-        sim (np.array):     A (stick) simulation
-        sigma (float):      The Gaussian sigma for the voigt
-        gamma (float):      The Lorentzian gamma (HWHM) for the voigt
-        norm (bool):        Boolean to toggle normalizing (default: False)
+        sim (np.array):         A (stick) simulation
+        sigma (float):          The Gaussian sigma (standard deviation) for the voigt
+        gamma (float):          The Lorentzian gamma (HWHM) for the voigt
+        resolution (float|int): The resolution of the equidistant grid, equal to 1/grid_spacing, default: 100.
+        norm (bool):            DEPRECATED, has no effect ~Boolean to toggle normalizing (default: False)~
 
     Returns:
-        np.ndarray:           A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
+        A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
     """
     x = sim[:, 0]
+    dx = 1 / resolution
     dim = x.shape[0]
-    mu = (x[dim // 2 - 1] + x[dim // 2]) / 2 if dim % 2 == 0 else x[dim // 2]
+    mu = (x[dim // 2 - 1] + x[dim // 2]) / 2.0 if dim % 2 == 0 else x[dim // 2]
 
     v = vgt(x, sigma, gamma, mu, 1, 0)
-    conv = scipy.signal.fftconvolve(sim[:, 1], v, mode="same")
-    if norm:
-        conv /= scipy.integrate.trapezoid(conv, x)
-
+    # uses trapezoid over simpson for faster evaluation, negligible error for fine grids.
+    conv = scipy.signal.fftconvolve(sim[:, 1], v / scipy.integrate.trapezoid(v, x), mode="same") * dx
+    # TODO: only return convolved y data, since x does not change? save memory/cpu impact.
     return np.column_stack((x, conv))
 
 

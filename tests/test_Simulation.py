@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 
 from scipy.special import voigt_profile
+from scipy.signal import fftconvolve
+from scipy.integrate import trapezoid
 from sqlite3 import DatabaseError, OperationalError
 from importlib import resources
 from pandas.testing import assert_frame_equal
@@ -131,15 +133,22 @@ class TestSimulation:
         assert_array_equal(Simulation.vgt(x, 0.2, 0.2, 0, 1, 0), voigt_profile(x, 0.2, 0.2))
         assert_allclose(Simulation.vgt(x, 0.1, 0.1, 0.1, 1, 0), voigt_profile(x - 0.1, 0.1, 0.1))
 
-    def test_apply_voigt(self):
-        sticks = np.array([np.linspace(-1, 1, 100), np.zeros(100)]).T
-        sticks[50, 1] = 1
+    @pytest.mark.parametrize("points", [100, 300, 1000])
+    def test_apply_voigt(self, points):
+        peaks = 5
+        sticks = np.array([np.linspace(329, 331, points), np.zeros(points)]).T
+        sticks[self.rng.integers(int(points * 0.35), int(points * 0.65), peaks), 1] = self.rng.uniform(1, 10, peaks)
+        dx = sticks[1, 0] - sticks[0, 0]
+        v_true = voigt_profile(sticks[:, 0] - 330, 0.1, 0.1)
+        expected = fftconvolve(sticks[:, 1], v_true / trapezoid(v_true, sticks[:, 0]), mode="same") * dx
+        broadened = Simulation.apply_voigt(sticks, 0.1, 0.1, 1 / dx)
         assert_allclose(
-            Simulation.apply_voigt(sticks, 0.1, 0.1, False)[:, 1],
-            np.convolve(sticks[:, 1], voigt_profile(sticks[:, 0], 0.1, 0.1), mode="same"),
+            broadened,
+            np.column_stack((sticks[:, 0], expected)),
             atol=1e-12,
             rtol=1e-12,
         )
+        assert_allclose(trapezoid(broadened[:, 1], broadened[:, 0]), trapezoid(sticks[:, 1], sticks[:, 0]), rtol=2e-2)
 
     def test_match_spectra(self):
         sim = np.array([np.linspace(0, 100, 100), self.rng.random(100)]).T
@@ -236,7 +245,9 @@ class TestSimulation:
         )
         assert_allclose(simulated, outcome, atol=5e-5, rtol=0.05)
         with pytest.raises(TypeError):
-            Simulation.model_for_fit(np.linspace(300, 400, 10), T_rot=300, T_vib=300, sigma=1, gamma=1, mu=0, A=1, b=0)
+            Simulation.model_for_fit(
+                np.linspace(300, 400, 10), T_rot=300, T_vib=300, sigma=1, gamma=1, mu=0, A=1, b=0, sim_db=None
+            )
 
     def test_query_execution(self, temp_db):
         df = Simulation.query_DB("test", path=temp_db.parent)
