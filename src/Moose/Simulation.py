@@ -310,15 +310,29 @@ def model_for_fit(
     resolution: int = 100,
     wl_pad: float = 10,
     sim_db: pd.DataFrame = None,
+    normalize: bool = True,
     **kwargs,
 ) -> np.ndarray:
-    """Model function with function signature compatible for usage with [lmfit](https://lmfit.github.io/lmfit-py/).Model.
+    """Model function with function signature compatible for usage with [lmfit.model.Model][].
 
     Creates and broadens an equidistant stick spectrum from the provided simulation database.
 
     After broadening, resamples the simulation to the same coordinates as the (measured) data.
 
-    Returns a spectrum normalized on the interval [b,A+b].
+    Returns a spectrum normalized on the interval [b,A+b], if normalize=True.
+
+    Usage:
+    ```python
+    import lmfit
+    import Moose
+
+    db = Moose.query_DB("N2CB")
+
+    params = lmfit.create_params(**Moose.default_params)
+    model = lmfit.Model(Moose.model_for_fit,normalize=True,sim_db=db, independent_vars=["x"])
+
+    result = model.fit(y=...,x=..., params=params)
+    ```
 
     Arguments:
         x (np.array):               The x-axis of the (measured) data that we want to compare/fit against
@@ -334,11 +348,11 @@ def model_for_fit(
         resolution (int):           The resolution per nanometer of  the equidistant mesh compared to bin/sample simulation by (default: 100)
         mode (str, optional):       The mode of the spectrum, i.e. 'Emission' versus 'Absorption' (default: Emission)
         wl_mode (str, optional):    Whether to use 'air' vs 'vacuum' wavelength (default: air)
+        normalize (bool):           A flag to normalize the spectrum, before scaling by `A` and `b`.
 
     Returns:
         np.ndarray:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.
     """
-    normalize = kwargs.pop("normalize", True)
     sticks = create_stick_spectrum(
         T_vib,
         T_rot,
