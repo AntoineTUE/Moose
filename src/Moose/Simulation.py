@@ -347,7 +347,7 @@ def model_for_fit(
         wl_mode=kwargs.pop("wl_mode", "air"),
     )
     refined = equidistant_mesh(sticks, wl_pad=wl_pad, resolution=resolution)
-    simulation = apply_voigt(refined, sigma, gamma)
+    simulation = apply_voigt(refined, sigma, gamma, resolution=resolution)
     sim_matched = match_spectra(x, simulation, shift=mu)
     if normalize is True:
         # normalize to [0,1] rather than integral=1
