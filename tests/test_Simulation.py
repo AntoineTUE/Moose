@@ -76,7 +76,7 @@ class TestSimulation:
                 "air_wavelength": [300, 400],
             }
         )
-        sticks = Simulation.create_stick_spectrum(300, 3000, db)
+        sticks = Simulation.create_stick_spectrum(300, 3000, df_db=db)
         assert_array_equal(sticks, np.array([[300.0, 0.5], [400, 0.5]]))
         assert sticks[:, 1].sum() == 1
 
@@ -98,14 +98,24 @@ class TestSimulation:
             ],
             strict=True,
         ):
-            sticks = Simulation.create_stick_spectrum(t, t, db)
+            sticks = Simulation.create_stick_spectrum(t, t, df_db=db)
             assert_allclose(sticks, np.array([[300.0, 400.0], result]).T)
             assert sticks[:, 1].sum() == 1
 
     @pytest.mark.parametrize("db", [None, np.zeros(10), {}])
     def test_create_stick_spectrum_not_valid_DB(self, db):
-        with pytest.raises(TypeError):
-            Simulation.create_stick_spectrum(300, 300, db)
+        print(db)
+        if db is None:
+            error = TypeError
+            info = "No Dataframe with line-by-line"
+        if isinstance(db, np.ndarray):
+            error = IndexError
+            info = "only integers"
+        if isinstance(db, dict):
+            error = KeyError
+            info = "J"
+        with pytest.raises(error, match=info):
+            Simulation.create_stick_spectrum(300, 300, df_db=db)
 
     @pytest.mark.parametrize("points", [10, 1000, 10000])
     @pytest.mark.parametrize("resolution", [10, 1000])
