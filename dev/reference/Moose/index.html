@@ -999,7 +999,7 @@
               <td><code><a class="autorefs autorefs-internal" title="            model_for_fit (Moose.model_for_fit)" href="#Moose.model_for_fit">model_for_fit</a></code></td>
               <td>
                 <div class="doc-md-description">
-                  <p>Model function with function signature compatible for usage with <a href="https://lmfit.github.io/lmfit-py/">lmfit</a>.Model.</p>
+                  <p>Model function with function signature compatible for usage with <a class="autorefs autorefs-external" href="https://lmfit.github.io/lmfit-py/model.html#lmfit.model.Model">lmfit.model.Model</a>.</p>
                 </div>
               </td>
             </tr>
@@ -2433,16 +2433,28 @@
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">wl_pad</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">sim_db</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pandas.DataFrame" href="http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a></span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">normalize</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Model function with function signature compatible for usage with <a href="https://lmfit.github.io/lmfit-py/">lmfit</a>.Model.</p>
+        <p>Model function with function signature compatible for usage with <a class="autorefs autorefs-external" href="https://lmfit.github.io/lmfit-py/model.html#lmfit.model.Model">lmfit.model.Model</a>.</p>
 <p>Creates and broadens an equidistant stick spectrum from the provided simulation database.</p>
 <p>After broadening, resamples the simulation to the same coordinates as the (measured) data.</p>
-<p>Returns a spectrum normalized on the interval [b,A+b].</p>
+<p>Returns a spectrum normalized on the interval [b,A+b], if normalize=True.</p>
+<p>Usage:
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">lmfit</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">Moose</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">db</span> <span class="o">=</span> <span class="n">Moose</span><span class="o">.</span><span class="n">query_DB</span><span class="p">(</span><span class="s2">&quot;N2CB&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">params</span> <span class="o">=</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">create_params</span><span class="p">(</span><span class="o">**</span><span class="n">Moose</span><span class="o">.</span><span class="n">default_params</span><span class="p">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">model</span> <span class="o">=</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">Moose</span><span class="o">.</span><span class="n">model_for_fit</span><span class="p">,</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">sim_db</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">independent_vars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y</span><span class="o">=...</span><span class="p">,</span><span class="n">x</span><span class="o">=...</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+</code></pre></div></p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2664,6 +2676,22 @@
                 <em>required</em>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>normalize</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A flag to normalize the spectrum, before scaling by <code>A</code> and <code>b</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -2748,7 +2776,21 @@
 <span class="normal"><a href="#__codelineno-0-353">353</a></span>
 <span class="normal"><a href="#__codelineno-0-354">354</a></span>
 <span class="normal"><a href="#__codelineno-0-355">355</a></span>
-<span class="normal"><a href="#__codelineno-0-356">356</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_for_fit</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
+<span class="normal"><a href="#__codelineno-0-357">357</a></span>
+<span class="normal"><a href="#__codelineno-0-358">358</a></span>
+<span class="normal"><a href="#__codelineno-0-359">359</a></span>
+<span class="normal"><a href="#__codelineno-0-360">360</a></span>
+<span class="normal"><a href="#__codelineno-0-361">361</a></span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
+<span class="normal"><a href="#__codelineno-0-368">368</a></span>
+<span class="normal"><a href="#__codelineno-0-369">369</a></span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_for_fit</span><span class="p">(</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -2760,50 +2802,64 @@
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="n">wl_pad</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">sim_db</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Model function with function signature compatible for usage with [lmfit](https://lmfit.github.io/lmfit-py/).Model.</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Creates and broadens an equidistant stick spectrum from the provided simulation database.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    After broadening, resamples the simulation to the same coordinates as the (measured) data.</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Returns a spectrum normalized on the interval [b,A+b].</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    Arguments:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        x (np.array):               The x-axis of the (measured) data that we want to compare/fit against</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        sigma (float):              Gaussian broadening width of Voigt</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        gamma (float):              Lorentzian broadening width of Voigt</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        mu (float):                 The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        T_rot (float):              The rotational temperature in Kelvin</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        T_vib (float):              The vibrational temperature in Kelvin</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        A (float):                  The amplitude scaling factor of the spectrum (default: 1)</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        b (float):                  The offset w.r.t. 0 of the spectrum (default: 0)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        sim_db (DataFrame):         The DataFrame containing the database used for the simulation.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        wl_pad (float):             The amount of nanometer to pad the x-axis of the simulation with to avoid edge effects. Default: 10</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        resolution (int):           The resolution per nanometer of  the equidistant mesh compared to bin/sample simulation by (default: 100)</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        mode (str, optional):       The mode of the spectrum, i.e. &#39;Emission&#39; versus &#39;Absorption&#39; (default: Emission)</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        wl_mode (str, optional):    Whether to use &#39;air&#39; vs &#39;vacuum&#39; wavelength (default: air)</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        np.ndarray:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="n">normalize</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;normalize&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="n">sticks</span> <span class="o">=</span> <span class="n">create_stick_spectrum</span><span class="p">(</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="n">T_vib</span><span class="p">,</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">T_rot</span><span class="p">,</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="n">sim_db</span><span class="p">,</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="n">kind</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;mode&quot;</span><span class="p">,</span> <span class="s2">&quot;Emission&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="n">wl_mode</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;wl_mode&quot;</span><span class="p">,</span> <span class="s2">&quot;air&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="p">)</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="n">refined</span> <span class="o">=</span> <span class="n">equidistant_mesh</span><span class="p">(</span><span class="n">sticks</span><span class="p">,</span> <span class="n">wl_pad</span><span class="o">=</span><span class="n">wl_pad</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="n">simulation</span> <span class="o">=</span> <span class="n">apply_voigt</span><span class="p">(</span><span class="n">refined</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="n">sim_matched</span> <span class="o">=</span> <span class="n">match_spectra</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">mu</span><span class="p">)</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>    <span class="k">if</span> <span class="n">normalize</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="c1"># normalize to [0,1] rather than integral=1</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="n">val</span> <span class="o">=</span> <span class="n">sim_matched</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="n">sim_matched</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">val</span> <span class="o">-</span> <span class="n">val</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">val</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="k">return</span> <span class="n">A</span> <span class="o">*</span> <span class="n">sim_matched</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Model function with function signature compatible for usage with [lmfit.model.Model][].</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Creates and broadens an equidistant stick spectrum from the provided simulation database.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    After broadening, resamples the simulation to the same coordinates as the (measured) data.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Returns a spectrum normalized on the interval [b,A+b], if normalize=True.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Usage:</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    ```python</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    import lmfit</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    import Moose</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    db = Moose.query_DB(&quot;N2CB&quot;)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">    params = lmfit.create_params(**Moose.default_params)</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    model = lmfit.Model(Moose.model_for_fit,normalize=True,sim_db=db, independent_vars=[&quot;x&quot;])</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    result = model.fit(y=...,x=..., params=params)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">    ```</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    Arguments:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        x (np.array):               The x-axis of the (measured) data that we want to compare/fit against</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        sigma (float):              Gaussian broadening width of Voigt</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        gamma (float):              Lorentzian broadening width of Voigt</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        mu (float):                 The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        T_rot (float):              The rotational temperature in Kelvin</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        T_vib (float):              The vibrational temperature in Kelvin</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        A (float):                  The amplitude scaling factor of the spectrum (default: 1)</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        b (float):                  The offset w.r.t. 0 of the spectrum (default: 0)</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        sim_db (DataFrame):         The DataFrame containing the database used for the simulation.</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        wl_pad (float):             The amount of nanometer to pad the x-axis of the simulation with to avoid edge effects. Default: 10</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        resolution (int):           The resolution per nanometer of  the equidistant mesh compared to bin/sample simulation by (default: 100)</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        mode (str, optional):       The mode of the spectrum, i.e. &#39;Emission&#39; versus &#39;Absorption&#39; (default: Emission)</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        wl_mode (str, optional):    Whether to use &#39;air&#39; vs &#39;vacuum&#39; wavelength (default: air)</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        normalize (bool):           A flag to normalize the spectrum, before scaling by `A` and `b`.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        np.ndarray:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">sticks</span> <span class="o">=</span> <span class="n">create_stick_spectrum</span><span class="p">(</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="n">T_vib</span><span class="p">,</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="n">T_rot</span><span class="p">,</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">sim_db</span><span class="p">,</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">kind</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;mode&quot;</span><span class="p">,</span> <span class="s2">&quot;Emission&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">wl_mode</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;wl_mode&quot;</span><span class="p">,</span> <span class="s2">&quot;air&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="p">)</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="n">refined</span> <span class="o">=</span> <span class="n">equidistant_mesh</span><span class="p">(</span><span class="n">sticks</span><span class="p">,</span> <span class="n">wl_pad</span><span class="o">=</span><span class="n">wl_pad</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">simulation</span> <span class="o">=</span> <span class="n">apply_voigt</span><span class="p">(</span><span class="n">refined</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">sim_matched</span> <span class="o">=</span> <span class="n">match_spectra</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">mu</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="k">if</span> <span class="n">normalize</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="c1"># normalize to [0,1] rather than integral=1</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="n">val</span> <span class="o">=</span> <span class="n">sim_matched</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">sim_matched</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">val</span> <span class="o">-</span> <span class="n">val</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">val</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="k">return</span> <span class="n">A</span> <span class="o">*</span> <span class="n">sim_matched</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
