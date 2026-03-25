@@ -4,10 +4,10 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10454339.svg)](https://doi.org/10.5281/zenodo.10454339)
 [![PyPI - Version](https://img.shields.io/pypi/v/moose-spectra)](https://pypi.org/project/moose-spectra/)
 ![GitHub License](https://img.shields.io/github/license/AntoineTUE/Moose)
-![GitHub Workflow Status build](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
-[![GitHub Workflow Status docs](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Docs)](https://antoinetue.github.io/Moose/)
-![PyPI python versions](https://img.shields.io/pypi/pyversions/moose-spectra.svg)
-![PyPI Downloads](https://img.shields.io/pypi/dm/moose-spectra)
+![PyPI build](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/build.yml?label=PyPI%20build)
+[![Docs build](https://img.shields.io/github/actions/workflow/status/AntoineTUE/Moose/documentation.yml?label=Docs)](https://antoinetue.github.io/Moose/)
+[![PyPI python versions](https://img.shields.io/pypi/pyversions/moose-spectra.svg)](https://pypi.org/project/moose-spectra/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/moose-spectra)](https://pypistats.org/packages/moose-spectra)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/AntoineTUE/Moose/main)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
@@ -26,12 +26,12 @@ In addition, `Moose` is quite *adaptable*: you can use it as a foundation for mo
 
 Put differently, `Moose` is aimed at helping you: you can integrate and adapt it to your workflow, rather than the reverse.
 
-To get a better grasp of how it works under the hood, see the online documentation for [code reference](https://antoinetue.github.io/Moose/reference/Moose/Simulation/) and [examples](https://antoinetue.github.io/Moose/examples/).
+To get a better grasp of how it works under the hood, see the online documentation for [code reference](https://antoinetue.github.io/Moose/latest/reference/Moose/Simulation/) and [examples](https://antoinetue.github.io/Moose/latest/examples/).
 
 ## Supported bands
 
 Since `Moose` reuses the databases from [MassiveOES](https://bitbucket.org/OES_muni/massiveoes), it supports the same bands for fitting.
-Details can be found in [data_sources.txt](./Moose/data/data_sources.txt), and the [page with information on citing](https://antoinetue.github.io/Moose/citing/).
+Details can be found in [data_sources.txt](./Moose/data/data_sources.txt), and the [page with information on citing](https://antoinetue.github.io/Moose/latest/citing/).
 
 | **Molecule** | **Band** |
 | --- | --- |
@@ -53,7 +53,7 @@ Part of the automated test suite checks for compatibility of `numpy` and `pandas
 Furthermore, even though the project does not import by default `lmfit` and contains no functions that specifically rely on it, the code contains convenience functions that were specifically written for usage with the `lmfit.Model` and `lmfit.Parameters` classes.
 If `lmfit` is installed in the active environment, some additional convenience function will be imported.
 
-Further optional dependecies can be installed by specifying the appropriate feature flags when installing `Moose`, see also [this doc page](https://antoinetue.github.io/Moose/get_started/).
+Further optional dependecies can be installed by specifying the appropriate feature flags when installing `Moose`, see also [this doc page](https://antoinetue.github.io/Moose/latest/get_started/).
 
 These dependencies will be installed when you install `Moose` using `pip` or `uv`.
 
@@ -80,6 +80,8 @@ You can also install the lastest development version of `Moose`, which may not b
 pip install git+https://github.com/AntoineTUE/Moose.git
 ```
 
+The docs for this development version can be found [here](https://antoinetue.github.io/Moose/dev)
+
 ## Basic usage
 
 A basic example demonstrating the usage is as follows.
@@ -87,7 +89,7 @@ It assumes that there is a `pandas` DataFrame (called `data`) containing several
 It is important that the wavelength range over which we query the database (`wl_interval`) plus the padding range `wl_pad`, is larger than the experimental range plus the possible shift (`mu`) between simulation and experiment.
 
 Extending the fitting over multiple cores/processes can be done by using for instance the excellent [Dask](https://dask.org/) library, via i.e. `client.map`.
-More elaborate examples are available via the [online documentation](https://antoinetue.github.io/Moose/examples/).
+More elaborate examples are available via the [online documentation](https://antoinetue.github.io/Moose/latest/examples/).
 
 ```python
 import Moose, lmfit
