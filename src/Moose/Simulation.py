@@ -214,6 +214,8 @@ def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -
 def vgt(x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float) -> np.ndarray:
     """Voigt profile implementation, thinly wraps the scipy implementation.
 
+    See [scipy.special.voigt_profile][]
+
     Args:
         x (np.array): the x-axis array for the voigt profile.
         sigma (float): Gaussian broadening parameter, the standard deviation
@@ -229,18 +231,18 @@ def vgt(x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float) 
 
 
 @deprecated_keywords("norm")
-def apply_voigt(
-    sim: NDArray, sigma: float, gamma: float, resolution: float | int = 100, norm: bool | None = None
-) -> NDArray:
-    """Apply Voigt broadening to a simulated equidistant spectrum, preserving the integral.
+def apply_voigt(sim: NDArray, sigma: float, gamma: float, norm: bool | None = None) -> NDArray:
+    """Apply Voigt broadening to a simulated equidistant spectrum, preserving the integral and sum.
 
-    The x-axis of the simulation `sim` must be an equidistant grid, where `resolution` is the inverse of the grid-spacing.
+    The x-axis of the simulation `sim` must be an equidistant grid.
 
     See also [equidistant_mesh][Moose.Simulation.equidistant_mesh].
 
     Note that `sigma` is defined as the Gaussian standard deviation, while `gamma` is the Lorentzian Half-Width-at-Half-Maximum.
 
     That means these widths are not one-to-one comparable but should be converted to HWHM of FHWM.
+
+    If either `gamma` or `sigma` are respectively 0, will apply solely `Gaussian` or `Lorentzian` broadening.
 
     Warning:
         Though the function accepts a "norm=True" keyword argument, this is considered deprecated behaviour and will not do anything.
@@ -251,20 +253,17 @@ def apply_voigt(
         sim (np.array):         A (stick) simulation
         sigma (float):          The Gaussian sigma (standard deviation) for the voigt
         gamma (float):          The Lorentzian gamma (HWHM) for the voigt
-        resolution (float|int): The resolution of the equidistant grid, equal to 1/grid_spacing, default: 100.
         norm (bool):            DEPRECATED, has no effect ~Boolean to toggle normalizing (default: False)~
 
     Returns:
         A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
     """
     x = sim[:, 0]
-    dx = 1 / resolution
     dim = x.shape[0]
     mu = (x[dim // 2 - 1] + x[dim // 2]) / 2.0 if dim % 2 == 0 else x[dim // 2]
 
     v = vgt(x, sigma, gamma, mu, 1, 0)
-    # uses trapezoid over simpson for faster evaluation, negligible error for fine grids.
-    conv = scipy.signal.fftconvolve(sim[:, 1], v / scipy.integrate.trapezoid(v, x), mode="same") * dx
+    conv = scipy.signal.fftconvolve(sim[:, 1], v / v.sum(), mode="same")
     # TODO: only return convolved y data, since x does not change? save memory/cpu impact.
     return np.column_stack((x, conv))
 
@@ -331,7 +330,7 @@ def model_for_fit(
     params = lmfit.create_params(**Moose.default_params)
     model = lmfit.Model(Moose.model_for_fit,normalize=True,sim_db=db, independent_vars=["x"])
 
-    result = model.fit(y=...,x=..., params=params)
+    result = model.fit(data=...,x=..., params=params)
     ```
 
     Arguments:
@@ -361,7 +360,7 @@ def model_for_fit(
         wl_mode=kwargs.pop("wl_mode", "air"),
     )
     refined = equidistant_mesh(sticks, wl_pad=wl_pad, resolution=resolution)
-    simulation = apply_voigt(refined, sigma, gamma, resolution=resolution)
+    simulation = apply_voigt(refined, sigma, gamma)
     sim_matched = match_spectra(x, simulation, shift=mu)
     if normalize is True:
         # normalize to [0,1] rather than integral=1

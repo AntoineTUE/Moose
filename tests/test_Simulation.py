@@ -134,21 +134,22 @@ class TestSimulation:
         assert_allclose(Simulation.vgt(x, 0.1, 0.1, 0.1, 1, 0), voigt_profile(x - 0.1, 0.1, 0.1))
 
     @pytest.mark.parametrize("points", [100, 300, 1000])
-    def test_apply_voigt(self, points):
-        peaks = 5
-        sticks = np.array([np.linspace(329, 331, points), np.zeros(points)]).T
+    @pytest.mark.parametrize("peaks", [5, 10, 500])
+    @pytest.mark.parametrize("width", [5e-3, 5e-2, 1])
+    def test_apply_voigt(self, points, peaks, width):
+        sticks = np.array([np.linspace(320, 340, points), np.zeros(points)]).T
         sticks[self.rng.integers(int(points * 0.35), int(points * 0.65), peaks), 1] = self.rng.uniform(1, 10, peaks)
-        dx = sticks[1, 0] - sticks[0, 0]
-        v_true = voigt_profile(sticks[:, 0] - 330, 0.1, 0.1)
-        expected = fftconvolve(sticks[:, 1], v_true / trapezoid(v_true, sticks[:, 0]), mode="same") * dx
-        broadened = Simulation.apply_voigt(sticks, 0.1, 0.1, 1 / dx)
+        v_true = voigt_profile(sticks[:, 0] - 330, width / 2, width / 2)
+        expected = fftconvolve(sticks[:, 1], v_true / v_true.sum(), mode="same")
+        broadened = Simulation.apply_voigt(sticks, width / 2, width / 2)
         assert_allclose(
             broadened,
             np.column_stack((sticks[:, 0], expected)),
             atol=1e-12,
             rtol=1e-12,
         )
-        assert_allclose(trapezoid(broadened[:, 1], broadened[:, 0]), trapezoid(sticks[:, 1], sticks[:, 0]), rtol=2e-2)
+        assert_allclose(broadened[:, 1].sum(), sticks[:, 1].sum(), rtol=1e-2)
+        assert_allclose(trapezoid(broadened[:, 1], broadened[:, 0]), trapezoid(sticks[:, 1], sticks[:, 0]), rtol=1e-2)
 
     def test_match_spectra(self):
         sim = np.array([np.linspace(0, 100, 100), self.rng.random(100)]).T

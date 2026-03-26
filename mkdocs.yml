@@ -110,6 +110,7 @@ plugins:
           - https://numpy.org/doc/stable/objects.inv
           - https://lmfit.github.io/lmfit-py/objects.inv
           - http://pandas.pydata.org/pandas-docs/stable/objects.inv
+          - https://docs.scipy.org/doc/scipy/objects.inv
         paths: 
           - src
         options:
