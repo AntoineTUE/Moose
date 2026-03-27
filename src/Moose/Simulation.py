@@ -171,7 +171,7 @@ def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -
 
     The simulated line intensities are rebinned onto the equidistant mesh by summing their values, if multiple lines fall into the same bin.
 
-    In fact, each line contribution is binned to the two nearest bins, weighted by the inverse distance between the line position and bins.
+    In fact, each line contribution is binned to the two nearest bins, weighted by the linear distance between the line position and bins.
 
     This avoids discontinuities caused by lines jumping between bins for high resolution spectra and somewhat 'preserves' the information of the line position w.r.t. the bins.
 
@@ -179,7 +179,9 @@ def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -
 
     Edge effects are avoided by extending the mesh beyond the input spectrum, with zero-padding for the intensities.
 
-    This is controlled with the `wl_pad` argument, which specifies the amount of nanomter to pad.
+    This is controlled with the `wl_pad` argument, which specifies the amount of nanometer to pad.
+
+    This padding is essential for later line-broadening (see [`apply_voigt`][..apply_voigt])
 
     Args:
         sim (np.array):     The 2D numpy array containing a simulation
@@ -189,26 +191,32 @@ def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -
     Returns:
         np.array:           A 2D array containing the mesh grid positions and corresponding stick values.
 
-    See also [create_stick_spectrum][Moose.Simulation.create_stick_spectrum]
+    See also:
+      * [create_stick_spectrum][Moose.Simulation.create_stick_spectrum]
+      * [apply_voigt][Moose.Simulation.apply_voigt]
     """
-    delta = sim[-1, 0] - sim[0, 0] + 2 * wl_pad
-    points = int(delta * resolution)
-    equid = np.linspace(sim[0, 0] - wl_pad, sim[-1, 0] + wl_pad, points)
+    wl = sim[:, 0]
+    wl_max = wl.max() + wl_pad
+    wl_min = wl.min() - wl_pad
+    delta = wl_max - wl_min
+    points = int(delta * resolution) + 1
+    wl_new = np.linspace(wl_min, wl_max, points)
+    ys = sim[:, 1]
 
-    idx = np.searchsorted(equid, sim[:, 0], side="left")  # if `side`=left => finds: a[i-1] < v <= a[i]
-    indices = np.vstack(
-        (
-            idx - 1,
-            idx,
-        )
-    )
-    inv_dists = np.reciprocal(np.abs(sim[:, 0, np.newaxis] - equid[indices.T]))
-    inv_dists /= inv_dists.sum(axis=1, keepdims=True)
+    # if `side`=left => finds: a[i-1] < v <= a[i]
+    idx_right = np.searchsorted(wl_new, wl, side="left")
+    idx_left = idx_right - 1
+    bin_left = wl_new[idx_left]
+    weights_right = (wl - bin_left) * resolution
+    weights_left = 1 - weights_right
 
-    intens = np.zeros_like(equid)
-    np.add.at(intens, indices, (sim[:, 1, np.newaxis] * inv_dists).T)
-
-    return np.column_stack((equid, intens))
+    equid = np.zeros((points, 2), dtype=np.float64)
+    equid[:, 0] = wl_new
+    # Use np.add.at ufunc to accumulate at repeated indices
+    # the alternative np.bincount (with `minlength=points`) appears slower for relevant use cases
+    np.add.at(equid[:, 1], idx_right, weights_right * ys)
+    np.add.at(equid[:, 1], idx_left, weights_left * ys)
+    return equid
 
 
 def vgt(x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float) -> np.ndarray:
