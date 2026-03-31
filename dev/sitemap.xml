@@ -2,66 +2,66 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/Theory/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/citing/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/examples/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/get_started/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/examples/Moose_fitting_backends/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/examples/Multiple_species/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/examples/bokeh/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/examples/dask/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/examples/matplotlib/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/examples/plotly/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/reference/SUMMARY/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/reference/Moose/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/reference/Moose/FitUtil/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/reference/Moose/Simulation/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
     <url>
          <loc>https://antoinetue.github.io/Moose/latest/reference/Moose/maintenance/</loc>
-         <lastmod>2026-03-27</lastmod>
+         <lastmod>2026-03-31</lastmod>
     </url>
 </urlset>
