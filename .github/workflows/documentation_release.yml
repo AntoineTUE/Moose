@@ -1,20 +1,19 @@
-name: documentation
+name: documentation release version
 on:
-  push:
-    branches:
-      - main
-    tags-ignore:
-      - v*
+  release:
+    types: [published]
+
 permissions:
   contents: write
   pages: write
   id-token: write
+
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  deploy_docs_dev:
+  deploy_docs_release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -37,5 +36,5 @@ jobs:
       - name: Install Hatch
         run: uv pip install --upgrade --system hatch
       - name: Deploy latest dev version docs
-        run: hatch run docs:ci-build --push dev
+        run: hatch run docs:ci-build --push --update-aliases ${{ github.event.release.tag_name }} latest
       
