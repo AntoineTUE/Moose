@@ -127,10 +127,10 @@ ci-build = "mike deploy --config-file mkdocs.yml --update-aliases {args}"
 
 [tool.hatch.envs.hatch-test.overrides]
 matrix.feature.dependencies = [
-  { value = "pandas==1.5.3", if = ["pandas-legacy"]},
-  { value = "numpy<2.0", if = ["pandas-legacy"]},
-  { value = "pandas>=2.0.0", if = ["pandas-2.0"] },
-  { value = "numpy>=2.0", if = ["pandas-2.0"] },
+    { value = "pandas==1.5.3", if = ["pandas-legacy"]},
+    { value = "numpy<2.0", if = ["pandas-legacy"]},
+    { value = "pandas>=2.0.0", if = ["pandas-2.0"] },
+    { value = "numpy>=2.0", if = ["pandas-2.0"] },
     { value = "pandas>=3.0.0", if = ["pandas-3.0"] },
     { value = "numpy>=2.0", if = ["pandas-3.0"] },
 ]
