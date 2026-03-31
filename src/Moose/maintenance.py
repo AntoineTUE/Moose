@@ -3,7 +3,15 @@
 from inspect import signature
 from functools import wraps
 import warnings
-from collections.abc import Callable
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from typing import TypeVar
+    from typing_extensions import ParamSpec
+
+    P = ParamSpec("P")
+    R = TypeVar("R")
 
 _IMPLEMENTS_DEPRECATED = hasattr(warnings, "deprecated")
 
@@ -52,11 +60,11 @@ def deprecated_keywords(*kw_names: str, removed_in: str = "a future release"):
         removed_in: short text saying when it will be removed (included in the message).
     """
 
-    def decorator(func: Callable):
+    def decorator(func: "Callable[P,R]") -> "Callable[P,R]":
         sig = signature(func)
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: "P.args", **kwargs: "P.kwargs") -> "R":
             bound = sig.bind_partial(*args, **kwargs)
             for kw in kw_names:
                 if kw in bound.arguments and bound.arguments[kw] is not None:
@@ -71,6 +79,7 @@ def deprecated_keywords(*kw_names: str, removed_in: str = "a future release"):
                     )
             return func(*args, **kwargs)
 
+        wrapper.__signature__ = sig
         return wrapper
 
     return decorator
