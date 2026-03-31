@@ -137,10 +137,11 @@ def query_DB(
 def create_stick_spectrum(
     T_vib: float,
     T_rot: float,
+    pop: float = 1,
     df_db: pd.DataFrame = None,
     kind: Literal["Absorption", "Emission"] = "Emission",
     wl_mode: Literal["air", "vacuum"] = "air",
-) -> NDArray:
+) -> NDArray[np.float64]:
     """Create a stick spectrum based on the data retrieved from a SQL database with the [query_DB][Moose.Simulation.query_DB] function.
 
     Alternatively, can be provided with any pandas DataFrame that has the requisite columns for the calculation.
@@ -148,25 +149,26 @@ def create_stick_spectrum(
     Args:
         T_vib (float):          Vibrational temperature
         T_rot (float):          Rotational temperature
-        df_db (pd.DataFrame):   A pandas DataFrame containing the database data
+        pop (float, optional):  A population scaling factor.
+        df_db (pd.DataFrame):   A pandas DataFrame containing the database data.
         kind (str):             Either 'Absorption' or 'Emission' depending on the kind of spectrum to simulate.
         wl_mode (str):          Either 'air' or 'vacuum' depending which equivalent we want for the wavelength.
 
-    See also [query_DB][Moose.Simulation.query_DB] and [equidistant_mesh][Moose.Simulation.equidistant_mesh]
+    See also:
+        * [query_DB][Moose.Simulation.query_DB]
+        * [equidistant_mesh][Moose.Simulation.equidistant_mesh]
     """
     # Simply check for None, so other compatible objects can be passed in that don't look like a dataframe at first (dask delayed)
     if df_db is None:
         raise TypeError("No Dataframe with line-by-line data supplied.")
     pops = (2 * df_db["J"] + 1) * np.exp(-df_db["E_v"] / (kB * T_vib) - df_db["E_J"] / (kB * T_rot))
-    pops /= pops.sum()
-    if kind.capitalize() == "Emission":
-        y = pops * df_db["A"]
-    elif kind.capitalize() == "Absorption":
-        y = pops * df_db["B"]
+    pops = pop * pops / pops.sum()
+    # Einstein B coefficient if kind=="Absorption" else Einstein A
+    y = pop * pops * (df_db["B"] if kind.startswith(("A", "a")) else df_db["A"])
     return np.column_stack((df_db[f"{wl_mode}_wavelength"], y))
 
 
-def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -> np.ndarray:
+def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: int = 100) -> NDArray[np.float64]:
     """Create an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
 
     The simulated line intensities are rebinned onto the equidistant mesh by summing their values, if multiple lines fall into the same bin.
@@ -189,7 +191,7 @@ def equidistant_mesh(sim: np.array, wl_pad: float = 10, resolution: int = 100) -
         resolution (int):   The resolution at which to construct the equidistant mesh (per nanometer) compared to the simulation (default: 100)
 
     Returns:
-        np.array:           A 2D array containing the mesh grid positions and corresponding stick values.
+        A 2D array containing the mesh grid positions and corresponding stick values.
 
     See also:
       * [create_stick_spectrum][Moose.Simulation.create_stick_spectrum]
@@ -319,16 +321,18 @@ def model_for_fit(
     sim_db: pd.DataFrame = None,
     normalize: bool = True,
     **kwargs,
-) -> np.ndarray:
+) -> NDArray[np.float64]:
     """Model function with function signature compatible for usage with [lmfit.model.Model][].
 
     Creates and broadens an equidistant stick spectrum from the provided simulation database.
 
     After broadening, resamples the simulation to the same coordinates as the (measured) data.
 
-    Returns a spectrum normalized on the interval [b,A+b], if normalize=True.
+    Returns a spectrum normalized on the interval $(b,A+b)$, if `normalize=True`.
 
-    Usage:
+    If `normalize=False`, the argument `A` is used as a population scaling factor (the `pop` argument) for [create_stick_spectrum][..]
+
+    Example usage:
     ```python
     import lmfit
     import Moose
@@ -342,36 +346,37 @@ def model_for_fit(
     ```
 
     Arguments:
-        x (np.array):               The x-axis of the (measured) data that we want to compare/fit against
-        sigma (float):              Gaussian broadening width of Voigt
-        gamma (float):              Lorentzian broadening width of Voigt
+        x (np.array):               The x-axis of the (measured) data that we want to compare/fit against, or want to evaluate the simulation at.
+        sigma (float):              Gaussian broadening width of Voigt, the standard deviation.
+        gamma (float):              Lorentzian broadening width of Voigt, the Half-Width-at-Half-Maximum.
         mu (float):                 The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength
         T_rot (float):              The rotational temperature in Kelvin
         T_vib (float):              The vibrational temperature in Kelvin
-        A (float):                  The amplitude scaling factor of the spectrum (default: 1)
+        A (float):                  The amplitude scaling factor of the spectrum, if `normalize=True`, else a population scaling factor for the stick spectrum (default: 1)
         b (float):                  The offset w.r.t. 0 of the spectrum (default: 0)
         sim_db (DataFrame):         The DataFrame containing the database used for the simulation.
         wl_pad (float):             The amount of nanometer to pad the x-axis of the simulation with to avoid edge effects. Default: 10
         resolution (int):           The resolution per nanometer of  the equidistant mesh compared to bin/sample simulation by (default: 100)
+        normalize (bool):           A flag to normalize the spectrum, before scaling by `A` and `b`.
         mode (str, optional):       The mode of the spectrum, i.e. 'Emission' versus 'Absorption' (default: Emission)
         wl_mode (str, optional):    Whether to use 'air' vs 'vacuum' wavelength (default: air)
-        normalize (bool):           A flag to normalize the spectrum, before scaling by `A` and `b`.
 
     Returns:
-        np.ndarray:       A 1D vector representing the signal intensity calculated from the simulation, which can be used for the minimisation procedure.
+        A vector representing the signal intensity calculated from the simulation, which can be used for a minimization/fitting procedure.
     """
     sticks = create_stick_spectrum(
         T_vib,
         T_rot,
-        sim_db,
+        1 if normalize else A,
+        df_db=sim_db,
         kind=kwargs.pop("mode", "Emission"),
         wl_mode=kwargs.pop("wl_mode", "air"),
     )
     refined = equidistant_mesh(sticks, wl_pad=wl_pad, resolution=resolution)
     simulation = apply_voigt(refined, sigma, gamma)
     sim_matched = match_spectra(x, simulation, shift=mu)
+    val = sim_matched[:, 1]
     if normalize is True:
         # normalize to [0,1] rather than integral=1
-        val = sim_matched[:, 1]
-        sim_matched[:, 1] = (val - val.min()) / (val.max() - val.min())
-    return A * sim_matched[:, 1] + b
+        val = A * (val - val.min()) / (val.max() - val.min())
+    return val + b
