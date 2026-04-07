@@ -10,7 +10,7 @@ import lmfit
 import numpy as np
 from .Simulation import default_params, thermal_default_params, model_for_fit, query_DB
 
-from .maintenance import deprecated
+from .utils.maintenance import deprecated
 
 from numpy.typing import NDArray
 

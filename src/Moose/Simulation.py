@@ -20,7 +20,8 @@ from typing import Literal
 
 from numpy.typing import NDArray
 
-from .maintenance import deprecated_keywords
+from .utils.maintenance import deprecated_keywords
+from .utils.profiler import profile
 
 kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
 
