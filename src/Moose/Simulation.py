@@ -147,6 +147,12 @@ def create_stick_spectrum(
 
     Alternatively, can be provided with any pandas DataFrame that has the requisite columns for the calculation.
 
+    The Dataframe provided as `df_db` must have the columns: `["J","E_J",E_v"]`.
+
+    In addition it must have one of either `["A","B"]` (the Einstein coefficients), and `["air_wavelength","vacuum_wavelength"]`.
+
+    The stick spectrum is computed assuming a Boltzmann distribution for both the vibrational and rotational populations.
+
     Args:
         T_vib (float):          Vibrational temperature
         T_rot (float):          Rotational temperature
