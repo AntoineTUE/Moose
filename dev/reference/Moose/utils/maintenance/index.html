@@ -12,19 +12,19 @@
         <meta name="author" content="Antoine Salden">
       
       
-        <link rel="canonical" href="https://antoinetue.github.io/Moose/latest/reference/Moose/maintenance/">
+        <link rel="canonical" href="https://antoinetue.github.io/Moose/latest/reference/Moose/utils/maintenance/">
       
       
-        <link rel="prev" href="../Simulation/">
+        <link rel="prev" href="../caching/">
       
       
-        <link rel="next" href="../../../examples/">
+        <link rel="next" href="../profiler/">
       
       
         
       
       
-      <link rel="icon" href="../../../assets/moose.svg">
+      <link rel="icon" href="../../../../assets/moose.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
     
     
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.618322db.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -55,9 +55,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#Moose.maintenance" class="md-skip">
+        <a href="#Moose.utils.maintenance" class="md-skip">
           Skip to content
         </a>
       
@@ -102,9 +102,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="Moose Docs" class="md-header__button md-logo" aria-label="Moose Docs" data-md-component="logo">
+    <a href="../../../.." title="Moose Docs" class="md-header__button md-logo" aria-label="Moose Docs" data-md-component="logo">
       
-  <img src="../../../assets/moose.svg" alt="logo">
+  <img src="../../../../assets/moose.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -239,9 +239,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="Moose Docs" class="md-nav__button md-logo" aria-label="Moose Docs" data-md-component="logo">
+    <a href="../../../.." title="Moose Docs" class="md-nav__button md-logo" aria-label="Moose Docs" data-md-component="logo">
       
-  <img src="../../../assets/moose.svg" alt="logo">
+  <img src="../../../../assets/moose.svg" alt="logo">
 
     </a>
     Moose Docs
@@ -268,7 +268,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../../../.." class="md-nav__link">
         
   
   
@@ -295,7 +295,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../get_started/" class="md-nav__link">
+      <a href="../../../../get_started/" class="md-nav__link">
         
   
   
@@ -322,7 +322,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../citing/" class="md-nav__link">
+      <a href="../../../../citing/" class="md-nav__link">
         
   
   
@@ -419,7 +419,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   
@@ -461,7 +461,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../FitUtil/" class="md-nav__link">
+      <a href="../../FitUtil/" class="md-nav__link">
         
   
   
@@ -489,7 +489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Simulation/" class="md-nav__link">
+      <a href="../../Simulation/" class="md-nav__link">
         
   
   
@@ -497,6 +497,92 @@
     
   
     Simulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    utils
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1_3" id="__nav_4_1_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    utils
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../caching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    caching
   
 
     
@@ -573,7 +659,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#Moose.maintenance" class="md-nav__link">
+  <a href="#Moose.utils.maintenance" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;maintenance
@@ -585,7 +671,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#Moose.maintenance.P" class="md-nav__link">
+  <a href="#Moose.utils.maintenance.P" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;P
@@ -596,7 +682,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#Moose.maintenance.R" class="md-nav__link">
+  <a href="#Moose.utils.maintenance.R" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;R
@@ -607,7 +693,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#Moose.maintenance.deprecated" class="md-nav__link">
+  <a href="#Moose.utils.maintenance.deprecated" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;deprecated
@@ -618,7 +704,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#Moose.maintenance.deprecated_keywords" class="md-nav__link">
+  <a href="#Moose.utils.maintenance.deprecated_keywords" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;deprecated_keywords
@@ -636,6 +722,42 @@
     </ul>
   
 </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../profiler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    profiler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -681,7 +803,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../examples/" class="md-nav__link ">
+            <a href="../../../../examples/" class="md-nav__link ">
               
   
   
@@ -772,7 +894,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/bokeh/" class="md-nav__link">
+      <a href="../../../../examples/bokeh/" class="md-nav__link">
         
   
   
@@ -800,7 +922,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/plotly/" class="md-nav__link">
+      <a href="../../../../examples/plotly/" class="md-nav__link">
         
   
   
@@ -828,7 +950,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/matplotlib/" class="md-nav__link">
+      <a href="../../../../examples/matplotlib/" class="md-nav__link">
         
   
   
@@ -864,7 +986,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/Moose_fitting_backends/" class="md-nav__link">
+      <a href="../../../../examples/Moose_fitting_backends/" class="md-nav__link">
         
   
   
@@ -892,7 +1014,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/dask/" class="md-nav__link">
+      <a href="../../../../examples/dask/" class="md-nav__link">
         
   
   
@@ -920,7 +1042,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/Multiple_species/" class="md-nav__link">
+      <a href="../../../../examples/Multiple_species/" class="md-nav__link">
         
   
   
@@ -977,8 +1099,8 @@
 
 
 
-<h2 id="Moose.maintenance" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">Moose.maintenance</span>
+<h2 id="Moose.utils.maintenance" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">Moose.utils.maintenance</span>
 
 
 </h2>
@@ -1008,7 +1130,7 @@
       </thead>
       <tbody>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="            deprecated (Moose.maintenance.deprecated)" href="#Moose.maintenance.deprecated">deprecated</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="            deprecated (Moose.utils.maintenance.deprecated)" href="#Moose.utils.maintenance.deprecated">deprecated</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Decorate a function to be marked as deprecated.</p>
@@ -1016,7 +1138,7 @@
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="            deprecated_keywords (Moose.maintenance.deprecated_keywords)" href="#Moose.maintenance.deprecated_keywords">deprecated_keywords</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="            deprecated_keywords (Moose.utils.maintenance.deprecated_keywords)" href="#Moose.utils.maintenance.deprecated_keywords">deprecated_keywords</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Issue a DeprecationWarning if a function is called with a deprecated keyword argument.</p>
@@ -1045,7 +1167,7 @@
 
   
       module-attribute
-   (Moose.maintenance.P)" href="#Moose.maintenance.P">P</a></code></td>
+   (Moose.utils.maintenance.P)" href="#Moose.utils.maintenance.P">P</a></code></td>
             <td>
             </td>
             <td>
@@ -1060,7 +1182,7 @@
 
   
       module-attribute
-   (Moose.maintenance.R)" href="#Moose.maintenance.R">R</a></code></td>
+   (Moose.utils.maintenance.R)" href="#Moose.utils.maintenance.R">R</a></code></td>
             <td>
             </td>
             <td>
@@ -1086,7 +1208,7 @@
 
 
 
-<h3 id="Moose.maintenance.P" class="doc doc-heading">
+<h3 id="Moose.utils.maintenance.P" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">P</span>
 
 
@@ -1108,7 +1230,7 @@
 
 
 
-<h3 id="Moose.maintenance.R" class="doc doc-heading">
+<h3 id="Moose.utils.maintenance.R" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">R</span>
 
 
@@ -1132,7 +1254,7 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="Moose.maintenance.deprecated" class="doc doc-heading">
+<h3 id="Moose.utils.maintenance.deprecated" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">deprecated</span>
 
 
@@ -1147,7 +1269,7 @@
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>src/Moose/maintenance.py</code></summary>
+              <summary>Source code in <code>src/Moose/utils/maintenance.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-19">19</a></span>
 <span class="normal"><a href="#__codelineno-0-20">20</a></span>
 <span class="normal"><a href="#__codelineno-0-21">21</a></span>
@@ -1220,7 +1342,7 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="Moose.maintenance.deprecated_keywords" class="doc doc-heading">
+<h3 id="Moose.utils.maintenance.deprecated_keywords" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">deprecated_keywords</span>
 
 
@@ -1282,7 +1404,7 @@
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>src/Moose/maintenance.py</code></summary>
+              <summary>Source code in <code>src/Moose/utils/maintenance.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-53">53</a></span>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
@@ -1391,7 +1513,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../Simulation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Simulation">
+          <a href="../caching/" class="md-footer__link md-footer__link--prev" aria-label="Previous: caching">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1401,20 +1523,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Simulation
+                caching
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../../examples/" class="md-footer__link md-footer__link--next" aria-label="Next: Examples">
+          <a href="../profiler/" class="md-footer__link md-footer__link--next" aria-label="Next: profiler">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Examples
+                profiler
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1471,12 +1593,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.list", "navigation.sections", "navigation.footer", "toc.integrate", "toc.follow", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.list", "navigation.sections", "navigation.footer", "toc.integrate", "toc.follow", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
       
-        <script src="../../../javascripts/mathjax.js"></script>
+        <script src="../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
       
