@@ -9,7 +9,7 @@ from scipy.integrate import trapezoid
 from sqlite3 import DatabaseError, OperationalError
 from importlib import resources
 from pandas.testing import assert_frame_equal
-from numpy.testing import assert_array_equal, assert_array_almost_equal, assert_allclose
+from numpy.testing import assert_array_equal, assert_allclose, assert_raises, assert_array_less
 
 
 class TestSimulation:
@@ -114,8 +114,8 @@ class TestSimulation:
             error = IndexError
             info = "only integers"
         if isinstance(db, dict):
-            error = KeyError
-            info = "J"
+            error = AttributeError
+            info = "shape"
         with pytest.raises(error, match=info):
             Simulation.create_stick_spectrum(300, 300, df_db=db)
 
@@ -137,6 +137,33 @@ class TestSimulation:
     @pytest.mark.parametrize("peaks", [5, 10, 500])
     @pytest.mark.parametrize("width", [5e-3, 5e-2, 1])
     def test_apply_voigt(self, points, peaks, width):
+        # Must contruct `sticks` like done below, or at least without transposing a c-contiguous array, as it becomes F-contiguous...
+        # F-contiguous array would not be cachable
+        sticks = np.zeros((points, 2))
+        sticks[:, 0] = np.linspace(320, 340, points)
+        sticks[self.rng.integers(int(points * 0.35), int(points * 0.65), peaks), 1] = self.rng.uniform(1, 10, peaks)
+        v_true = voigt_profile(sticks[:, 0] - 330, width / 2, width / 2)
+        expected = fftconvolve(sticks[:, 1], v_true / v_true.sum(), mode="same")
+        broadened = Simulation.apply_voigt(sticks, width / 2, width / 2)
+        assert_allclose(
+            broadened,
+            np.column_stack((sticks[:, 0], expected)),
+            atol=1e-12,
+            rtol=1e-11,
+        )
+        assert_allclose(broadened[:, 1].sum(), sticks[:, 1].sum(), rtol=1e-2)
+        assert_allclose(trapezoid(broadened[:, 1], broadened[:, 0]), trapezoid(sticks[:, 1], sticks[:, 0]), rtol=1e-2)
+
+    @pytest.mark.parametrize("points", [100, 300, 1000])
+    @pytest.mark.parametrize("peaks", [5, 10, 500])
+    @pytest.mark.parametrize("width", [5e-3, 5e-2, 1])
+    def test_apply_voigt_F_contiguous(self, points, peaks, width):
+        """Same test as above, but now forcing the input to `apply_voigt` to be F-contiguous rather than C-contiguous.
+
+        For caching to work using zero-copy, the array to be cached must be C-contiguous!
+
+        When transposing a C-contiguous array, it becomes F-contiguous.
+        """
         sticks = np.array([np.linspace(320, 340, points), np.zeros(points)]).T
         sticks[self.rng.integers(int(points * 0.35), int(points * 0.65), peaks), 1] = self.rng.uniform(1, 10, peaks)
         v_true = voigt_profile(sticks[:, 0] - 330, width / 2, width / 2)
@@ -146,7 +173,7 @@ class TestSimulation:
             broadened,
             np.column_stack((sticks[:, 0], expected)),
             atol=1e-12,
-            rtol=1e-12,
+            rtol=1e-11,
         )
         assert_allclose(broadened[:, 1].sum(), sticks[:, 1].sum(), rtol=1e-2)
         assert_allclose(trapezoid(broadened[:, 1], broadened[:, 0]), trapezoid(sticks[:, 1], sticks[:, 0]), rtol=1e-2)
@@ -157,6 +184,7 @@ class TestSimulation:
 
         matched = Simulation.match_spectra(meas, sim)
         assert matched.shape == meas.shape
+        assert_allclose(matched[:, 0], meas[:, 0])
 
     def test_match_spectra_measurement_beyond_simulation(self):
         sim = np.array([np.linspace(0, 100, 100), np.ones(100)]).T

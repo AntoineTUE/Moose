@@ -27,6 +27,7 @@ dependencies = [
     "numpy",
     "pandas",
     "scipy",
+    "xxhash"
 ]
 
 [project.urls]

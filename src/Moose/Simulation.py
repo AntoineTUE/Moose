@@ -15,13 +15,13 @@ from scipy.special import voigt_profile
 import scipy.integrate
 import scipy.signal
 import scipy.constants as const
-from functools import lru_cache
 from typing import Literal
 
 from numpy.typing import NDArray
 
 from .utils.maintenance import deprecated_keywords
 from .utils.profiler import profile
+from .utils.caching import array_cache
 
 kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
 
@@ -50,7 +50,7 @@ thermal_default_params = {
 }
 
 
-@lru_cache(maxsize=32)
+@array_cache(maxsize=32)
 def query_DB(
     db_name: str,
     wl: tuple = (0, 1e9),
@@ -162,13 +162,15 @@ def create_stick_spectrum(
     # Simply check for None, so other compatible objects can be passed in that don't look like a dataframe at first (dask delayed)
     if df_db is None:
         raise TypeError("No Dataframe with line-by-line data supplied.")
+    sticks = np.zeros((df_db.shape[0], 2), np.float64)
+    sticks[:, 0] = df_db[f"{wl_mode}_wavelength"]
     pops = (2 * df_db["J"] + 1) * np.exp(-df_db["E_v"] / (kB * T_vib) - df_db["E_J"] / (kB * T_rot))
-    pops = pop * pops / pops.sum()
     # Einstein B coefficient if kind=="Absorption" else Einstein A
-    y = pop * pops * (df_db["B"] if kind.startswith(("A", "a")) else df_db["A"])
-    return np.column_stack((df_db[f"{wl_mode}_wavelength"], y))
+    sticks[:, 1] = pop * pops / pops.sum() * (df_db["B"] if kind.startswith(("A", "a")) else df_db["A"])
+    return sticks
 
 
+@array_cache(maxsize=128)
 def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: int = 100) -> NDArray[np.float64]:
     """Create an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
 
@@ -190,6 +192,13 @@ def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: i
         sim (np.array):     The 2D numpy array containing a simulation
         wl_pad (float):     The padding of the wavelength axis in nm to avoid edge effects
         resolution (int):   The resolution at which to construct the equidistant mesh (per nanometer) compared to the simulation (default: 100)
+
+    Important:
+        This function makes use of the [Moose.utils.caching.array_cache][].
+
+        To get the best performance out of the cache, make sure that any input array is a C-contiguous array (check the array attribute `flags.c_contiguous`).
+
+        If so, hashing is a zero-copy operation, but for a F-contiguous array a copy first needs to be made each time before hashing!
 
     Returns:
         A 2D array containing the mesh grid positions and corresponding stick values.
