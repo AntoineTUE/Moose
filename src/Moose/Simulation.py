@@ -237,27 +237,57 @@ def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: i
     return equid
 
 
-def vgt(x: np.array, sigma: float, gamma: float, mu: float, a: float, b: float) -> np.ndarray:
-    """Voigt profile implementation, thinly wraps the scipy implementation.
+@array_cache()
+def vgt(sigma: float, gamma: float, points: int, dx: float, truncate: None | float = None) -> NDArray:
+    """Calculate a normalized Voigt profile, centered on a (equidistant) grid of size `points` with spacing `dx`.
 
-    See [scipy.special.voigt_profile][]
+    Essentially it computes a Voigt profile over a range of i.e. wavelength *change*, instead of wavelenght itself.
+
+    This means it is scaled correctly to the data, but does not depend on the exact range of data.
+
+    Because of this, it can be cached more effectively, as a fit may attempt to optimize a wavelength shift (param `mu`).
+
+    Parameters such as the simulation resolution (`resolution`) and padding (`wl_pad`) are much less frequently optimized (or in need thereof).
+
+    Note:
+        Uses the standard deviation for the Gaussian width, while the Lorentzian Half-Width-at-Half-Maximum for Lorentzian width.
+        These two widths are not fully equivalent in definition!
+        Also note: if either broadening is 0, falls back to resp. a pure Gaussian or Lorentzian profile.
+        This is to maintain consistency with the scipy implementation that is used, see [scipy.special.voigt_profile][].
+
+    Important:
+        This function makes use of the [Moose.utils.caching.array_cache][].
+
+        To get the best performance out of the cache, make sure that any input array is a C-contiguous array (check the array attribute `flags.c_contiguous`).
+
+        If so, hashing is a zero-copy operation, but for a F-contiguous array a copy first needs to be made each time before hashing!
 
     Args:
-        x (np.array): the x-axis array for the voigt profile.
-        sigma (float): Gaussian broadening parameter, the standard deviation
-        gamma (float): Lorentzian broadening parameter, half width at half maximum
-        mu (float): Shift parameter with respect to the center of the x-axis, in the same units as `x`.
-        a (float): Amplitude scaling factor
-        b (float): Offset with respect to 0 of the values.
+        sigma (float):          Gaussian broadening parameter, the standard deviation
+        gamma (float):          Lorentzian broadening parameter, half width at half maximum
+        points (int):           Amount of points in the grid to evaluate the Voigt at.
+        dx (float):             The spacing between points in the grid.
+        truncate (None|float):  If `None` (the default), don't truncate the range to calculate the Voigt over, else evaluate over a range $FWHM*truncate$ around center.
 
     Returns:
-        np.ndarray: Voigt profile as a function of `x`
+        A normalized and centered Voigt profile.
     """
-    return a * voigt_profile(x - mu, sigma, gamma) + b
+    x_range = (np.arange(points) - (points - 1) / 2.0) * dx
+    if truncate is not None:
+        V = np.zeros_like(x_range)
+        fwhm = 0.5343 * gamma * 2 + np.sqrt(0.2169 * (gamma * 2) ** 2 + (np.sqrt(8 * np.log(2)) * sigma) ** 2)
+        mask = (x_range > -fwhm * truncate / 2) & (x_range < fwhm * truncate / 2)
+        V[mask] = voigt_profile(x_range[mask], sigma, gamma)
+    else:
+        V = voigt_profile(x_range, sigma, gamma)
+    return V / V.sum()
 
 
 @deprecated_keywords("norm")
-def apply_voigt(sim: NDArray, sigma: float, gamma: float, norm: bool | None = None) -> NDArray:
+@array_cache(maxsize=128)
+def apply_voigt(
+    sim: NDArray, sigma: float, gamma: float, norm: bool | None = None, truncate: None | float = None
+) -> NDArray:
     """Apply Voigt broadening to a simulated equidistant spectrum, preserving the integral and sum.
 
     The x-axis of the simulation `sim` must be an equidistant grid.
@@ -269,6 +299,13 @@ def apply_voigt(sim: NDArray, sigma: float, gamma: float, norm: bool | None = No
     That means these widths are not one-to-one comparable but should be converted to HWHM of FHWM.
 
     If either `gamma` or `sigma` are respectively 0, will apply solely `Gaussian` or `Lorentzian` broadening.
+
+    Important:
+        This function makes use of the [Moose.utils.caching.array_cache][].
+
+        To get the best performance out of the cache, make sure that any input array is a C-contiguous array (check the array attribute `flags.c_contiguous`).
+
+        If so, hashing is a zero-copy operation, but for a F-contiguous array a copy first needs to be made each time before hashing!
 
     Warning:
         Though the function accepts a "norm=True" keyword argument, this is considered deprecated behaviour and will not do anything.
@@ -285,13 +322,16 @@ def apply_voigt(sim: NDArray, sigma: float, gamma: float, norm: bool | None = No
         A 2D array of the same shape as the input array `sim`, but convolved with a voigt profile.
     """
     x = sim[:, 0]
-    dim = x.shape[0]
-    mu = (x[dim // 2 - 1] + x[dim // 2]) / 2.0 if dim % 2 == 0 else x[dim // 2]
+    dim = x.size
+    step = x[dim // 2] - x[dim // 2 - 1]
 
-    v = vgt(x, sigma, gamma, mu, 1, 0)
-    conv = scipy.signal.fftconvolve(sim[:, 1], v / v.sum(), mode="same")
+    convolved = np.zeros_like(sim)
+    convolved[:, 0] = sim[:, 0]
+
+    v = vgt(sigma, gamma, points=x.size, dx=step, truncate=truncate)
+    convolved[:, 1] = scipy.signal.fftconvolve(sim[:, 1], v, mode="same")
     # TODO: only return convolved y data, since x does not change? save memory/cpu impact.
-    return np.column_stack((x, conv))
+    return convolved
 
 
 def match_spectra(meas: np.array, sim: np.array, shift=0) -> np.ndarray:
@@ -389,7 +429,7 @@ def model_for_fit(
         wl_mode=kwargs.pop("wl_mode", "air"),
     )
     refined = equidistant_mesh(sticks, wl_pad=wl_pad, resolution=resolution)
-    simulation = apply_voigt(refined, sigma, gamma)
+    simulation = apply_voigt(refined, sigma, gamma, truncate=kwargs.pop("truncate", None))
     sim_matched = match_spectra(x, simulation, shift=mu)
     val = sim_matched[:, 1]
     if normalize is True:

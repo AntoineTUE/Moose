@@ -128,10 +128,50 @@ class TestSimulation:
         assert_allclose(equid[:, 1].sum(), sim[:, 1].sum())
         assert_allclose(sim[:, 0].min() - pad, equid[:, 0].min())
 
-    def test_vgt(self):
-        x = np.linspace(-10, 10, 1000)
-        assert_array_equal(Simulation.vgt(x, 0.2, 0.2, 0, 1, 0), voigt_profile(x, 0.2, 0.2))
-        assert_allclose(Simulation.vgt(x, 0.1, 0.1, 0.1, 1, 0), voigt_profile(x - 0.1, 0.1, 0.1))
+    @pytest.mark.parametrize("points", [100, 1000, 10000])
+    @pytest.mark.parametrize("step", [0.01, 0.1, 1])
+    @pytest.mark.parametrize("width", [0.01, 0.1, 1])
+    def test_vgt(self, points, step, width):
+        x = (np.arange(points) - (points - 1) / 2.0) * step
+        v_ref = voigt_profile(x, width, width)
+        v = Simulation.vgt(width, width, x.size, step)
+        assert v.size == points
+        assert_allclose(v, v_ref / v_ref.sum())
+        assert_array_less(0, v)  # above 0
+        assert_allclose(v.sum(), 1.0, atol=1e-12)  # normalized
+        # Check symmetric
+        mid = points // 2
+        assert_allclose(v[:mid].sum(), v[mid:].sum(), atol=1e-12)
+
+    def test_voigt_truncated_reduces_nonzero_count(self):
+        """Test that truncated version has more zeros, but preserves normalization."""
+        sigma = 0.4
+        gamma = 0.2
+        points = 1001
+        dx = 0.01
+        truncate = 4
+
+        V_full = Simulation.vgt(sigma, gamma, points, dx, truncate=None)
+        V_trunc = Simulation.vgt(sigma, gamma, points, dx, truncate=truncate)
+
+        assert np.count_nonzero(V_trunc) < np.count_nonzero(V_full)
+        assert_allclose(V_trunc.sum(), 1.0, atol=1e-12)
+
+    @pytest.mark.parametrize("truncate", [0.1, 1, 5, 9, 15, 30])
+    def test_voigt_no_truncation_vs_truncation(self, truncate):
+        sigma = 0.5
+        gamma = 0.1
+        points = 801
+        dx = 0.01
+
+        V1 = Simulation.vgt(sigma, gamma, points, dx, truncate=None)
+        V2 = Simulation.vgt(sigma, gamma, points, dx, truncate=truncate)
+
+        # Low truncation should be different, high truncation is almost the same
+        if truncate < 8:
+            assert_raises(AssertionError, assert_allclose, V1, V2)
+        else:
+            assert_allclose(V1, V2)
 
     @pytest.mark.parametrize("points", [100, 300, 1000])
     @pytest.mark.parametrize("peaks", [5, 10, 500])
