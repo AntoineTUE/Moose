@@ -41,7 +41,27 @@ class ProfilerInfo:
 
 
 def profile(func):
-    """Profile function execution time, simply tracking the average execution time."""
+    """Profile function execution time, simply tracking the average execution time.
+
+    Example:
+    ```python
+    # Simply decorate a function that you want to profile
+    @profile
+    def my_function(...):
+        ...
+
+    # alternatively, you can wrap a function
+    my_other_function = profile(...)
+
+    # run the function to gather data
+    for _ in range(1000):
+        my_function()
+        my_other_function()
+
+    # Show results
+    print(my_function.prof, my_other_function.prof)
+    ```
+    """
 
     @wraps(func)
     def wrapper(*args, **kwargs):
