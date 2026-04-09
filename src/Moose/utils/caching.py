@@ -116,11 +116,13 @@ class ArrayLRUCache:
         """
         with self.lock:
             return {
+                "function": self.func.__name__,
                 "hits": self.hits,
                 "misses": self.misses,
+                "cache hit rate": self.hits / (self.hits + self.misses) * 100,
                 "size": len(self.cache),
                 "maxsize": self.maxsize,
-                "unique_objects": len(self.object_store),
+                "unique objects": len(self.object_store),
             }
 
     def cache_clear(self):
