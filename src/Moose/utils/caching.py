@@ -119,7 +119,7 @@ class ArrayLRUCache:
                 "function": self.func.__name__,
                 "hits": self.hits,
                 "misses": self.misses,
-                "cache hit rate": self.hits / (self.hits + self.misses) * 100,
+                "cache hit rate": self.hits / max((self.hits + self.misses), 1) * 100,
                 "size": len(self.cache),
                 "maxsize": self.maxsize,
                 "unique objects": len(self.object_store),
@@ -236,10 +236,22 @@ def array_cache(maxsize=128):
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            return cache(*args, **kwargs)
+            return wrapper._target(*args, **kwargs)
+
+        wrapper._target = cache
+
+        def enable_cache(enabled: bool = True, reset: bool = False):
+            if enabled:
+                wrapper._target = cache
+            else:
+                wrapper._target = func
+            if reset:
+                cache.cache_clear()
+            return
 
         wrapper.cache_info = cache.cache_info
         wrapper.cache_clear = cache.cache_clear
+        wrapper.enable_cache = enable_cache
 
         return wrapper
 
