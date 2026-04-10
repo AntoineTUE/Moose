@@ -1883,7 +1883,7 @@ To do this, it relies on the use of <a href="https://www.dask.org"><code>Dask</c
 
 <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span><span class="mi">390</span><span class="p">,</span><span class="mi">2000</span><span class="p">)</span>
 <span class="n">db</span> <span class="o">=</span> <span class="n">Moose</span><span class="o">.</span><span class="n">query_DB</span><span class="p">(</span><span class="s1">'N2CB'</span><span class="p">,</span> <span class="n">wl</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">Moose</span><span class="o">.</span><span class="n">model_for_fit</span><span class="p">,</span> <span class="n">sim_db</span> <span class="o">=</span> <span class="n">db</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">Moose</span><span class="o">.</span><span class="n">model_for_fit</span><span class="p">,</span> <span class="n">sim_db</span> <span class="o">=</span> <span class="n">db</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">params</span> <span class="o">=</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">create_params</span><span class="p">(</span><span class="o">**</span><span class="n">Moose</span><span class="o">.</span><span class="n">default_params</span><span class="p">)</span>
 
 <span class="n">params</span><span class="p">[</span><span class="s1">'T_rot'</span><span class="p">]</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="mi">8000</span>
@@ -1910,7 +1910,7 @@ pn.extension('plotly')
 
 x = np.linspace(320,390,2000)
 db = Moose.query_DB('N2CB', wl=(x.min(), x.max()))
-model = lmfit.Model(Moose.model_for_fit, sim_db = db)
+model = lmfit.Model(Moose.model_for_fit, sim_db = db, normalize=True)
 params = lmfit.create_params(**Moose.default_params)
 
 params['T_rot'].max = 8000
@@ -1950,9 +1950,9 @@ client = distributed.Client()</div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedJavaScript jp-OutputArea-output" data-mime-type="application/javascript" id="9adbc7af-a20e-41c9-bf37-4c1d55bfd3c3" tabindex="0">
+<div class="jp-RenderedJavaScript jp-OutputArea-output" data-mime-type="application/javascript" id="67201271-4580-4486-aac9-a5c54d8fbc5f" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('9adbc7af-a20e-41c9-bf37-4c1d55bfd3c3');
+var element = document.getElementById('67201271-4580-4486-aac9-a5c54d8fbc5f');
 (function(root) {
   function now() {
     return new Date();
@@ -2213,9 +2213,9 @@ function(Bokeh) {} // ensure no trailing comma for IE
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedJavaScript jp-OutputArea-output" data-mime-type="application/javascript" id="dd991410-275d-4e6c-a1b5-790c6650c512" tabindex="0">
+<div class="jp-RenderedJavaScript jp-OutputArea-output" data-mime-type="application/javascript" id="155ce029-24ff-48cb-a661-94976e733c36" tabindex="0">
 <script type="text/javascript">
-var element = document.getElementById('dd991410-275d-4e6c-a1b5-790c6650c512');
+var element = document.getElementById('155ce029-24ff-48cb-a661-94976e733c36');
 
 if ((window.PyViz === undefined) || (window.PyViz instanceof HTMLElement)) {
   window.PyViz = {comms: {}, comm_status:{}, kernels:{}, receivers: {}, plot_index: []}
@@ -2869,7 +2869,7 @@ layout</div>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 14, 2025 11:27:39 UTC">May 14, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 10, 2026 14:10:13 UTC">April 10, 2026</span>
   </span>
 
     
