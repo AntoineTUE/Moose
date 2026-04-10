@@ -177,6 +177,38 @@ def create_stick_spectrum(
 
 
 @array_cache(maxsize=128)
+def compute_equidistant_bins(wl: NDArray, pad: float = 10, resolution: int = 100) -> tuple[NDArray, NDArray]:
+    """Compute an equidistant vector over the range of `wl`, at the specified resolution and with edges padded by `pad`.
+
+    Returns a vector of the equidistantly spaces values and the indices that would sort `wl` into it.
+
+    The input vector (or 1D array) `wl` does not need to be sorted.
+
+    The indices are computed such that if they are used to insert elements into an array, the order would be preserved.
+
+    For any index value `v`, that is used to insert into an array `a`, that: `a[i-1]<v<=a[i]`.
+
+    See also [numpy.searchsorted][].
+
+    Args:
+        wl (NDArray): An input array of (potentially  unsorted) wavelenghts (or other values).
+        pad (float, optional): An amount to pad the range of `wl` by. Defaults to 10.
+        resolution (int, optional): Resolution in points per unit (of `x`) for the equidistant samples; spacing would be 1/resolution. Defaults to 100.
+
+    Returns:
+        A tuple of equidistant values, and the sorting indices that would sort `wl` between the equidistant points.
+    """
+    wl_min = wl.min() - pad
+    wl_max = wl.max() + pad
+    delta = wl_max - wl_min
+    points = int(delta * resolution) + 1
+    wl_equidistant = np.linspace(wl_min, wl_max, points)
+    idx_right = np.searchsorted(wl_equidistant, wl, side="left")
+
+    return wl_equidistant, idx_right
+
+
+@array_cache(maxsize=128)
 def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: int = 100) -> NDArray[np.float64]:
     """Create an equidistant mesh from a (stick) simulation, where the mesh resolution per nanometer is controlled by the `resolution`.
 
@@ -214,21 +246,15 @@ def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: i
       * [apply_voigt][Moose.Simulation.apply_voigt]
     """
     wl = sim[:, 0]
-    wl_max = wl.max() + wl_pad
-    wl_min = wl.min() - wl_pad
-    delta = wl_max - wl_min
-    points = int(delta * resolution) + 1
-    wl_new = np.linspace(wl_min, wl_max, points)
     ys = sim[:, 1]
 
-    # if `side`=left => finds: a[i-1] < v <= a[i]
-    idx_right = np.searchsorted(wl_new, wl, side="left")
+    wl_new, idx_right = compute_equidistant_bins(wl, wl_pad, resolution)
     idx_left = idx_right - 1
     bin_left = wl_new[idx_left]
     weights_right = (wl - bin_left) * resolution
     weights_left = 1 - weights_right
 
-    equid = np.zeros((points, 2), dtype=np.float64)
+    equid = np.zeros((wl_new.size, 2), dtype=np.float64)
     equid[:, 0] = wl_new
     # Use np.add.at ufunc to accumulate at repeated indices
     # the alternative np.bincount (with `minlength=points`) appears slower for relevant use cases
