@@ -44,10 +44,5 @@ You may be better served using `MassiveOES` or other programs, because of the fo
 *   `Moose` does not give you tools to read, correct, or plot spectra
     *   There are better, more feature complete libraries for that
 *   `Moose` lacks out-of-the-box fitting of multiple excited species not in equilibrium
-    *   See the [examples](./examples) pages to see how you could use `Moose` for fitting
+    *   See the [examples](./examples) pages to see how you could use `Moose` for fitting (and visualizing)
     *   Or simply build upon `Moose` for your own custom fitting routines
-*  The provided fitting examples simply recalculate the simulated spectrum for each fit iteration, which sacrifices some speed. 
-    *   The benefit is that it can be run in [parallel with ease](./examples/dask).
-    *   If you don't have a huge set of very similar data or complex fits, this should not be an issue
-
- 

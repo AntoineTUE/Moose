@@ -62,6 +62,7 @@ These dependencies will be installed when you install `Moose` using `pip` or `uv
 | Numpy  | >= 1.24.2  |
 | Pandas | >= 1.5.3 |
 | scipy | >= 1.11.1 |
+| xxhash | >= 3.6.0 |
 | *lmfit* (optional) | >= *1.2.0* |
 
 ## Installation

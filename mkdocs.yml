@@ -111,6 +111,8 @@ plugins:
           - https://lmfit.github.io/lmfit-py/objects.inv
           - http://pandas.pydata.org/pandas-docs/stable/objects.inv
           - https://docs.scipy.org/doc/scipy/objects.inv
+          - https://scikit-hep.org/iminuit/objects.inv
+          - https://docs.python.org/3/objects.inv
         paths: 
           - src
         options:
@@ -152,11 +154,12 @@ nav:
 - API Reference: reference/
 - Examples:
   - examples.md
+  - Fitting backends: examples/Moose_fitting_backends.ipynb
   - Interactive plotting:
+    - Matplotlib: examples/matplotlib.ipynb
     - Bokeh: examples/bokeh.ipynb
     - Plotly: examples/plotly.ipynb
-    - Matplotlib: examples/matplotlib.ipynb
-  - Fitting backends: examples/Moose_fitting_backends.ipynb
+    - Iminuit: examples/iminuit.ipynb
   - Parallel fitting with Dask: examples/dask.ipynb
   - Spectra with multiple species: examples/Multiple_species.ipynb
 
