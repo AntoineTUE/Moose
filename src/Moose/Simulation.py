@@ -54,10 +54,10 @@ thermal_default_params = {
 def query_DB(
     db_name: str,
     wl: tuple = (0, 1e9),
-    kind: str = "emission",
+    kind: Literal["emission", "absorption"] = "emission",
     mode: Literal["air", "vacuum"] = "air",
-    v_max=None,
-    J_max=None,
+    v_max: int | None = None,
+    J_max: int | None = None,
     path: str | pathlib.Path | None = None,
 ) -> pd.DataFrame:
     """Query a SQL database that must contain line-by-line information, compatible with the format used by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes).
@@ -67,8 +67,8 @@ def query_DB(
         wl (tuple, optional): A wavelength range to constrain the query to. Defaults to (0,np.inf).
         kind (str, optional): The `kind` of spectrum that you want to create, either `emission` or `absorption`. The latter is not really tested. Defaults to 'emission'.
         mode (str, optional): A selection of the `mode` for wavelength, either in air or vacuum equivalent. Defaults to 'air'.
-        v_max (_type_, optional): Maximum vibrational quantum number `v` for the query. Defaults to None.
-        J_max (_type_, optional): Maximum rotational quantum number `J` for the query. Defaults to None.
+        v_max (int, optional): Maximum vibrational quantum number `v` for the query. Defaults to None.
+        J_max (int, optional): Maximum rotational quantum number `J` for the query. Defaults to None.
         path (str, optional): The path to the folder containing database files. Defaults to the location of pre-packed databases.
 
     Raises:
@@ -76,7 +76,7 @@ def query_DB(
         sql.DatabaseError: If the SQL query failed, due to incompatible database format, or errors in input
 
     Returns:
-        pd.DataFrame: A pandas DataFrame object containing the result of the query.
+        A pandas DataFrame containing the result of the query.
 
     See also [create_stick_spectrum][Moose.Simulation.create_stick_spectrum]
     """

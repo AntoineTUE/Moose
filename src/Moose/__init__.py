@@ -28,6 +28,7 @@ from .Simulation import (
 
 database_path = resources.files("Moose").joinpath("data")
 database_files = [p.stem for p in database_path.glob("*.db")]  # + [p.stem for p in database_path.glob("*.par")]
+"""List of database names available in Moose out-of-the-box."""
 
 __all__ = [
     "default_params",

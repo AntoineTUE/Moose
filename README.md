@@ -43,6 +43,12 @@ Details can be found in [data_sources.txt](./Moose/data/data_sources.txt), and t
 | C2 | Swan |
 | CN | B-X |
 
+### Other bands
+
+If you have suitable line-by-line data available for other molecular bands, you can also use `Moose` to fit those species.
+
+You'd need to provide the data as a Dataframe that the function [`create_stick_spectrum`][https://antoinetue.github.io/Moose/latest/reference/Moose/Simulation/#Moose.Simulation.create_stick_spectrum] can work with, or write your own function.
+
 ## Dependencies
 
 Dependencies are mainly specified in the [pyproject.toml](./pyproject.toml).
