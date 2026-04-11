@@ -11,4 +11,4 @@ dependencies:
   - python=3.13
   - pip
   - pip:
-    - -e .[examples]
+    - -e ..[examples]
