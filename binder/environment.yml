@@ -1,0 +1,14 @@
+# Explicit enviroment defined for MyBinder to install the [examples] extra dependencies
+# MyBinder (using repo2docker) will not install extras when installing from pyproject.toml
+# When a `./binder` folder exists, repo2docker will look in that folder for an environment definition.
+# This means it skips pyproject.toml in root (and will not find it as an enviroment anymore)
+# Since March 9, 2026 repo2docker will fail intentionally when no environment file is found
+# See: https://github.com/jupyterhub/repo2docker/issues/1507
+name: binder-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - pip
+  - pip:
+    - -e .[examples]
