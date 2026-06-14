@@ -14,7 +14,6 @@ To see `Moose` in action, check out the [examples](../../examples)
 """
 
 import importlib.util
-from importlib import resources
 from .Simulation import (
     default_params,
     thermal_default_params,
@@ -26,9 +25,9 @@ from .Simulation import (
     model_for_fit,
 )
 
-database_path = resources.files("Moose").joinpath("data")
-database_files = [p.stem for p in database_path.glob("*.db")]  # + [p.stem for p in database_path.glob("*.par")]
-"""List of database names available in Moose out-of-the-box."""
+from .utils.db_io import get_database_path, set_database_path, database_files
+
+get_database_path()  # triggers migration message.
 
 __all__ = [
     "default_params",
@@ -39,9 +38,7 @@ __all__ = [
     "apply_voigt",
     "match_spectra",
     "model_for_fit",
+    "get_database_path",
+    "set_database_path",
+    "database_files",
 ]
-
-if importlib.util.find_spec("lmfit") is not None:
-    from .FitUtil import set_param, set_params, make_model
-
-    __all__ += ["set_param", "set_params", "make_model"]

@@ -40,10 +40,24 @@ from tqdm import tqdm
 GITHUB_API_URL = "https://api.github.com"
 REPO = "AntoineTUE/Moose"
 SRC_DATA_PATH = "src/Moose/data"  # case-sensitive
-_PKGD_PATH: Path = resources.files("Moose").joinpath("data")  # This can be very slow the first time
-_PKGD_FILES = list(_PKGD_PATH.glob("*"))
 USER_DIR = Path.home().joinpath("moose-spectra")
 _CHUNK_SIZE = 2097152
+HAS_BEEN_NOTIFIED = False
+
+
+def _find_packaged_data():
+    """Find the location of the databases that are packaged with Moose.
+
+    This will also find the location if Moose is installed in `editable` mode from a clone of the git repo.
+
+    Returns:
+        pkg_data_path (Path):   The path to the directory that stores the database files
+        pkg_files (list[Path]): A list of all files in the directory.
+    """
+    # This can be quite slow when it first runs
+    pkg_data_path: Path = resources.files("Moose").joinpath("data")  # ty:ignore[invalid-assignment]
+    pkg_files = list(pkg_data_path.glob("*"))
+    return pkg_data_path, pkg_files
 
 
 def generate_chunks_and_hash(buff, size: int, chunk_size=_CHUNK_SIZE) -> tuple[Iterable[bytes], HASH]:
@@ -170,6 +184,9 @@ def download_databases_from_repo(target_dir: Path | None = None, overwrite=False
 
     These are the files in the repo path `src/Moose/data`.
 
+    Note:
+        This will download all database files, but also files like `data_sources.txt`.
+
     Args:
         target_dir (Path|None): The target directory to download to. Must be a directory, not a file path. If missing, falls back to [USER_DIR][..]
         overwrite (bool): Flag to overwrite existing files, or not (default:False)
@@ -208,13 +225,17 @@ def migrate_file(file: Path, target_dir: Path, overwrite=False):
     shutil.copy2(file, target_file)
 
 
-def migrate():
-    """Migrate files shipped with the Moose package to the user directory."""
-    if not USER_DIR.exists():
-        USER_DIR.mkdir(exist_ok=True)  # Do not raise if exist, though it should not at this point.
-    for file in _PKGD_FILES:
+def migrate(overwrite=False):
+    """Migrate files shipped with the Moose package to the user directory.
+
+    Will create the directory `~/moose-spectra` if missing.
+    """
+    if _dir_missing := not USER_DIR.exists():
+        USER_DIR.mkdir(exist_ok=True)  # Do not raise if exist, though it should not be needed at this point.
+    _, pkg_files = _find_packaged_data()
+    for file in pkg_files:
         try:
-            migrate_file(file, target_dir=USER_DIR)
+            migrate_file(file, target_dir=USER_DIR, overwrite=overwrite)
         except OSError as e:
             if "already exists" in e.args[0]:
                 continue
@@ -230,8 +251,63 @@ def download_databases(overwrite=False):
     This latter behaviour will be deprecated after a transition period, when Moose stops shipping the databases.
     """
     if not USER_DIR.exists():
-        USER_DIR.mkdir(exist_ok=True)  # Do not raise if exist, though it should not at this point.
+        USER_DIR.mkdir(exist_ok=True, parents=True)  # Do not raise if exist, though it should not at this point.
     if not overwrite:
         # only migrate if this will not be overwritten
         migrate()
     download_databases_from_repo(USER_DIR, overwrite=overwrite)
+
+
+def set_database_path(path: Path, mkdir=False):
+    """Set the path where Moose searches for databases by default.
+
+    The default location is `~/moose-spectra`, but this function lets you point to another location.
+
+    Note that this does not persist and you will need to do this each session.
+
+    Use this over setting  [DEFAULT_USER_DIR][..] directly, as this function will allow the change to propagate.
+    """
+    if not path.is_dir():
+        if not mkdir:
+            raise ValueError(f"{path} is not a directory, or does not exist.")
+        path.mkdir(parents=True, exist_ok=True)
+    global USER_DIR
+    USER_DIR = path
+
+
+def get_database_path() -> Path:
+    """Get the path where Moose searches for databases by default.
+
+    Defaults to the directory `~/moose-spectra`, but can be changed with [set_database_path][..].
+
+    If this folder does not exist, it falls back to package folder.
+    """
+    global USER_DIR
+    if not USER_DIR.exists():
+        # Avoid updating DEFAULT_USER_DIR, so migrations still can happen.
+        package_dir, _ = _find_packaged_data()
+        notify_data_dir_migration()
+        return package_dir
+    return USER_DIR
+
+
+def database_files() -> list[str]:
+    """List the database names available to Moose out-of-the-box.
+
+    Relies on the [DEFAULT_USER_DIR][..] and/or [set_database_path][..] and [get_database_path][..] to find the available files.
+    """
+    path = get_database_path()
+    return [p.stem for p in path.glob("*.db")]
+
+
+def notify_data_dir_migration():
+    """Notify user to migrate data."""
+    global HAS_BEEN_NOTIFIED
+    if not HAS_BEEN_NOTIFIED:
+        print("Moose is moving towards storing databases in the user folder, instead of bundling them.")
+        print("See:\n\thttps://github.com/AntoineTUE/Moose/issues/2\n")
+        print(f"The user folder is: {USER_DIR}.")
+        print("This folder does not exist or is empty.\nRun either of these functions to migrate:\n")
+        print("\t> Moose.utils.db_io.migrate")
+        print("\t> Moose.utils.db_io.download_databases")
+        HAS_BEEN_NOTIFIED = True
