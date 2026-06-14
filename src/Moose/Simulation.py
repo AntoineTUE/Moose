@@ -22,6 +22,7 @@ from numpy.typing import NDArray
 from .utils.maintenance import deprecated_keywords
 from .utils.profiler import profile
 from .utils.caching import array_cache
+from .utils.db_io import get_database_path
 
 kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
 
@@ -80,17 +81,16 @@ def query_DB(
 
     See also [create_stick_spectrum][Moose.Simulation.create_stick_spectrum]
     """
-    path = pathlib.Path(path) if path is not None else resources.files("Moose") / "data"
-    if ".db" not in db_name:
-        db_name += ".db"
+    path = pathlib.Path(path) if path is not None else get_database_path()
+    db_name = db_name if db_name.endswith(".db") else f"{db_name}.db"
     wl_min, wl_max = map(float, wl) if wl is not None else (0.0, 1e9)
-    db_path = pathlib.Path(path).joinpath(db_name)
+    db_path = path.joinpath(db_name)
     if not db_path.exists():
         errmsg = f'No such database, the file "{db_path.as_posix()}" was not found...'
         raise FileNotFoundError(errmsg)
     with db_path.open("rb") as f:
         header = f.read(100)
-    if header[:16] != b"SQLite format 3\x00":
+    if not header.startswith(b"SQLite format 3\x00"):
         errmsg = "File does not contain a valid SQL3 database..."
         raise sql.DatabaseError(errmsg)
 
