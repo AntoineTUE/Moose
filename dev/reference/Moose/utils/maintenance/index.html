@@ -1301,7 +1301,7 @@
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">P</span> <span class="o">=</span> <span class="n"><span title="typing_extensions.ParamSpec">ParamSpec</span></span><span class="p">(</span><span class="s1">&#39;P&#39;</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">P</span> <span class="o">=</span> <span class="n"><span title="typing_extensions.ParamSpec">ParamSpec</span></span><span class="p">(</span><span class="s1">'P'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1323,7 +1323,7 @@
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">R</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="typing.TypeVar" href="https://docs.python.org/3/library/typing.html#typing.TypeVar">TypeVar</a></span><span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">R</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="typing.TypeVar" href="https://docs.python.org/3/library/typing.html#typing.TypeVar">TypeVar</a></span><span class="p">(</span><span class="s1">'R'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1386,15 +1386,15 @@
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>
 <span class="normal"><a href="#__codelineno-0-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="k">def</span><span class="w"> </span><span class="nf">deprecated</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorate a function to be marked as deprecated.</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">"""Decorate a function to be marked as deprecated.</span>
 <a id="__codelineno-0-21" name="__codelineno-0-21"></a>
 <a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">    Can be provided with an additional message to show, in addition to the default deprecation string.</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">    """</span>
 <a id="__codelineno-0-24" name="__codelineno-0-24"></a>
 <a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">make_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>        <span class="n">base_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The function `</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">` is deprecated and will be removed in the future.&quot;</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>        <span class="n">base_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"The function `</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">` is deprecated and will be removed in the future."</span>
 <a id="__codelineno-0-27" name="__codelineno-0-27"></a>        <span class="k">if</span> <span class="n">message</span><span class="p">:</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="n">base_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="n">base_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span>
 <a id="__codelineno-0-29" name="__codelineno-0-29"></a>
 <a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="c1"># Python 3.13+</span>
 <a id="__codelineno-0-31" name="__codelineno-0-31"></a>        <span class="k">if</span> <span class="n">_IMPLEMENTS_DEPRECATED</span><span class="p">:</span>
@@ -1412,7 +1412,7 @@
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a>    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a>        <span class="k">return</span> <span class="n">make_decorator</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="c1"># When used as: `@deprecated(&quot;message&quot;)`</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="c1"># When used as: `@deprecated("message")`</span>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a>        <span class="k">return</span> <span class="n">make_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a>
@@ -1431,7 +1431,7 @@
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">deprecated_keywords</span><span class="p">(</span><span class="o">*</span><span class="n">kw_names</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n">removed_in</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s1">&#39;a future release&#39;</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">deprecated_keywords</span><span class="p">(</span><span class="o">*</span><span class="n">kw_names</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n">removed_in</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s1">'a future release'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1521,27 +1521,27 @@
 <span class="normal"><a href="#__codelineno-0-82">82</a></span>
 <span class="normal"><a href="#__codelineno-0-83">83</a></span>
 <span class="normal"><a href="#__codelineno-0-84">84</a></span>
-<span class="normal"><a href="#__codelineno-0-85">85</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="k">def</span><span class="w"> </span><span class="nf">deprecated_keywords</span><span class="p">(</span><span class="o">*</span><span class="n">kw_names</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">removed_in</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;a future release&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Issue a DeprecationWarning if a function is called with a deprecated keyword argument.</span>
+<span class="normal"><a href="#__codelineno-0-85">85</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="k">def</span><span class="w"> </span><span class="nf">deprecated_keywords</span><span class="p">(</span><span class="o">*</span><span class="n">kw_names</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">removed_in</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"a future release"</span><span class="p">):</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="w">    </span><span class="sd">"""Issue a DeprecationWarning if a function is called with a deprecated keyword argument.</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    Any non-None value is considered a violation.</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">        *kw_names: names of keyword args to watch.</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">        removed_in: short text saying when it will be removed (included in the message).</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    """</span>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="s2">&quot;Callable[P,R]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Callable[P,R]&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="s2">"Callable[P,R]"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Callable[P,R]"</span><span class="p">:</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>        <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="s2">&quot;P.args&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="s2">&quot;P.kwargs&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="s2">"P.args"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="s2">"P.kwargs"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"R"</span><span class="p">:</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>            <span class="n">bound</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a>            <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">kw_names</span><span class="p">:</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a>                <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span> <span class="ow">and</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>                        <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">&#39; is deprecated and will be removed in </span><span class="si">{</span><span class="n">removed_in</span><span class="si">}</span><span class="s2">; &quot;</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a>                        <span class="sa">f</span><span class="s2">&quot;do not pass &#39;</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">&#39; (it will be ignored).&quot;</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a>                        <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">' is deprecated and will be removed in </span><span class="si">{</span><span class="n">removed_in</span><span class="si">}</span><span class="s2">; "</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>                        <span class="sa">f</span><span class="s2">"do not pass '</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">' (it will be ignored)."</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>                    <span class="p">)</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>                        <span class="n">msg</span><span class="p">,</span>

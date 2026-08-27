@@ -1279,7 +1279,7 @@
 <span class="normal"><a href="#__codelineno-0-25">25</a></span>
 <span class="normal"><a href="#__codelineno-0-26">26</a></span>
 <span class="normal"><a href="#__codelineno-0-27">27</a></span>
-<span class="normal"><a href="#__codelineno-0-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Use built-in features of lmfit to set or update a Parameter on a Parameters container-object.&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="nd">@deprecated</span><span class="p">(</span><span class="s2">"Use built-in features of lmfit to set or update a Parameter on a Parameters container-object."</span><span class="p">)</span>
 <a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_param</span><span class="p">(</span>
 <a id="__codelineno-0-20" name="__codelineno-0-20"></a>    <span class="n">params</span><span class="p">:</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">Parameters</span><span class="p">,</span>
 <a id="__codelineno-0-21" name="__codelineno-0-21"></a>    <span class="n">param_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1288,7 +1288,7 @@
 <a id="__codelineno-0-24" name="__codelineno-0-24"></a>    <span class="nb">max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="n">vary</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="p">):</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Set or modify a single parameter in `lmfit.Parameters` object.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">    </span><span class="sd">"""Set or modify a single parameter in `lmfit.Parameters` object."""</span>
 <a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="n">params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="nb">max</span><span class="p">,</span> <span class="n">vary</span><span class="o">=</span><span class="n">vary</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1325,9 +1325,9 @@
 <span class="normal"><a href="#__codelineno-0-34">34</a></span>
 <span class="normal"><a href="#__codelineno-0-35">35</a></span>
 <span class="normal"><a href="#__codelineno-0-36">36</a></span>
-<span class="normal"><a href="#__codelineno-0-37">37</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Use built-in features of lmfit to update many parameters of a Parameters object.&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-37">37</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="nd">@deprecated</span><span class="p">(</span><span class="s2">"Use built-in features of lmfit to update many parameters of a Parameters object."</span><span class="p">)</span>
 <a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_params</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">Parameters</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">default_params</span><span class="p">,</span> <span class="nb">print</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Set or modify a bunch of parameters using a dict in a `lmfit.Parameters` object.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">    </span><span class="sd">"""Set or modify a bunch of parameters using a dict in a `lmfit.Parameters` object."""</span>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="p">:</span>
 <a id="__codelineno-0-35" name="__codelineno-0-35"></a>        <span class="n">set_param</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="o">**</span><span class="n">param_dict</span><span class="p">[</span><span class="n">param</span><span class="p">])</span>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="k">if</span> <span class="nb">print</span><span class="p">:</span>
@@ -1515,7 +1515,7 @@
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="n">wl_pad</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="p">):</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a `lmfit.Model` instance already prepared with the line-by-line database for fitting.</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="w">    </span><span class="sd">"""Create a `lmfit.Model` instance already prepared with the line-by-line database for fitting.</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">        species (str): The name of the species database to query.</span>
@@ -1529,14 +1529,14 @@
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">        model (lmfit.Model): A `Model` object that can be used for fitting</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">        params (lmfit.Parameters): A `Parameters` object that can be used for fitting, containing default initial values and ranges.</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>    <span class="n">pars</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;params&quot;</span><span class="p">,</span> <span class="n">default_params</span><span class="p">)</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    """</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a>    <span class="n">pars</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"params"</span><span class="p">,</span> <span class="n">default_params</span><span class="p">)</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a>    <span class="n">db</span> <span class="o">=</span> <span class="n">query_DB</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="c1"># param_names = kwargs.pop(&#39;param_names&#39;, [p for p in _default_params.keys()]) # Makes it possible to change what are considered fit parameters. Be default only `wl_pad` and `resolution` are excluded</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="c1"># param_names = kwargs.pop('param_names', [p for p in _default_params.keys()]) # Makes it possible to change what are considered fit parameters. Be default only `wl_pad` and `resolution` are excluded</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a>    <span class="n">model</span> <span class="o">=</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_for_fit</span><span class="p">,</span> <span class="n">sim_db</span><span class="o">=</span><span class="n">db</span><span class="p">)</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>    <span class="n">params</span> <span class="o">=</span> <span class="n">lmfit</span><span class="o">.</span><span class="n">create_params</span><span class="p">(</span><span class="o">**</span><span class="n">pars</span><span class="p">)</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;wl_pad&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">wl_pad</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">resolution</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"wl_pad"</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">wl_pad</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="n">params</span><span class="p">[</span><span class="s2">"resolution"</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">resolution</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span>
 </code></pre></div></td></tr></table></div>
             </details>
