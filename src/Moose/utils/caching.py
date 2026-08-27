@@ -37,8 +37,8 @@ def hash_numpy(arr: NDArray) -> str:
     See also: https://github.com/Cyan4973/xxHash/wiki/Collision-ratio-comparison
     """
     h = xxhash.xxh128()
-    h.update(str(arr.shape))
-    h.update(arr.dtype.str)
+    h.update(str(arr.shape).encode())
+    h.update(arr.dtype.str.encode())
     h.update(memoryview(arr))  # zero-copy
     return h.hexdigest()
 
