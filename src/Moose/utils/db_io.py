@@ -28,6 +28,7 @@ In the meantime, it will be possible to migrate the bundled databases to the new
 
 from _hashlib import HASH
 from collections.abc import Callable, Iterable
+from enum import Flag, auto
 
 import hashlib
 from pathlib import Path
@@ -35,7 +36,7 @@ from importlib import resources
 import shutil
 
 from requests import Session, Response
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 GITHUB_API_URL = "https://api.github.com"
 REPO = "AntoineTUE/Moose"
@@ -43,6 +44,15 @@ SRC_DATA_PATH = "src/Moose/data"  # case-sensitive
 USER_DIR = Path.home().joinpath("moose-spectra")
 _CHUNK_SIZE = 2097152
 HAS_BEEN_NOTIFIED = False
+
+
+class FileExistsBehavior(Flag):
+    """Enum to define behavior when a file already exists in the target directory."""
+
+    OVERWRITE = auto()
+    SKIP = auto()
+    VALIDATE = auto()
+    RAISE = auto()
 
 
 def _find_packaged_data():
@@ -74,8 +84,8 @@ def generate_chunks_and_hash(buff, size: int, chunk_size=_CHUNK_SIZE) -> tuple[I
     Example:
     ```python
     file = Path("test.tmp")
-    with file.open('rb') as fo:
-        chunks, sha1 = stream_with_hash(fo,file.stat().st_size)
+    with file.open("rb") as fo:
+        chunks, sha1 = stream_with_hash(fo, file.stat().st_size)
         for chunk in chunks:
             pass
 
@@ -135,15 +145,18 @@ def list_data_files_in_repo(ses: Session, branch="main") -> list[dict]:
         info (list[dict]):  A list of dictionaries with info per file that existst under the path.
     """
     response = ses.get(f"{GITHUB_API_URL}/repos/{REPO}/contents/{SRC_DATA_PATH}", params={"ref": branch})
+    response.raise_for_status()
     return response.json()
 
 
-def download_file(ses: Session, info: dict[str, str | int], target_dir: Path, overwrite=False):
+def download_file(
+    ses: Session, info: dict[str, str | int], target_dir: Path, mode: FileExistsBehavior = FileExistsBehavior.VALIDATE
+):
     """Download a file from the Moose repo based on information returned from the GitHub API.
 
-    If `overwrite=False` and the file already exists, the download will be skipped.
+    If `mode=FileExistsBehavior.SKIP` and the file already exists, the download will be skipped.
 
-    Similarly, if `overwrite=True`, but the file hash on disk is the same as upstream, the files are already the same and nothing will be downloaded.
+    Similarly, if `mode=FileExistsBehavior.VALIDATE`, but the file hash on disk is the same as upstream, the files are already the same and nothing will be downloaded.
 
     Finally, if data is downloaded, it checks if the file SHA hash matches the expected hash to verify the download.
 
@@ -151,24 +164,28 @@ def download_file(ses: Session, info: dict[str, str | int], target_dir: Path, ov
         ses (Session):  A persistent requests Session
         info (dict):    A dict with file path information as retrieved from the GitHub API.
         target_dir (Path):  The target directory to store the file in, if download succeeds
-        overwrite (bool): Flag to overwrite files that already exist or not (default: False)
+        mode (FileExistsBehavior): Behavior when the file already exists (default: FileExistsBehavior.VALIDATE)
 
     Raises:
-        OSError:    raised when the target file already exists and `overwrite=False`
+        OSError:    raised when the target file already exists and `mode=FileExistsBehavior.RAISE`
         ValueError: raised when there is a mismatch in the SHA hash reported by GitHub and the actual download.
     """
     name: str = info["name"]  # ty:ignore[invalid-assignment]
+    file_path = target_dir.joinpath(name)
+    if file_path.exists():
+        if mode == FileExistsBehavior.RAISE:
+            raise OSError(f"File {name} already exists.")
+        elif mode == FileExistsBehavior.SKIP:
+            return  # skip download
+        elif mode == FileExistsBehavior.VALIDATE:
+            existing_hash = hash_file(file_path)
+            if existing_hash == info["sha"]:
+                return  # skip download if hash matches
+
     response: Response = ses.get(info["download_url"], stream=True, timeout=30)
     response.raise_for_status()
-    file_path = target_dir.joinpath(name)
-    if file_path.exists() and not overwrite:
-        raise OSError(f"File {name} already exists.")
-    if file_path.exists():
-        existing_hash = hash_file(file_path)
-        if existing_hash == info["sha"]:
-            print(f"{file_path} is up-to-date, skipping download.")
-            return  # No need to download
-    with file_path.open("wb") as f, tqdm(total=info["size"], unit="B", unit_scale=True, desc=name) as pbar:
+
+    with file_path.open("wb") as f, tqdm(total=info["size"], unit="B", unit_scale=True, desc=name, leave=False) as pbar:
         chunks, sha1 = generate_chunks_and_hash(response, info["size"])  # ty:ignore[invalid-argument-type]
         for chunk in chunks:
             f.write(chunk)
@@ -179,7 +196,9 @@ def download_file(ses: Session, info: dict[str, str | int], target_dir: Path, ov
         )
 
 
-def download_databases_from_repo(target_dir: Path | None = None, overwrite=False):
+def download_databases_from_repo(
+    target_dir: Path | None = None, mode: FileExistsBehavior = FileExistsBehavior.VALIDATE
+):
     """Download all databases and ancillary files from the Moose git repository to the target directory.
 
     These are the files in the repo path `src/Moose/data`.
@@ -189,7 +208,7 @@ def download_databases_from_repo(target_dir: Path | None = None, overwrite=False
 
     Args:
         target_dir (Path|None): The target directory to download to. Must be a directory, not a file path. If missing, falls back to [USER_DIR][..]
-        overwrite (bool): Flag to overwrite existing files, or not (default:False)
+        mode (FileExistsBehavior): Behavior when the file already exists (default: FileExistsBehavior.VALIDATE)
     """
     target_dir = USER_DIR if target_dir is None else target_dir
     if not target_dir.exists():
@@ -199,7 +218,7 @@ def download_databases_from_repo(target_dir: Path | None = None, overwrite=False
     errors = {}
     for info in tqdm(file_info):
         try:
-            download_file(session, info, target_dir, overwrite)
+            download_file(session, info, target_dir, mode=mode)
         except (OSError, ValueError) as e:
             errors[info["name"]] = e.args[0]
     if errors != {}:
@@ -208,42 +227,53 @@ def download_databases_from_repo(target_dir: Path | None = None, overwrite=False
             print(f"\t- {file}: {error}")
 
 
-def migrate_file(file: Path, target_dir: Path, overwrite=False):
+def migrate_file(file: Path, target_dir: Path, mode: FileExistsBehavior = FileExistsBehavior.SKIP):
     """Copy a file to the directory `target_dir`.
 
     This fuction is intended to migrate bundled files to the new `moose-spectra` folder in the user directory.
     """
+    if mode == FileExistsBehavior.VALIDATE:
+        raise ValueError(
+            "Cannot validate file when migrating, please use `mode=FileExistsBehavior.SKIP` or `mode=FileExistsBehavior.OVERWRITE`."
+        )
     if file.is_dir():
         raise OSError(f"{file=} is a directory, please provide a file path.")
     if not target_dir.is_dir() or not target_dir.exists():
         raise OSError(f"{target_dir=} is not an existing directory.")
     target_file = target_dir.joinpath(file.name)
-    if not overwrite and target_file.exists():
-        raise OSError(
-            f"A file named {file.name} already exists in {target_dir}. Set `overwrite=True` if you want to ignore this error."
-        )
+    if target_file.exists():
+        if mode == FileExistsBehavior.RAISE:
+            raise OSError(
+                f"A file named {file.name} already exists in {target_dir}. Set `mode=FileExistsBehavior.SKIP` if you want to ignore this error."
+            )
+        elif mode == FileExistsBehavior.SKIP:
+            return  # skip migration
     shutil.copy2(file, target_file)
 
 
-def migrate(overwrite=False):
+def migrate(mode: FileExistsBehavior = FileExistsBehavior.SKIP):
     """Migrate files shipped with the Moose package to the user directory.
 
     Will create the directory `~/moose-spectra` if missing.
     """
+    if mode == FileExistsBehavior.VALIDATE:
+        raise ValueError(
+            "Cannot validate files when migrating, please use `mode=FileExistsBehavior.SKIP` or `mode=FileExistsBehavior.OVERWRITE`."
+        )
     if _dir_missing := not USER_DIR.exists():
         USER_DIR.mkdir(exist_ok=True)  # Do not raise if exist, though it should not be needed at this point.
     _, pkg_files = _find_packaged_data()
     for file in pkg_files:
         try:
-            migrate_file(file, target_dir=USER_DIR, overwrite=overwrite)
+            migrate_file(file, target_dir=USER_DIR, mode=mode)
         except OSError as e:
-            if "already exists" in e.args[0]:
+            if "already exists" in e.args[0] and mode == FileExistsBehavior.SKIP:
                 continue
             else:
                 raise
 
 
-def download_databases(overwrite=False):
+def download_databases(mode: FileExistsBehavior = FileExistsBehavior.VALIDATE):
     """Download databases from the Moose repository to the `moose-spectra` folder in the user directory.
 
     Will first attempt to migrate the files shipped with Moose to avoid downloading.
@@ -252,10 +282,10 @@ def download_databases(overwrite=False):
     """
     if not USER_DIR.exists():
         USER_DIR.mkdir(exist_ok=True, parents=True)  # Do not raise if exist, though it should not at this point.
-    if not overwrite:
+    if mode != FileExistsBehavior.OVERWRITE:
         # only migrate if this will not be overwritten
-        migrate()
-    download_databases_from_repo(USER_DIR, overwrite=overwrite)
+        migrate(mode=FileExistsBehavior.SKIP)
+    download_databases_from_repo(USER_DIR, mode=mode)
 
 
 def set_database_path(path: Path, mkdir=False):
