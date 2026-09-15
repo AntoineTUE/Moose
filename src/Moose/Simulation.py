@@ -422,9 +422,11 @@ def model_for_fit(
     db = Moose.query_DB("N2CB")
 
     params = lmfit.create_params(**Moose.default_params)
-    model = lmfit.Model(Moose.model_for_fit,normalize=True,sim_db=db, independent_vars=["x"])
+    model = lmfit.Model(
+        Moose.model_for_fit, normalize=True, sim_db=db, independent_vars=["x"]
+    )
 
-    result = model.fit(data=...,x=..., params=params)
+    result = model.fit(data=..., x=..., params=params)
     ```
 
     Arguments:
