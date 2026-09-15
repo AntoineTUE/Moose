@@ -101,8 +101,8 @@ More elaborate examples are available via the [online documentation](https://ant
 ```python
 import Moose, lmfit
 
-wl_interval = (320,345) # Wavelength interval over which to simulate the spectrum
-db = Moose.query_DB('N2CB.db', wl_interval)
+wl_interval = (320, 345)  # Wavelength interval over which to simulate the spectrum
+db = Moose.query_DB("N2CB.db", wl_interval)
 
 
 # Create the lmfit.Model and lmfit.Parameters object needed for the fit.
@@ -114,8 +114,7 @@ params = lmfit.create_params(**Moose.default_params)
 # Perform the fit
 fits = []
 for col in data.columns[1:]:
-    fits.append(model.Fit(data[col].values, x=data['Wavelength'].values, params=params))
-
+    fits.append(model.Fit(data[col].values, x=data["Wavelength"].values, params=params))
 ```
 
 You can also try a cloud instance provided by Binder to run the Moose examples, or try it with your own data: [![Try Moose](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/AntoineTUE/Moose/main?urlpath=%2Fdoc%2Ftree%2F.%2Fdocs%2Fexamples%2Fmatplotlib.ipynb).

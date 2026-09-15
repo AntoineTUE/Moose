@@ -148,22 +148,36 @@ def as_minimizer_objective(model_function: Callable, **fixed_kwargs):
 
         db = Moose.query_DB("OHAX")
         params = lmfit.create_params(**Moose.default_params)
-        params.pop("A") # remove A as a parameter, to set it as a fixed argument of the model
+        # remove A as a parameter, to set it as a fixed argument of the model
+        params.pop("A")
 
-        x,y,yerror = ...
+        x, y, yerror = ...
 
         # Flexible model with drop-in replacement of database when fitting
-        model = Moose.lmfit.as_minimizer_objective(Moose.model_for_fit, normalize=True, A=1)
-        opt = lmfit.Minimizer(model, params, fcn_args=(x,), fcn_kws={"y": y, "eps": yerror, "normalize": True, "sim_db":  db})
+        model = Moose.lmfit.as_minimizer_objective(
+            Moose.model_for_fit, normalize=True, A=1
+        )
+        opt = lmfit.Minimizer(
+            model,
+            params,
+            fcn_args=(x,),
+            fcn_kws={"y": y, "eps": yerror, "normalize": True, "sim_db": db},
+        )
         result = opt.minimize()
 
         # Skip the construction of the Minimizer and minimize directly:
-        result = lmfit.minimize(model, params, args=(x,), kws={"y": y, "eps": yerror, "sim_db": db})
+        result = lmfit.minimize(
+            model, params, args=(x,), kws={"y": y, "eps": yerror, "sim_db": db}
+        )
 
         # Create a model that reuses the same database for fitting many similar spectra
-        model_fixed = Moose.lmfit.as_minimizer_objective(Moose.model_for_fit, normalize=True, A=1, sim_db=db)
-        sim = model_fixed(params, x = np.linspace(300, 330, 1000)) # Simulate spectrum
-        result_fixed = lmfit.minimize(model_fixed, params, args=(x,), kws={"y": y, "eps":yerror})
+        model_fixed = Moose.lmfit.as_minimizer_objective(
+            Moose.model_for_fit, normalize=True, A=1, sim_db=db
+        )
+        sim = model_fixed(params, x=np.linspace(300, 330, 1000))  # Simulate spectrum
+        result_fixed = lmfit.minimize(
+            model_fixed, params, args=(x,), kws={"y": y, "eps": yerror}
+        )
         ```
 
     Args:

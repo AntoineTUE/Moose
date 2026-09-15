@@ -50,21 +50,20 @@ import lmfit
 
 rng = np.random.default_rng(100)
 
-db = Moose.query_DB('N2CB', wl=(320,390)) # Restrict to wavelength between 320 and 390 nm
+db = Moose.query_DB("N2CB", wl=(320, 390))  # Restrict to wavelength between 320 and 390 nm
 
-x = np.linspace(320,390,2000)
+x = np.linspace(320, 390, 2000)
 
-simulated = Moose.model_for_fit(x,sigma=0.01,gamma=0.01,mu=0.5,T_rot=1000, T_vib=5000, sim_db=db)
+simulated = Moose.model_for_fit(x, sigma=0.01, gamma=0.01, mu=0.5, T_rot=1000, T_vib=5000, sim_db=db)
 
-y = rng.normal(simulated, 0.01)# add noise
+y = rng.normal(simulated, 0.01)  # add noise
 
 model = lmfit.Model(Moose.model_for_fit, sim_db=db, independent_vars=["x"])
 params = lmfit.create_params(**Moose.default_params)
 
 result = model.fit(y, x=x, params=params)
 
-result.plot(title='N2CB fit', datafmt='x')
-
+result.plot(title="N2CB fit", datafmt="x")
 ```
 
 For more examples see the [examples section](../examples)
