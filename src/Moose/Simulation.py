@@ -6,25 +6,30 @@ However (for now) it focusses on multiprocessing support and not introducing unn
 Inspired by [MassiveOES](https://bitbucket.org/OES_muni/massiveoes/src/master/) and uses the underlying database files, compiled by J. Vorac and P. Synek.
 """
 
-import sqlite3 as sql
-import pandas as pd
-import numpy as np
-from importlib import resources
 import pathlib
-from scipy.special import voigt_profile
-import scipy.integrate
-import scipy.signal
-import scipy.constants as const
-from typing import Literal
+import sqlite3 as sql
+from typing import TYPE_CHECKING, Literal
 
+import numpy as np
+import pandas as pd
+import scipy
 from numpy.typing import NDArray
 
-from .utils.maintenance import deprecated_keywords
-from .utils.profiler import profile
 from .utils.caching import array_cache
 from .utils.db_io import get_database_path
+from .utils.maintenance import deprecated_keywords, warn_if_not_imported
+from .utils.profiler import profile
 
-kB = const.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
+if TYPE_CHECKING:
+    # Only import these modules here when type checking, so we can benefit from scipy lazy-loading.
+    # This cuts down import-time of Moose significantly
+    # The consequence of this is that these modules will need to load when first accessed
+    # This increases the first function call time such as for `model_for_fit` massively.
+    # The `warn_if_not_imported` decorator warns if this happens in optimization functions.
+    from scipy import constants, signal, special
+
+
+kB = scipy.constants.physical_constants["Boltzmann constant in inverse meters per kelvin"][0] / 100
 
 default_params = {
     "sigma": {"value": 0.05, "min": 0.0001, "max": 0.3},
@@ -81,6 +86,12 @@ def query_DB(
 
     See also [create_stick_spectrum][Moose.Simulation.create_stick_spectrum]
     """
+    # Force import of scipy modules here (if not loaded yet), so the optimization-critical path is not affected
+    # Else, the first time e.g. `model_for_fit` is called.
+    # It incurs import overhead of a few hundred milliseconds (or even higher sometimes)
+    # Instead, import them here, since in most cases a db must be queried first, but this happens outside optimization.
+    from scipy import signal, special
+
     path = pathlib.Path(path) if path is not None else get_database_path()
     db_name = db_name if db_name.endswith(".db") else f"{db_name}.db"
     wl_min, wl_max = map(float, wl) if wl is not None else (0.0, 1e9)
@@ -139,7 +150,7 @@ def create_stick_spectrum(
     T_vib: float,
     T_rot: float,
     pop: float = 1,
-    df_db: pd.DataFrame = None,
+    df_db: pd.DataFrame | None = None,
     kind: Literal["Absorption", "Emission"] = "Emission",
     wl_mode: Literal["air", "vacuum"] = "air",
 ) -> NDArray[np.float64]:
@@ -263,6 +274,7 @@ def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: i
     return equid
 
 
+@warn_if_not_imported("scipy.special")
 @array_cache()
 def vgt(sigma: float, gamma: float, points: int, dx: float, truncate: None | float = None) -> NDArray:
     """Calculate a normalized Voigt profile, centered on a (equidistant) grid of size `points` with spacing `dx`.
@@ -303,13 +315,14 @@ def vgt(sigma: float, gamma: float, points: int, dx: float, truncate: None | flo
         V = np.zeros_like(x_range)
         fwhm = 0.5343 * gamma * 2 + np.sqrt(0.2169 * (gamma * 2) ** 2 + (np.sqrt(8 * np.log(2)) * sigma) ** 2)
         mask = (x_range > -fwhm * truncate / 2) & (x_range < fwhm * truncate / 2)
-        V[mask] = voigt_profile(x_range[mask], sigma, gamma)
+        V[mask] = scipy.special.voigt_profile(x_range[mask], sigma, gamma)
     else:
-        V = voigt_profile(x_range, sigma, gamma)
+        V = scipy.special.voigt_profile(x_range, sigma, gamma)
     return V / V.sum()
 
 
 @deprecated_keywords("norm")
+@warn_if_not_imported("scipy.signal")
 @array_cache(maxsize=128)
 def apply_voigt(
     sim: NDArray, sigma: float, gamma: float, norm: bool | None = None, truncate: None | float = None
@@ -360,7 +373,7 @@ def apply_voigt(
     return convolved
 
 
-def match_spectra(meas: np.array, sim: np.array, shift=0) -> np.ndarray:
+def match_spectra(meas: np.ndarray, sim: np.ndarray, shift=0) -> np.ndarray:
     """Match a simulation to the same x-axis as the measurement using interpolation, with an optional shift.
 
     Make sure the simulation spans a larger range, fully containing the experimental range.
@@ -372,8 +385,8 @@ def match_spectra(meas: np.array, sim: np.array, shift=0) -> np.ndarray:
     Effectively downsamples the simulation to the measurement x data points, interpolating the y values, for residual minimization.
 
     Arguments:
-        meas (np.array):    A 2D array containing a single measurement of emission as function of wavelength
-        sim  (np.array):    A 2D array containing a simulated spectrum.
+        meas (np.ndarray):    A 2D array containing a single measurement of emission as function of wavelength
+        sim  (np.ndarray):    A 2D array containing a simulated spectrum.
         shift (float):      Wavelength shift to apply in nanometer, default: 0.
 
     Returns:
@@ -390,7 +403,7 @@ def match_spectra(meas: np.array, sim: np.array, shift=0) -> np.ndarray:
 
 
 def model_for_fit(
-    x: np.array,
+    x: np.ndarray,
     sigma: float,
     gamma: float,
     mu: float,
@@ -430,7 +443,7 @@ def model_for_fit(
     ```
 
     Arguments:
-        x (np.array):               The x-axis of the (measured) data that we want to compare/fit against, or want to evaluate the simulation at.
+        x (np.ndarray):               The x-axis of the (measured) data that we want to compare/fit against, or want to evaluate the simulation at.
         sigma (float):              Gaussian broadening width of Voigt, the standard deviation.
         gamma (float):              Lorentzian broadening width of Voigt, the Half-Width-at-Half-Maximum.
         mu (float):                 The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength

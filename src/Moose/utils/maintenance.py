@@ -1,5 +1,6 @@
 """Module containing functions etc. to help in development and maintenance of Moose."""
 
+import sys
 from inspect import signature
 from functools import wraps
 import warnings
@@ -80,6 +81,42 @@ def deprecated_keywords(*kw_names: str, removed_in: str = "a future release"):
             return func(*args, **kwargs)
 
         wrapper.__signature__ = sig
+        return wrapper
+
+    return decorator
+
+
+def warn_if_not_imported(module_name):
+    """Decorate a function to warn if `module_name` has not been imported.
+
+    This is to warn users that lazy-importing modules have not loaded yet for functions likely used in optimization.
+
+    For example: calling `Moose.apply_voigt` when `scipy.signal` has not been imported will trigger an import.
+    This import that can take over a second (or even 5 seconds!) in some scenarios.
+    Especially in a fit routine, but probably in most cases, you'd want to avoid that behaviour.
+    While some mitigation is in place (importing the modules in `query_DB`), we should inform and warn if it happens.
+
+    Note:
+        The decorator will disable when the module has been imported.
+    """
+
+    def decorator(func):
+        check_enabled = True
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            nonlocal check_enabled
+            if check_enabled and module_name not in sys.modules:
+                warnings.warn(
+                    f"Lazy loaded {module_name!r} will import now, which negatively impacts function execution time. "
+                    "Consider importing it earlier, outside of a critical loop.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+            else:
+                check_enabled = False
+            return func(*args, **kwargs)
+
         return wrapper
 
     return decorator
