@@ -3,6 +3,14 @@ import sqlite3 as sql
 from pathlib import Path
 
 
+def pytest_sessionstart(session):
+    import numpy as np
+    import pandas as pd
+
+    print(f"numpy: {np.__version__}")
+    print(f"pandas: {pd.__version__}")
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--lmfit",
