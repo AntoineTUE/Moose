@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
+requires = ["hatch-fancy-pypi-readme", "hatch-vcs", "hatchling"]
 
 [project]
 name = "moose-spectra"
@@ -9,28 +9,19 @@ description = "A package to simulate diatomic optical emission spectra relying o
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
-authors = [
-    { name = "Antoine Salden", email = "t.p.w.salden@tue.nl" },
-]
+authors = [{ name = "Antoine Salden", email = "t.p.w.salden@tue.nl" }]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Intended Audience :: Science/Research",
-    "Topic :: Scientific/Engineering",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14"
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14"
 ]
-dependencies = [
-    "numpy",
-    "pandas",
-    "scipy",
-    "xxhash",
-    "requests",
-    "tqdm"
-]
+dependencies = ["numpy", "pandas", "scipy", "xxhash", "requests", "tqdm"]
 
 [project.urls]
 Source = "https://github.com/AntoineTUE/Moose"
@@ -39,25 +30,26 @@ Documentation = "https://antoinetue.github.io/Moose/"
 [project.optional-dependencies]
 fit = ["lmfit"]
 docs = [
-    "mkdocs==1.6.1",
-    "mkdocs-material==9.7.0",
-    "mkdocstrings", 
-    "mkdocstrings-python",
-    "mkdocs-gen-files", 
-    "mkdocs-literate-nav",
-    # "mkdocs-api-autonav", 
-    "mkdocs-section-index", 
-    "mkdocs-jupyter", 
-    "mkdocs-git-revision-date-localized-plugin",
-    "mkdocs-include-markdown-plugin",
-    "mkdocstrings-python-xref",
-    "mkdocs-github-admonitions-plugin",
-    "ruff>=0.14.2", 
-    "pygments",
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.7.0",
+  "mkdocstrings",
+  "mkdocstrings-python",
+  "mkdocs-gen-files",
+  "mkdocs-literate-nav",
+  # "mkdocs-api-autonav", 
+  "mkdocs-section-index",
+  "mkdocs-jupyter",
+  "mkdocs-git-revision-date-localized-plugin",
+  "mkdocs-include-markdown-plugin",
+  "mkdocstrings-python-xref",
+  "mkdocs-github-admonitions-plugin",
+  "ruff>=0.14.2",
+  "pygments"
 ]
 examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel", "ipympl", "dask[distributed]"]
-dev = ["ruff","ipykernel","ipython","prek","ty"]
-all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]","moose-spectra[dev]"]
+test = ["hypothesis", "pytest-sugar"]
+dev = ["ruff", "ipykernel", "ipython", "prek", "ty", "moose-spectra[test]"]
+all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]", "moose-spectra[dev]"]
 
 [tool.hatch.version]
 source = "vcs"
@@ -69,26 +61,16 @@ version-file = "./src/Moose/_version.py"
 [tool.setuptools_scm]
 
 [tool.hatch.build.targets.wheel]
-packages = [
-    "src/Moose",
-]
-include =[
-    "src/Moose/data"
-]
+packages = ["src/Moose"]
+include = ["src/Moose/data"]
 
 [tool.hatch.build.targets.wheel.sources]
 "src" = ""
 "data" = "src/Moose/data/*.db"
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "src/Moose",
-    "docs/",
-    "mkdocs.yml"
-]
-exclude = [
-    "src/Moose/_version.py"
-]
+include = ["src/Moose", "docs/", "mkdocs.yml"]
+exclude = ["src/Moose/_version.py"]
 
 [tool.ruff]
 line-length = 120
@@ -98,27 +80,25 @@ exclude = ["test", "docs/examples"]
 docstring-code-line-length = 80
 
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F","C4", "SIM", "TC", "NPY", "PD","B","UP","D"]
+select = ["E4", "E7", "E9", "F", "C4", "SIM", "TC", "NPY", "PD", "B", "UP", "D"]
 ignore = ["F401"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["D","F401","B","D"]
+"tests/**" = ["D", "F401", "B", "D"]
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
 content-type = "text/markdown"
-fragments = [
-    { path = "README.md" }
-]
+fragments = [{ path = "README.md" }]
 
 [tool.pytest.ini_options]
-markers = ["lmfit: mark test to run when lmfit is present" ]
+markers = ["lmfit: mark test to run when lmfit is present"]
 
 [tool.hatch.envs.default]
 installer = "uv"
-features = ["examples","dev"]
+features = ["examples", "dev"]
 post-install-commands = ["prek install"]
 
 [tool.hatch.envs.docs]
@@ -131,23 +111,25 @@ serve = "mkdocs serve -f mkdocs.yml {args}"
 build = "mkdocs build --clean -f mkdocs.yml {args}"
 ci-build = "mike deploy --config-file mkdocs.yml --update-aliases {args}"
 
-[tool.hatch.envs.hatch-test.overrides]
-matrix.feature.dependencies = [
-    { value = "pandas==1.5.3", if = ["pandas-legacy"]},
-    { value = "numpy<2.0", if = ["pandas-legacy"]},
-    { value = "pandas>=2.0.0", if = ["pandas-2.0"] },
-    { value = "numpy>=2.0", if = ["pandas-2.0"] },
-    { value = "pandas>=3.0.0", if = ["pandas-3.0"] },
-    { value = "numpy>=2.0", if = ["pandas-3.0"] },
-]
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.11"]
+pandas = ["pandas-1.5"]
+numpy = ["numpy-1.26"]
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.10","3.11"]
-feature = ["pandas-legacy","pandas-2.0"]
+python = ["3.10"]
+pandas = ["pandas-2.x"]
+numpy = ["numpy-1.26", "numpy-2.x"]
 
 [[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.11","3.12","3.13","3.14"]
-feature = ["pandas-2.0","pandas-3.0"]
+python = ["3.11", "3.12"]
+pandas = ["pandas-2.x", "pandas-3.x"]
+numpy = ["numpy-1.26", "numpy-2.x"]
+
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.13", "3.14"]
+pandas = ["pandas-2.x", "pandas-3.x"]
+numpy = ["numpy-2.x"]
 
 [tool.uv]
 cache-keys = [{ git = true }]
