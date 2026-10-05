@@ -23,17 +23,30 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        python-version: ['3.10', '3.11','3.12','3.13', '3.14']
-        numpy: ["numpy-1.26","numpy-2.x"]
-        pandas: ["pandas-1.5","pandas-2.x","pandas-3.x"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        pandas: ["pandas-1.5", "pandas-2.x", "pandas-3.x"]
+        numpy: ["numpy-1.26", "numpy-2.x"]
+        # Exclude apparently only remove a single combinations, not lists
         exclude:
-          - python-version: '3.10'
-            pandas: 'pandas-3.x'
-          - python-version: '3.12'
-            pandas: 'pandas-1.5'
-          - python-version: ['3.13','3.14']
+          # pandas 1.5 only with Python 3.10/3.11 + NumPy 1.26
+          - pandas: "pandas-1.5"
+            numpy: "numpy-2.x"
+          - pandas: "pandas-1.5"
+            python-version: "3.12"
+          - pandas: "pandas-1.5"
+            python-version: "3.13"
+          - pandas: "pandas-1.5"
+            python-version: "3.14"
+          # pandas 2.x + NumPy 1.26 only up to Python 3.12
+          - pandas: "pandas-2.x"
             numpy: "numpy-1.26"
-            pandas: 'pandas-1.5'
+            python-version: "3.13"
+          - pandas: "pandas-2.x"
+            numpy: "numpy-1.26"
+            python-version: "3.14"
+          # pandas 3.x only with Python 3.11+
+          - pandas: "pandas-3.x"
+            python-version: "3.10"
 
     steps:
     - uses: actions/checkout@v6
