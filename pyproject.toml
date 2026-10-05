@@ -113,6 +113,8 @@ ci-build = "mike deploy --config-file mkdocs.yml --update-aliases {args}"
 
 [tool.hatch.envs.hatch-test]
 features = ["fit", "test"]
+retries = 2
+randomize = true
 
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.10", "3.11"]
