@@ -13,23 +13,24 @@ If so, it will import some additional functions in the `Moose` namespace for you
 To see `Moose` in action, check out the [examples](../../examples)
 """
 
-import importlib.util
+from ._version import version, version_tuple
 from .Simulation import (
-    default_params,
-    thermal_default_params,
-    query_DB,
-    create_stick_spectrum,
-    equidistant_mesh,
     apply_voigt,
+    create_stick_spectrum,
+    default_params,
+    equidistant_mesh,
     match_spectra,
     model_for_fit,
+    query_DB,
+    thermal_default_params,
 )
-
-from .utils.db_io import get_database_path, set_database_path, database_files
+from .utils.db_io import database_files, get_database_path, set_database_path
 
 get_database_path()  # triggers migration message.
 
 __all__ = [
+    "version",
+    "version_tuple",
     "default_params",
     "thermal_default_params",
     "query_DB",

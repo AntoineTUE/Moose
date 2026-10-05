@@ -21,12 +21,16 @@ Important:
 """
 
 import functools
+import inspect
 import threading
-import xxhash
-import numpy as np
 from collections import OrderedDict, defaultdict
+from dataclasses import dataclass, field
 
+import numpy as np
+import xxhash
 from numpy.typing import NDArray
+
+from .profiler import profile
 
 
 def hash_numpy(arr: NDArray) -> str:
@@ -43,6 +47,42 @@ def hash_numpy(arr: NDArray) -> str:
     return h.hexdigest()
 
 
+@dataclass(frozen=True, slots=True)
+class ArrayKey:
+    """A (hashable) key representing a numpy array, used for caching purposes.
+
+    In principle the shape and dtype info is already contained in the (hex)digest of the has.
+
+    However, including this information in this object helps identificiation when debugging or testing.
+
+    It is immediately clear that the key represents an array, and preserves some useful information.
+
+    Note:
+        The use of `frozen=True` and `eq=True`  for the dataclass ensures the object is hashable (as it is immutable).
+        This enables it to be used as a cache-key itself.
+    """
+
+    digest: str
+    shape: tuple[int, ...]
+    dtype: str
+
+
+@dataclass()
+class CacheInfo:
+    """Information about cache use."""
+
+    function: str
+    hits: int
+    misses: int
+    size: int
+    max_size: int
+    cache_hit_rate: float = field(init=False)
+
+    def __post_init__(self):
+        """Compute cache hit rate."""
+        self.cache_hit_rate = self.hits / max((self.hits + self.misses), 1) * 100
+
+
 class ArrayLRUCache:
     """A Least Recently Used cache implementation with support for numpy arrays.
 
@@ -52,60 +92,57 @@ class ArrayLRUCache:
 
     (Note: the array can still be modified, but any modification done on a returned array are isolated from the original cached version.)
 
-    At the cost of some compute overhead it deduplicates arrays (based on hash comparison), to avoid storing many identical copies.
-
-    Without deduplication the following calls would store the same array twice: `my_func(array,1,2)+my_func(array,3,4)`.
-
-    For large arrays (as we may deal with), this can cause significant memory use.
-
     Note that this cache only supports `numpy.ndarray` on top of standard hashable data types, NOT any 'ArrayLike' object such as dataframes.
 
     Computing hashes on a Dataframe (i.e. [pandas.util.hash_pandas_object][]) is too time consuming to be beneficial in the use-case of Moose it seems.
+
+    In addition, the numpy array must not use object dtype, as this would break the hashing and caching mechanism.
     """
 
     def __init__(self, func, maxsize=128):
         """Initialize a cache with support for numpy NDArray types, with object deduplication."""
         self.func = func
+        self.signature = inspect.signature(func)
         self.maxsize = maxsize
 
         self.cache = OrderedDict()  # map key to result
-        self.object_store = {}  # map hash to object
-        self.ref_counts = defaultdict(int)  # track ref count of hashes
 
         self.hits = 0
         self.misses = 0
 
         self.lock = threading.RLock()
 
+    @property
+    def func_name(self) -> str:
+        """The name of the function being cached as a string."""
+        if hasattr(self.func, "__qualname__"):
+            return self.func.__qualname__
+        return self.func.__name__
+
     def __call__(self, *args, **kwargs):
         """Compute keys, check/update cache and store objects.
 
         On cache miss, calls the original function and caches the result.
         """
-        # Build key and track hashes
+        # Build key and check if hit
         with self.lock:
-            key, obj_hashes = self._make_key(args, kwargs)
-
-            # Cache hit
-            if key in self.cache:
+            key = self._make_key(args, kwargs)
+            if key in self.cache:  # Cache hit; bump LRU and return
                 self.hits += 1
-                result = self.cache.pop(key)
-                self.cache[key] = result  # LRU bump
-                return self._safe_copy(result)
-
+                self.cache.move_to_end(key)  # LRU bump
+                return self._safe_copy(self.cache[key])
             self.misses += 1
 
         # Compute result outside lock to avoid blocking
         result = self.func(*args, **kwargs)
 
-        # Store result and update ref counts
+        # Store result; evict if needed
         with self.lock:
             self.cache[key] = result
-            self._inc_refs(obj_hashes)
 
             # Evict LRU if necessary
             if len(self.cache) > self.maxsize:
-                self._evict_lru()
+                self.cache.popitem(last=False)
 
             return self._safe_copy(result)
 
@@ -113,17 +150,11 @@ class ArrayLRUCache:
         """Return information about the cache and object storage.
 
         Threadsafe.
+
+        If the cache is disabled, these metrics won't change, but will persist until the cache is cleared.
         """
         with self.lock:
-            return {
-                "function": self.func.__name__,
-                "hits": self.hits,
-                "misses": self.misses,
-                "cache hit rate": self.hits / max((self.hits + self.misses), 1) * 100,
-                "size": len(self.cache),
-                "maxsize": self.maxsize,
-                "unique objects": len(self.object_store),
-            }
+            return CacheInfo(self.func_name, self.hits, self.misses, len(self.cache), self.maxsize)
 
     def cache_clear(self):
         """Clear the cache and associated object storage.
@@ -132,85 +163,53 @@ class ArrayLRUCache:
         """
         with self.lock:
             self.cache.clear()
-            self.object_store.clear()
-            self.ref_counts.clear()
             self.hits = self.misses = 0
+
+    @staticmethod
+    def normalize(x):
+        """Normalize an input for constructing a stable cache-key.
+
+        If a numpy array of object dtype is encountered, will raise a TypeError, as this is unsupported.
+
+        - Numpy arrays are converted to a hash-based ArrayKey.
+        - Lists and tuples are recursively normalized.
+        - Dictionaries are converted to sorted tuples of key-value pairs.
+        - Other types are returned as-is.
+
+        Note: for numpy arrays, make sure the array is C-contiguous for zero-copy hashing by xxhash.
+        A F-contiguous (Fortran-order) array will be copied and transposed to make it C-contiguous.
+        """
+        if isinstance(x, np.ndarray):
+            if x.dtype.hasobject:
+                raise TypeError("Numpy arrays with Object dtypes are not supported for caching.")
+            x = np.ascontiguousarray(x)
+            h = hash_numpy(x)
+            # Use ArrayKey so it is clear this used to be an array
+            return ArrayKey(h, x.shape, x.dtype.str)
+        if isinstance(x, (list, tuple)):
+            return tuple(ArrayLRUCache.normalize(i) for i in x)
+
+        if isinstance(x, dict):  # sort key-value pairs by key alphabetically.
+            return tuple(sorted((k, ArrayLRUCache.normalize(v)) for k, v in x.items()))
+
+        return x
 
     def _make_key(self, args, kwargs):
         """Construct a hashing key for a function call, based on the args/kwargs.
 
-        If any arg/kwarg is a numpy array, add their hash to a separate list as well, for reference-counting.
+        If a numpy array of object dtype is encountered, will raise a TypeError, as this is unsupported.
         """
-        obj_hashes = []
-
-        def normalize(x):
-            if isinstance(x, np.ndarray):
-                # Make sure array is C-contiguous to enable hashing
-                # Note: F-contiguous will be copied, C-contiguous just returns the object.
-                x = np.ascontiguousarray(x)
-                h = hash_numpy(x)
-                self._store_object(h, x)
-                obj_hashes.append(h)
-                return ("__np__", h)
-            if isinstance(x, (list, tuple)):
-                return tuple(normalize(i) for i in x)
-
-            if isinstance(x, dict):
-                return tuple(sorted((k, normalize(v)) for k, v in x.items()))
-
-            return x
-
-        key = (tuple(normalize(a) for a in args), tuple(sorted((k, normalize(v)) for k, v in kwargs.items())))
-
-        return key, obj_hashes
-
-    def _store_object(self, h, obj):
-        """Store an objects by its hash key in the object_store."""
-        if h not in self.object_store:
-            self.object_store[h] = obj
-
-    def _inc_refs(self, hashes):
-        """Increment references to tracked hashes for objects in the objects store."""
-        for h in hashes:
-            self.ref_counts[h] += 1
-
-    def _dec_refs(self, hashes):
-        """Decrement references to tracked hashes of objects in the objects_store.
-
-        Remove objects that have no references (i.e. 0 or less counts.)
-        """
-        for h in hashes:
-            self.ref_counts[h] -= 1
-            if self.ref_counts[h] <= 0:
-                self.ref_counts.pop(h, None)
-                self.object_store.pop(h, None)
-
-    def _evict_lru(self):
-        """Remove a key from the LRU cache and decrement refs to stored objects that are part of the key."""
-        old_key, _ = self.cache.popitem(last=False)
-        hashes = self._extract_hashes_from_key(old_key)
-        self._dec_refs(hashes)
-
-    def _extract_hashes_from_key(self, key):
-        """Find hashes of hashed numpy arrays by resursively traversing a cache key."""
-        hashes = []
-
-        def walk(x):
-            if isinstance(x, tuple):
-                if len(x) == 2 and x[0] in ("__np__",):
-                    hashes.append(x[1])
-                else:
-                    for i in x:
-                        walk(i)
-
-        walk(key)
-        return hashes
+        bound = self.signature.bind(*args, **kwargs)
+        bound.apply_defaults()
+        return tuple(ArrayLRUCache.normalize(arg) for arg in bound.arguments.values())
 
     @staticmethod
     def _safe_copy(result):
-        """Return a copy if the data is a numpy.ndarray.
+        """Return a copy of the data so that modifications do not affect the cached version, if it is a numpy.ndarray.
 
         This means that the returned array can be modified without affecting the cached version (or its hash).
+
+        Another function which consumes the result can safely modify (and is allowed to modify) the returned array.
         """
         if isinstance(result, np.ndarray):
             return result.copy()
@@ -241,13 +240,13 @@ def array_cache(maxsize=128):
         wrapper._target = cache
 
         def enable_cache(enabled: bool = True, reset: bool = False):
-            if enabled:
-                wrapper._target = cache
-            else:
-                wrapper._target = func
+            """Toggle the use of the cache on or off for the decorated function.
+
+            The optional `reset` flag controls if the cache should be cleared as well.
+            """
+            wrapper._target = cache if enabled else func
             if reset:
                 cache.cache_clear()
-            return
 
         wrapper.cache_info = cache.cache_info
         wrapper.cache_clear = cache.cache_clear
