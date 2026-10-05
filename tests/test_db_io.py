@@ -1,7 +1,8 @@
 import hashlib
-from pathlib import Path
-import pytest
 from io import BytesIO
+from pathlib import Path
+
+import pytest
 
 import Moose.utils.db_io as db_io
 
@@ -138,15 +139,31 @@ def test_migrate_file_skip_and_overwrite(tmp_path):
 
 
 def test_set_and_get_database_path_and_fallback(monkeypatch, tmp_path):
+    """IMPORTANT: after this test runs, the original path must be restored.
+    Else, if `test_Simulation.py` follows it, some tests will fail since they look in this temp path.
+    This issue will only be caught when using pytest --randomize.
+
+    monkeypatch.setattr will reverse this.
+    """
     # set and get
     p = tmp_path.joinpath("dbdir")
     p.mkdir()
+    monkeypatch.setattr(db_io, "USER_DIR", None)
     db_io.set_database_path(p)
     assert db_io.get_database_path() == p
 
+
+def test_get_database_path_with_fallback(monkeypatch, tmp_path):
+    """IMPORTANT: after this test runs, the original path must be restored.
+    Else, if `test_Simulation.py` follows it, some tests will fail since they look in this temp path.
+    This issue will only be caught when using pytest --randomize.
+
+    monkeypatch.setattr will reverse this.
+    """
     # fallback to packaged data when USER_DIR does not exist
     fake_pkg = tmp_path.joinpath("pkgdata")
     fake_pkg.mkdir()
+    monkeypatch.setattr(db_io, "USER_DIR", None)
     monkeypatch.setattr(db_io, "USER_DIR", Path(tmp_path / "nonexistent_dir"))
     monkeypatch.setattr(db_io, "_find_packaged_data", lambda: (fake_pkg, []))
     # avoid repeated notification toggling affecting other tests
