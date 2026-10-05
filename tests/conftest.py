@@ -1,6 +1,7 @@
-import pytest
 import sqlite3 as sql
 from pathlib import Path
+
+import pytest
 
 
 def pytest_sessionstart(session):
