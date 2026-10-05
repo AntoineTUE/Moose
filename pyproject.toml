@@ -111,6 +111,9 @@ serve = "mkdocs serve -f mkdocs.yml {args}"
 build = "mkdocs build --clean -f mkdocs.yml {args}"
 ci-build = "mike deploy --config-file mkdocs.yml --update-aliases {args}"
 
+[tool.hatch.envs.hatch-test]
+features = ["fit", "test"]
+
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.10", "3.11"]
 pandas = ["pandas-1.5"]
