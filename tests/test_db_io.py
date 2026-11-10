@@ -179,5 +179,5 @@ def test_database_files_returns_db_stems(monkeypatch, tmp_path):
     (p / "ignored.txt").write_text("no")
 
     monkeypatch.setattr(db_io, "get_database_path", lambda: p)
-    files = db_io.database_files()
+    files = db_io.get_database_files()
     assert set(files) == {"a", "b"}

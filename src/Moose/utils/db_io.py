@@ -26,16 +26,15 @@ This will become the norm in a future release, after a grace period (to be decid
 In the meantime, it will be possible to migrate the bundled databases to the new location, using either [migrate][..] or [download_databases][..]
 """
 
+import hashlib
+import shutil
 from _hashlib import HASH
 from collections.abc import Callable, Iterable
 from enum import Flag, auto
-
-import hashlib
-from pathlib import Path
 from importlib import resources
-import shutil
+from pathlib import Path
 
-from requests import Session, Response
+from requests import Response, Session
 from tqdm.auto import tqdm
 
 GITHUB_API_URL = "https://api.github.com"
@@ -321,7 +320,7 @@ def get_database_path() -> Path:
     return USER_DIR
 
 
-def database_files() -> list[str]:
+def get_database_files() -> list[str]:
     """List the database names available to Moose out-of-the-box.
 
     Relies on the [DEFAULT_USER_DIR][..] and/or [set_database_path][..] and [get_database_path][..] to find the available files.
