@@ -1,5 +1,5 @@
 import sqlite3 as sql
-from pathlib import Path
+import pandas as pd
 
 import pytest
 
@@ -13,19 +13,35 @@ def pytest_sessionstart(session):
 
 
 def pytest_addoption(parser):
-    parser.addoption(
+    group = parser.getgroup("Custom test markers")
+    group.addoption(
         "--lmfit",
         action="store_true",
         dest="lmfit",
         default=False,
         help="enable tests for integration testing with lmfit as fitting backend",
     )
+    group.addoption(
+        "--fit",
+        action="store_true",
+        dest="fit",
+        default=False,
+        help="enable tests that fit spectra for validation",
+    )
 
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "lmfit: enable tests with lmfit")
-    if not config.option.lmfit:
-        config.option.markexpr = "not lmfit"
+    config.addinivalue_line("markers", "fit: enable tests that actually fit data with lmfit")
+    parts = []
+    if not getattr(config.option, "lmfit", False):
+        parts.append("not lmfit")
+    if not getattr(config.option, "fit", False):
+        parts.append("not fit")
+    if parts and not config.option.markexpr:
+        config.option.markexpr = " and ".join(parts)
+    elif parts:
+        config.option.markexpr = f"({config.option.markexpr}) and " + " and ".join(parts)
 
 
 @pytest.fixture(scope="module")
@@ -50,3 +66,27 @@ def temp_db(tmp_path_factory):
         cursor.execute("INSERT INTO lower_states (id, E_J,J,E_v,v) VALUES (2,10,1,100,0)")
         conn.commit()
     return db_path
+
+
+@pytest.fixture
+def SPS_experimental_spectrum(request):
+    marker = request.node.get_closest_marker("fit")
+    active = True if marker is None else marker.kwargs.get("active", True) if marker.kwargs else True
+    if not active:
+        return None
+    data = pd.read_csv("./tests/test_files/N2SPS_experimental_sample.txt", sep="\t", header=1, names=["wl", "I"])
+    data["Norm"] = (data.I - data.I.min()) / (data.I.max() - data.I.min())
+    return data
+
+
+@pytest.fixture
+def SPS_synthetic_spectrum(request):
+    marker = request.node.get_closest_marker("fit")
+    active = True if marker is None else marker.kwargs.get("active", True) if marker.kwargs else True
+    if not active:
+        return None
+    data = pd.read_csv(
+        "./tests/test_files/calc_N2C_spectrum_Trot1200_Tvib3000_slit0.1.txt", sep="\t", header=0, names=["wl", "I"]
+    )
+    data["Norm"] = (data.I - data.I.min()) / (data.I.max() - data.I.min())
+    return data

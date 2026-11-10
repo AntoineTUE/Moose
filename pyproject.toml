@@ -30,8 +30,8 @@ Documentation = "https://antoinetue.github.io/Moose/"
 [project.optional-dependencies]
 fit = ["lmfit", "iminuit"]
 docs = [
-  "mkdocs==1.6.1",
-  "mkdocs-material==9.7.0",
+  "properdocs==1.6.7",
+  "mkdocs-material==9.7.7",
   "mkdocstrings",
   "mkdocstrings-python",
   "mkdocs-gen-files",
@@ -56,7 +56,7 @@ examples = [
   "dask[distributed]",
   "jupyter-bokeh"
 ]
-test = ["hypothesis", "pytest-sugar"]
+test = ["hypothesis", "pytest-sugar", "pytest-benchmark"]
 dev = ["ruff", "ipykernel", "ipython", "prek", "ty", "moose-spectra[test]"]
 all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]", "moose-spectra[dev]"]
 
@@ -103,7 +103,10 @@ content-type = "text/markdown"
 fragments = [{ path = "README.md" }]
 
 [tool.pytest.ini_options]
-markers = ["lmfit: mark test to run when lmfit is present"]
+markers = [
+  "lmfit: mark test to run when lmfit is present",
+  "fit: mark tests that fit data for validation",
+]
 
 [tool.hatch.envs.default]
 installer = "uv"
@@ -116,8 +119,8 @@ dependencies = ["mike==2.1.4"]
 features = ["docs"]
 
 [tool.hatch.envs.docs.scripts]
-serve = "mkdocs serve -f mkdocs.yml {args}"
-build = "mkdocs build --clean -f mkdocs.yml {args}"
+serve = "properdocs serve -f mkdocs.yml {args}"
+build = "properdocs build --clean -f mkdocs.yml {args}"
 ci-build = "mike deploy --config-file mkdocs.yml --update-aliases {args}"
 
 [tool.hatch.envs.hatch-test]
@@ -147,3 +150,20 @@ numpy = ["numpy-2.x"]
 
 [tool.uv]
 cache-keys = [{ git = true }]
+
+[tool.coverage.run]
+branch = true
+source = ["src/Moose"]
+omit = ["_version.py", "__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "if self\\.debug",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if 0:",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:"
+]
