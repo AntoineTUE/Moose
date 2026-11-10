@@ -72,6 +72,7 @@ version-file = "./src/Moose/_version.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/Moose"]
 include = ["src/Moose/data"]
+artifacts = ["src/Moose/_version.py"]
 
 [tool.hatch.build.targets.wheel.sources]
 "src" = ""
@@ -79,7 +80,6 @@ include = ["src/Moose/data"]
 
 [tool.hatch.build.targets.sdist]
 include = ["src/Moose", "docs/", "mkdocs.yml"]
-exclude = ["src/Moose/_version.py"]
 
 [tool.ruff]
 line-length = 120
