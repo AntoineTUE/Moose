@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://antoinetue.github.io/Moose/latest/reference/Moose/utils/maintenance/">
       
       
-        <link rel="prev" href="../caching/">
+        <link rel="prev" href="../db_io/">
       
       
         <link rel="next" href="../profiler/">
@@ -656,6 +656,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../db_io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    db_io
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -764,6 +792,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;deprecated_keywords
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#Moose.utils.maintenance.warn_if_not_imported" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;warn_if_not_imported
       
     </span>
   </a>
@@ -1229,6 +1268,14 @@
                 </div>
               </td>
             </tr>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="            warn_if_not_imported (Moose.utils.maintenance.warn_if_not_imported)" href="#Moose.utils.maintenance.warn_if_not_imported">warn_if_not_imported</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Decorate a function to warn if <code>module_name</code> has not been imported.</p>
+                </div>
+              </td>
+            </tr>
       </tbody>
     </table>
 
@@ -1354,69 +1401,69 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/Moose/utils/maintenance.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-19">19</a></span>
-<span class="normal"><a href="#__codelineno-0-20">20</a></span>
-<span class="normal"><a href="#__codelineno-0-21">21</a></span>
-<span class="normal"><a href="#__codelineno-0-22">22</a></span>
-<span class="normal"><a href="#__codelineno-0-23">23</a></span>
-<span class="normal"><a href="#__codelineno-0-24">24</a></span>
-<span class="normal"><a href="#__codelineno-0-25">25</a></span>
-<span class="normal"><a href="#__codelineno-0-26">26</a></span>
-<span class="normal"><a href="#__codelineno-0-27">27</a></span>
-<span class="normal"><a href="#__codelineno-0-28">28</a></span>
-<span class="normal"><a href="#__codelineno-0-29">29</a></span>
-<span class="normal"><a href="#__codelineno-0-30">30</a></span>
-<span class="normal"><a href="#__codelineno-0-31">31</a></span>
-<span class="normal"><a href="#__codelineno-0-32">32</a></span>
-<span class="normal"><a href="#__codelineno-0-33">33</a></span>
-<span class="normal"><a href="#__codelineno-0-34">34</a></span>
-<span class="normal"><a href="#__codelineno-0-35">35</a></span>
-<span class="normal"><a href="#__codelineno-0-36">36</a></span>
-<span class="normal"><a href="#__codelineno-0-37">37</a></span>
-<span class="normal"><a href="#__codelineno-0-38">38</a></span>
-<span class="normal"><a href="#__codelineno-0-39">39</a></span>
-<span class="normal"><a href="#__codelineno-0-40">40</a></span>
-<span class="normal"><a href="#__codelineno-0-41">41</a></span>
-<span class="normal"><a href="#__codelineno-0-42">42</a></span>
-<span class="normal"><a href="#__codelineno-0-43">43</a></span>
-<span class="normal"><a href="#__codelineno-0-44">44</a></span>
-<span class="normal"><a href="#__codelineno-0-45">45</a></span>
-<span class="normal"><a href="#__codelineno-0-46">46</a></span>
-<span class="normal"><a href="#__codelineno-0-47">47</a></span>
-<span class="normal"><a href="#__codelineno-0-48">48</a></span>
-<span class="normal"><a href="#__codelineno-0-49">49</a></span>
-<span class="normal"><a href="#__codelineno-0-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="k">def</span><span class="w"> </span><span class="nf">deprecated</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">"""Decorate a function to be marked as deprecated.</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21"></a>
-<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">    Can be provided with an additional message to show, in addition to the default deprecation string.</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">    """</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">make_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>        <span class="n">base_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"The function `</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">` is deprecated and will be removed in the future."</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a>        <span class="k">if</span> <span class="n">message</span><span class="p">:</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="n">base_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29"></a>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="c1"># Python 3.13+</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>        <span class="k">if</span> <span class="n">_IMPLEMENTS_DEPRECATED</span><span class="p">:</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>            <span class="k">return</span> <span class="n">warnings</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="n">base_msg</span><span class="p">)(</span><span class="n">func</span><span class="p">)</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a>        <span class="c1"># Python &lt;= 3.12</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a>        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a>            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">base_msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>        <span class="k">return</span> <span class="n">wrapper</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a>    <span class="c1"># When used as plain decorator, i.e.: `@deprecated`</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a>    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a>        <span class="k">return</span> <span class="n">make_decorator</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="c1"># When used as: `@deprecated("message")`</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>        <span class="k">return</span> <span class="n">make_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="k">return</span> <span class="n">decorator</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-20">20</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-21">21</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-22">22</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-23">23</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-24">24</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-25">25</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-37">37</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-38">38</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-39">39</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-40">40</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-41">41</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-42">42</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-43">43</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-45">45</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-50">50</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated--source--__codelineno-0-51">51</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-20" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-20"></a><span class="k">def</span><span class="w"> </span><span class="nf">deprecated</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-21" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-21"></a><span class="w">    </span><span class="sd">"""Decorate a function to be marked as deprecated.</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-22" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-22"></a>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-23" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-23"></a><span class="sd">    Can be provided with an additional message to show, in addition to the default deprecation string.</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-24" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-24"></a><span class="sd">    """</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-25" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-25"></a>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-26" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-26"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">make_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-27" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-27"></a>        <span class="n">base_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"The function `</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">` is deprecated and will be removed in the future."</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-28" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-28"></a>        <span class="k">if</span> <span class="n">message</span><span class="p">:</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-29" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-29"></a>            <span class="n">base_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-30" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-30"></a>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-31" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-31"></a>        <span class="c1"># Python 3.13+</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-32" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-32"></a>        <span class="k">if</span> <span class="n">_IMPLEMENTS_DEPRECATED</span><span class="p">:</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-33" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-33"></a>            <span class="k">return</span> <span class="n">warnings</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="n">base_msg</span><span class="p">)(</span><span class="n">func</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-34" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-34"></a>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-35" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-35"></a>        <span class="c1"># Python &lt;= 3.12</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-36" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-36"></a>        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-37" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-37"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-38" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-38"></a>            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">base_msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-39" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-39"></a>            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-40" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-40"></a>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-41" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-41"></a>        <span class="k">return</span> <span class="n">wrapper</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-42" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-42"></a>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-43" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-43"></a>    <span class="c1"># When used as plain decorator, i.e.: `@deprecated`</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-44" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-44"></a>    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-45" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-45"></a>        <span class="k">return</span> <span class="n">make_decorator</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-46" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-46"></a>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-47" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-47"></a>    <span class="c1"># When used as: `@deprecated("message")`</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-48" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-48"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-49" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-49"></a>        <span class="k">return</span> <span class="n">make_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-50" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-50"></a>
+<a id="Moose.utils.maintenance.deprecated--source--__codelineno-0-51" name="Moose.utils.maintenance.deprecated--source--__codelineno-0-51"></a>    <span class="k">return</span> <span class="n">decorator</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1431,7 +1478,7 @@
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">deprecated_keywords</span><span class="p">(</span><span class="o">*</span><span class="n">kw_names</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n">removed_in</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s1">'a future release'</span><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">deprecated_keywords</span><span class="p">(</span><span class="o">*</span><span class="n">kw_names</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n">removed_in</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s1">'a future release'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1456,7 +1503,7 @@
                 <code>*kw_names</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1472,7 +1519,7 @@
                 <code>removed_in</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1489,71 +1536,172 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/Moose/utils/maintenance.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span>
-<span class="normal"><a href="#__codelineno-0-55">55</a></span>
-<span class="normal"><a href="#__codelineno-0-56">56</a></span>
-<span class="normal"><a href="#__codelineno-0-57">57</a></span>
-<span class="normal"><a href="#__codelineno-0-58">58</a></span>
-<span class="normal"><a href="#__codelineno-0-59">59</a></span>
-<span class="normal"><a href="#__codelineno-0-60">60</a></span>
-<span class="normal"><a href="#__codelineno-0-61">61</a></span>
-<span class="normal"><a href="#__codelineno-0-62">62</a></span>
-<span class="normal"><a href="#__codelineno-0-63">63</a></span>
-<span class="normal"><a href="#__codelineno-0-64">64</a></span>
-<span class="normal"><a href="#__codelineno-0-65">65</a></span>
-<span class="normal"><a href="#__codelineno-0-66">66</a></span>
-<span class="normal"><a href="#__codelineno-0-67">67</a></span>
-<span class="normal"><a href="#__codelineno-0-68">68</a></span>
-<span class="normal"><a href="#__codelineno-0-69">69</a></span>
-<span class="normal"><a href="#__codelineno-0-70">70</a></span>
-<span class="normal"><a href="#__codelineno-0-71">71</a></span>
-<span class="normal"><a href="#__codelineno-0-72">72</a></span>
-<span class="normal"><a href="#__codelineno-0-73">73</a></span>
-<span class="normal"><a href="#__codelineno-0-74">74</a></span>
-<span class="normal"><a href="#__codelineno-0-75">75</a></span>
-<span class="normal"><a href="#__codelineno-0-76">76</a></span>
-<span class="normal"><a href="#__codelineno-0-77">77</a></span>
-<span class="normal"><a href="#__codelineno-0-78">78</a></span>
-<span class="normal"><a href="#__codelineno-0-79">79</a></span>
-<span class="normal"><a href="#__codelineno-0-80">80</a></span>
-<span class="normal"><a href="#__codelineno-0-81">81</a></span>
-<span class="normal"><a href="#__codelineno-0-82">82</a></span>
-<span class="normal"><a href="#__codelineno-0-83">83</a></span>
-<span class="normal"><a href="#__codelineno-0-84">84</a></span>
-<span class="normal"><a href="#__codelineno-0-85">85</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="k">def</span><span class="w"> </span><span class="nf">deprecated_keywords</span><span class="p">(</span><span class="o">*</span><span class="n">kw_names</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">removed_in</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"a future release"</span><span class="p">):</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="w">    </span><span class="sd">"""Issue a DeprecationWarning if a function is called with a deprecated keyword argument.</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    Any non-None value is considered a violation.</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">        *kw_names: names of keyword args to watch.</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">        removed_in: short text saying when it will be removed (included in the message).</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    """</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="s2">"Callable[P,R]"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Callable[P,R]"</span><span class="p">:</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>        <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a>        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="s2">"P.args"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="s2">"P.kwargs"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"R"</span><span class="p">:</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a>            <span class="n">bound</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>            <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">kw_names</span><span class="p">:</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a>                <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span> <span class="ow">and</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a>                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>                        <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">' is deprecated and will be removed in </span><span class="si">{</span><span class="n">removed_in</span><span class="si">}</span><span class="s2">; "</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a>                        <span class="sa">f</span><span class="s2">"do not pass '</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">' (it will be ignored)."</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>                        <span class="n">msg</span><span class="p">,</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>                        <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a>                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a>        <span class="n">wrapper</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">sig</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>        <span class="k">return</span> <span class="n">wrapper</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="k">return</span> <span class="n">decorator</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-56">56</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-58">58</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-59">59</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-60">60</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-61">61</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-62">62</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-63">63</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-64">64</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-65">65</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-66">66</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-67">67</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-68">68</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-69">69</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-71">71</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-72">72</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-73">73</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-74">74</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-75">75</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-76">76</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-77">77</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-78">78</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-79">79</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-80">80</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-81">81</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-82">82</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-83">83</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-84">84</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-85">85</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-86">86</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-54" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-54"></a><span class="k">def</span><span class="w"> </span><span class="nf">deprecated_keywords</span><span class="p">(</span><span class="o">*</span><span class="n">kw_names</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">removed_in</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"a future release"</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-55" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-55"></a><span class="w">    </span><span class="sd">"""Issue a DeprecationWarning if a function is called with a deprecated keyword argument.</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-56" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-56"></a>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-57" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-57"></a><span class="sd">    Any non-None value is considered a violation.</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-58" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-58"></a>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-59" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-59"></a><span class="sd">    Args:</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-60" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-60"></a><span class="sd">        *kw_names: names of keyword args to watch.</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-61" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-61"></a><span class="sd">        removed_in: short text saying when it will be removed (included in the message).</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-62" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-62"></a><span class="sd">    """</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-63" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-63"></a>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-64" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-64"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="s2">"Callable[P,R]"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Callable[P,R]"</span><span class="p">:</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-65" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-65"></a>        <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-66" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-66"></a>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-67" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-67"></a>        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-68" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-68"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="s2">"P.args"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="s2">"P.kwargs"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"R"</span><span class="p">:</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-69" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-69"></a>            <span class="n">bound</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-70" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-70"></a>            <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">kw_names</span><span class="p">:</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-71" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-71"></a>                <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span> <span class="ow">and</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-72" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-72"></a>                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-73" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-73"></a>                        <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">' is deprecated and will be removed in </span><span class="si">{</span><span class="n">removed_in</span><span class="si">}</span><span class="s2">; "</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-74" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-74"></a>                        <span class="sa">f</span><span class="s2">"do not pass '</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">' (it will be ignored)."</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-75" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-75"></a>                    <span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-76" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-76"></a>                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-77" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-77"></a>                        <span class="n">msg</span><span class="p">,</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-78" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-78"></a>                        <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-79" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-79"></a>                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-80" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-80"></a>                    <span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-81" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-81"></a>            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-82" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-82"></a>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-83" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-83"></a>        <span class="n">wrapper</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">sig</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-84" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-84"></a>        <span class="k">return</span> <span class="n">wrapper</span>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-85" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-85"></a>
+<a id="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-86" name="Moose.utils.maintenance.deprecated_keywords--source--__codelineno-0-86"></a>    <span class="k">return</span> <span class="n">decorator</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="Moose.utils.maintenance.warn_if_not_imported" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">warn_if_not_imported</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">warn_if_not_imported</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Decorate a function to warn if <code>module_name</code> has not been imported.</p>
+<p>This is to warn users that lazy-importing modules have not loaded yet for functions likely used in optimization.</p>
+<p>For example: calling <code>Moose.apply_voigt</code> when <code>scipy.signal</code> has not been imported will trigger an import.
+This import that can take over a second (or even 5 seconds!) in some scenarios.
+Especially in a fit routine, but probably in most cases, you'd want to avoid that behaviour.
+While some mitigation is in place (importing the modules in <code>query_DB</code>), we should inform and warn if it happens.</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The decorator will disable when the module has been imported.</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/Moose/utils/maintenance.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-89"> 89</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-90"> 90</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-91"> 91</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-92"> 92</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-93"> 93</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-94"> 94</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-95"> 95</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-96"> 96</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-97"> 97</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-98"> 98</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-99"> 99</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-100">100</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-101">101</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-102">102</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-103">103</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-104">104</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-105">105</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-106">106</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-107">107</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-108">108</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-109">109</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-110">110</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-111">111</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-112">112</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-113">113</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-114">114</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-115">115</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-116">116</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-117">117</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-118">118</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-119">119</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-120">120</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-121">121</a></span>
+<span class="normal"><a href="#Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-122">122</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-89" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-89"></a><span class="k">def</span><span class="w"> </span><span class="nf">warn_if_not_imported</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-90" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-90"></a><span class="w">    </span><span class="sd">"""Decorate a function to warn if `module_name` has not been imported.</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-91" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-91"></a>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-92" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-92"></a><span class="sd">    This is to warn users that lazy-importing modules have not loaded yet for functions likely used in optimization.</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-93" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-93"></a>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-94" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-94"></a><span class="sd">    For example: calling `Moose.apply_voigt` when `scipy.signal` has not been imported will trigger an import.</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-95" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-95"></a><span class="sd">    This import that can take over a second (or even 5 seconds!) in some scenarios.</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-96" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-96"></a><span class="sd">    Especially in a fit routine, but probably in most cases, you'd want to avoid that behaviour.</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-97" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-97"></a><span class="sd">    While some mitigation is in place (importing the modules in `query_DB`), we should inform and warn if it happens.</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-98" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-98"></a>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-99" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-99"></a><span class="sd">    Note:</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-100" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-100"></a><span class="sd">        The decorator will disable when the module has been imported.</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-101" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-101"></a><span class="sd">    """</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-102" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-102"></a>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-103" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-103"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-104" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-104"></a>        <span class="n">check_enabled</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-105" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-105"></a>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-106" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-106"></a>        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-107" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-107"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-108" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-108"></a>            <span class="k">nonlocal</span> <span class="n">check_enabled</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-109" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-109"></a>            <span class="k">if</span> <span class="n">check_enabled</span> <span class="ow">and</span> <span class="n">module_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-110" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-110"></a>                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-111" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-111"></a>                    <span class="sa">f</span><span class="s2">"Lazy loaded </span><span class="si">{</span><span class="n">module_name</span><span class="si">!r}</span><span class="s2"> will import now, which negatively impacts function execution time. "</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-112" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-112"></a>                    <span class="s2">"Consider importing it earlier, outside of a critical loop."</span><span class="p">,</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-113" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-113"></a>                    <span class="ne">UserWarning</span><span class="p">,</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-114" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-114"></a>                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-115" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-115"></a>                <span class="p">)</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-116" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-116"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-117" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-117"></a>                <span class="n">check_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-118" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-118"></a>            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-119" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-119"></a>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-120" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-120"></a>        <span class="k">return</span> <span class="n">wrapper</span>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-121" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-121"></a>
+<a id="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-122" name="Moose.utils.maintenance.warn_if_not_imported--source--__codelineno-0-122"></a>    <span class="k">return</span> <span class="n">decorator</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1597,7 +1745,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../caching/" class="md-footer__link md-footer__link--prev" aria-label="Previous: caching">
+          <a href="../db_io/" class="md-footer__link md-footer__link--prev" aria-label="Previous: db_io">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1607,7 +1755,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                caching
+                db_io
               </div>
             </div>
           </a>
@@ -1687,5 +1835,112 @@
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
       
     
-  </body>
+  <script data-mkdocs-jupyter-mathjax="{&quot;url&quot;: &quot;https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe&quot;, &quot;version&quot;: 4}">
+/* Shared by full pages and Material's instant navigation. */
+(() => {
+  const config = JSON.parse(document.currentScript.dataset.mkdocsJupyterMathjax);
+  if (window.mkdocsJupyterMathJax) return;
+
+  let loading;
+  let queue = Promise.resolve();
+  let previous = [];
+
+  const ready = async () => {
+    if (!loading) {
+      loading = (async () => {
+        let math = window.MathJax;
+        if (!math?.typesetPromise) {
+          const url = new URL(config.url, document.baseURI).href;
+          const existing = Array.from(document.scripts).find(script =>
+            script.src && (script.src === url || script.id === 'MathJax-script' ||
+              (/mathjax/i.test(script.src) &&
+               /\/(?:MathJax|latest|(?:tex|mml)(?:-mml)?-(?:chtml|svg))\.js(?:[?#]|$)/i.test(script.src))));
+          if (existing) {
+            if (!math?.startup?.promise) {
+              await new Promise((resolve, reject) => {
+                existing.addEventListener('load', resolve, { once: true });
+                existing.addEventListener('error', reject, { once: true });
+              });
+            }
+          } else {
+            // Keep site macros, delimiters and startup hooks when supplied.
+            const options = math || {};
+            window.MathJax = {
+              ...options,
+              loader: {
+                ...options.loader,
+                load: Array.from(new Set(['ui/safe', ...(options.loader?.load || [])]))
+              },
+              startup: { typeset: false, ...options.startup },
+              tex: {
+                tags: 'ams',
+                useLabelIds: true,
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                ...options.tex
+              }
+            };
+            await new Promise((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = config.url;
+              script.id = 'MathJax-script';
+              script.async = true;
+              script.onload = resolve;
+              script.onerror = reject;
+              document.head.appendChild(script);
+            });
+          }
+        }
+        math = window.MathJax;
+        await math.startup.promise;
+        return math;
+      })();
+    }
+    const math = await loading;
+    // A site owner can extend the v3 queue again on each navigation.
+    await math.startup.promise;
+    return math;
+  };
+
+  const unrendered = node => {
+    if (node.matches('mjx-container')) return [];
+    if (!node.querySelector('mjx-container')) return [node];
+    // In v3, scanning generated assistive MathML again produces nested output.
+    return Array.from(node.children).flatMap(unrendered);
+  };
+
+  const refresh = () => {
+    // A separate chain also serializes v3, without changing v4's startup promise.
+    queue = queue.then(async () => {
+      const notebooks = Array.from(document.querySelectorAll('.jupyter-wrapper'));
+      if (!notebooks.length && !previous.length) return;
+      if (notebooks.length === previous.length &&
+          notebooks.every((node, index) => node === previous[index])) return;
+      const math = await ready();
+      if (previous.length) {
+        math.typesetClear(previous);
+        math.texReset();
+      }
+      previous = notebooks.filter(node => node.isConnected);
+      const pending = previous.flatMap(unrendered);
+      if (pending.length) await math.typesetPromise(pending);
+    }).catch(error => console.error('mkdocs-jupyter: MathJax rendering failed', error));
+    return queue;
+  };
+
+  window.mkdocsJupyterMathJax = { refresh };
+  const start = () => {
+    if (typeof document$ !== 'undefined') document$.subscribe(refresh);
+    else refresh();
+  };
+  // Theme bundles and user-provided MathJax scripts can follow notebook content.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else start();
+})();
+
+</script>
+</body>
 </html>
