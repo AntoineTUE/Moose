@@ -28,7 +28,7 @@ Source = "https://github.com/AntoineTUE/Moose"
 Documentation = "https://antoinetue.github.io/Moose/"
 
 [project.optional-dependencies]
-fit = ["lmfit"]
+fit = ["lmfit", "iminuit"]
 docs = [
   "mkdocs==1.6.1",
   "mkdocs-material==9.7.0",
@@ -46,7 +46,16 @@ docs = [
   "ruff>=0.14.2",
   "pygments"
 ]
-examples = ["moose-spectra[fit]", "matplotlib", "plotly", "ipywidgets", "panel", "ipympl", "dask[distributed]"]
+examples = [
+  "moose-spectra[fit]",
+  "matplotlib",
+  "plotly",
+  "ipywidgets",
+  "panel",
+  "ipympl",
+  "dask[distributed]",
+  "jupyter-bokeh"
+]
 test = ["hypothesis", "pytest-sugar"]
 dev = ["ruff", "ipykernel", "ipython", "prek", "ty", "moose-spectra[test]"]
 all = ["moose-spectra[fit]", "moose-spectra[docs]", "moose-spectra[examples]", "moose-spectra[dev]"]
