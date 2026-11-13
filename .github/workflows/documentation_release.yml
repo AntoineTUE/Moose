@@ -16,25 +16,20 @@ jobs:
   deploy_docs_release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.3.3
         with:
           version: "latest"
           enable-cache: true
           python-version: '3.13'
           activate-environment: true
-      - name: Install Hatch
-        run: uv pip install --upgrade --system hatch
       - name: Deploy latest dev version docs
-        run: hatch run docs:ci-build --push --update-aliases ${{ github.event.release.tag_name }} latest
+        run: uvx hatch run docs:ci-build --push --update-aliases ${{ github.event.release.tag_name }} latest
       

@@ -54,23 +54,19 @@ jobs:
             python-version: "3.14"
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7.0.1
 
     - name: Set up Python ${{ matrix.python-version }} ${{ matrix.numpy }} ${{ matrix.pandas }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7.1.0
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Set up uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@v10.3.3
       with:
         version: "latest"
         enable-cache: true
         python-version: ${{ matrix.python-version }}
         activate-environment: true
-
-    - name: Install Hatch
-      run: uv pip install --upgrade --system hatch
-
     - name: Run tests
-      run: hatch test --python ${{ matrix.python-version }} -i numpy=${{ matrix.numpy }} -i pandas=${{ matrix.pandas }} --cover
+      run: uvx hatch test --python ${{ matrix.python-version }} -i numpy=${{ matrix.numpy }} -i pandas=${{ matrix.pandas }} --cover
