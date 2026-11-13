@@ -190,7 +190,9 @@ def create_stick_spectrum(
 
 
 @array_cache(maxsize=128)
-def compute_equidistant_bins(wl: NDArray, pad: float = 10, resolution: int = 100) -> tuple[NDArray, NDArray]:
+def compute_equidistant_bins(
+    wl: NDArray[np.float64], pad: float = 10, resolution: int = 100
+) -> tuple[NDArray[np.float64], NDArray[np.intp]]:
     """Compute an equidistant vector over the range of `wl`, at the specified resolution and with edges padded by `pad`.
 
     Returns a vector of the equidistantly spaces values and the indices that would sort `wl` into it.
@@ -240,7 +242,7 @@ def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: i
     This padding is essential for later line-broadening (see [`apply_voigt`][..apply_voigt])
 
     Args:
-        sim (np.array):     The 2D numpy array containing a simulation
+        sim (NDArray[np.float64]):     The 2D numpy array containing a simulation
         wl_pad (float):     The padding of the wavelength axis in nm to avoid edge effects
         resolution (int):   The resolution at which to construct the equidistant mesh (per nanometer) compared to the simulation (default: 100)
 
@@ -278,7 +280,7 @@ def equidistant_mesh(sim: NDArray[np.float64], wl_pad: float = 10, resolution: i
 
 @warn_if_not_imported("scipy.special")
 @array_cache()
-def vgt(sigma: float, gamma: float, points: int, dx: float, truncate: None | float = None) -> NDArray:
+def vgt(sigma: float, gamma: float, points: int, dx: float, truncate: None | float = None) -> NDArray[np.float64]:
     """Calculate a normalized Voigt profile, centered on a (equidistant) grid of size `points` with spacing `dx`.
 
     Essentially it computes a Voigt profile over a range of i.e. wavelength *change*, instead of wavelenght itself.
@@ -327,8 +329,8 @@ def vgt(sigma: float, gamma: float, points: int, dx: float, truncate: None | flo
 @warn_if_not_imported("scipy.signal")
 @array_cache(maxsize=128)
 def apply_voigt(
-    sim: NDArray, sigma: float, gamma: float, norm: bool | None = None, truncate: None | float = None
-) -> NDArray:
+    sim: NDArray[np.float64], sigma: float, gamma: float, norm: bool | None = None, truncate: None | float = None
+) -> NDArray[np.float64]:
     """Apply Voigt broadening to a simulated equidistant spectrum, preserving the integral and sum.
 
     The x-axis of the simulation `sim` must be an equidistant grid.
@@ -375,7 +377,7 @@ def apply_voigt(
     return convolved
 
 
-def match_spectra(meas: np.ndarray, sim: np.ndarray, shift=0) -> np.ndarray:
+def match_spectra(meas: NDArray[np.float64], sim: NDArray[np.float64], shift=0) -> NDArray[np.float64]:
     """Match a simulation to the same x-axis as the measurement using interpolation, with an optional shift.
 
     Make sure the simulation spans a larger range, fully containing the experimental range.
@@ -387,12 +389,12 @@ def match_spectra(meas: np.ndarray, sim: np.ndarray, shift=0) -> np.ndarray:
     Effectively downsamples the simulation to the measurement x data points, interpolating the y values, for residual minimization.
 
     Arguments:
-        meas (np.ndarray):    A 2D array containing a single measurement of emission as function of wavelength
-        sim  (np.ndarray):    A 2D array containing a simulated spectrum.
+        meas (NDArray[np.float64]):    A 2D array containing a single measurement of emission as function of wavelength
+        sim  (NDArray[np.float64]):    A 2D array containing a simulated spectrum.
         shift (float):      Wavelength shift to apply in nanometer, default: 0.
 
     Returns:
-        np.ndarray          :   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
+        NDArray[np.float64]:   A 2D array of the simulation, evaluated at the same grid coordinates as the measurement.
     """
     # TODO: implement first/second order corrections on the measured x data
     x_meas = meas if np.ndim(meas) == 1 else meas[:, 0]
@@ -405,7 +407,7 @@ def match_spectra(meas: np.ndarray, sim: np.ndarray, shift=0) -> np.ndarray:
 
 
 def model_for_fit(
-    x: np.ndarray,
+    x: NDArray[np.float64],
     sigma: float,
     gamma: float,
     mu: float,
@@ -445,7 +447,7 @@ def model_for_fit(
     ```
 
     Arguments:
-        x (np.ndarray):               The x-axis of the (measured) data that we want to compare/fit against, or want to evaluate the simulation at.
+        x (NDArray[np.float64]):               The x-axis of the (measured) data that we want to compare/fit against, or want to evaluate the simulation at.
         sigma (float):              Gaussian broadening width of Voigt, the standard deviation.
         gamma (float):              Lorentzian broadening width of Voigt, the Half-Width-at-Half-Maximum.
         mu (float):                 The shift in x-coordinates between data and simulation, negative shift is towards longer wavelength

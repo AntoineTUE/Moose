@@ -103,8 +103,12 @@ fragments = [{ path = "README.md" }]
 [tool.pytest.ini_options]
 markers = [
   "lmfit: mark test to run when lmfit is present",
-  "fit: mark tests that fit data for validation",
+  "fit: mark tests that fit data for validation"
 ]
+addopts = [
+  "--import-mode=importlib"
+]
+testpaths = ["tests"]
 
 [tool.hatch.envs.default]
 installer = "uv"

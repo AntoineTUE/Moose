@@ -39,6 +39,8 @@ def multi_species_objective(
 
     When not provided, these default respectively to the parameters: `T_rot`, `T_vib` and `A`, which themselves have default values (if not provided) resp: 500, 500, 1.
 
+    The `fraction` is somewhat loosely defined.
+
     Note:
         If only `x` is provided (not `y` and `error`) this function returns the model evaluated at `x`.
 
