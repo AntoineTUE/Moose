@@ -16,6 +16,34 @@ On the Zenodo page for the project or each release, you can obtain the citation 
 
 Please also make sure to cite the original sources and authors of the databases that you use.
 
+=== "Moose citation"
+    !!! quote "Citation"
+        Salden, A. (2026). *AntoineTUE/Moose: Molecular optical emission spectroscopy for Python*, [Online]. Available: https://github.com/AntoineTUE/Moose. DOI: https://doi.org/10.5281/zenodo.10454339
+
+=== "Recommended format"
+    !!! quote "Citation style"
+        Author(s)/editor(s) (Year). Title (edition), [Type of medium]. Available: URL [Access date].
+
+=== "BibTeX"
+    ```bibtex
+    @software{saldenMoose,
+        author       = {Salden, Antoine},
+        title        = {AntoineTUE/Moose: Molecular optical emission spectroscopy for Python (version 0.3.1)},
+        month        = aug,
+        year         = 2026,
+        publisher    = {Zenodo},
+        version      = {v0.3.1},
+        doi          = {10.5281/zenodo.10454339},
+        url          = {https://github.com/AntoineTUE/Moose},
+        swhid        = {swh:1:dir:4a8b60780e69be7b74d9fc251d5ec91ff605c0d6
+                        ;origin=https://doi.org/10.5281/zenodo.10454339;vi
+                        sit=swh:1:snp:37c542b5c8704e07b0bf6ef043af1671192a
+                        18a9;anchor=swh:1:rel:78a01da0ee564139f4eb5dbcc202
+                        b54f923e0777;path=AntoineTUE-Moose-454ace8
+                        },
+    }
+    ```
+
 ## Original sources for databases
 
 The table below summarizes the data sources for the databases that can be used.

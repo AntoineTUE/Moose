@@ -9,7 +9,7 @@ copyright: 'Copyright &copy; Antoine Salden 2024-present'
 docs_dir: docs
 site_dir: site
 theme:
-  name: material
+  name: materialx
   logo: assets/moose.svg
   favicon: assets/moose.svg
   custom_dir: docs/overrides
@@ -20,19 +20,27 @@ theme:
     - toc.integrate
     - toc.follow
     - content.code.copy
+    - search.highlight
+  topbar_style: accent 
   palette:
-    - scheme: pioneer
-      primary: green
-      accent: pink
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: pink
+      accent: green
       toggle:
         icon: material/brightness-7 
         name: Switch to dark mode
-    - scheme: slate
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
       primary: indigo
-      accent: pink
+      accent: indigo
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Switch to system preference
 
 markdown_extensions:
   - pymdownx.arithmatex:
@@ -76,32 +84,25 @@ plugins:
   search: {}
   autorefs: {}
   gh-admonitions: {}
+  section-index: {}
   mike:
     alias_type: copy
     canonical_version: "latest"
     version_selector: true
   mkdocs-jupyter:
+    # markdown_cell_processor: mkdocs
     include_requirejs: true
     include_source: true
     include: ["*.ipynb"]
     ignore: ["*/.ipynb_checkpoints/*.ipynb"]
-    custom_mathjax_url: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe" #https://github.com/danielfrg/mkdocs-jupyter/issues/227
-  git-revision-date-localized:
-    exclude:
-      - reference/*
-    fallback_to_build_date: true
-    enable_creation_date: true
-  # Does not work with mkdocs-jupyter due to virtual files created, which have no source dir
-  # api-autonav:
-  #   modules: ["src/Moose"]
-  #   exclude_private: true
-  #   nav_section_title: API Reference
-  gen-files:
-    scripts:
-    - docs/gen_ref_pages.py
-  literate-nav:
-    nav_file: SUMMARY.md
-  section-index: {}
+  document-dates:
+    position: bottom
+    type: date
+    show_author: false
+  api-autonav:
+    modules: ["src/Moose"]
+    exclude_private: true
+    nav_section_title: API Reference 
   mkdocstrings:
     default_handler: python_xref
     handlers:
@@ -150,8 +151,6 @@ nav:
 - Getting started: get_started.md
 # - Principles: Theory.md
 - Citing: citing.md
-# defer to gen-files + literate-nav
-- API Reference: reference/
 - Examples:
   - examples.md
   - Fitting backends: examples/Moose_fitting_backends.ipynb

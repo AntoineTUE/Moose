@@ -31,15 +31,13 @@ Documentation = "https://antoinetue.github.io/Moose/"
 fit = ["lmfit", "iminuit"]
 docs = [
   "properdocs==1.6.7",
-  "mkdocs-material==9.7.7",
+  "mkdocs-materialx==10.2.2",
+  "mike==2.2.0",
   "mkdocstrings",
   "mkdocstrings-python",
-  "mkdocs-gen-files",
-  "mkdocs-literate-nav",
-  # "mkdocs-api-autonav", 
+  "mkdocs-api-autonav",
   "mkdocs-section-index",
   "mkdocs-jupyter",
-  "mkdocs-git-revision-date-localized-plugin",
   "mkdocs-include-markdown-plugin",
   "mkdocstrings-python-xref",
   "mkdocs-github-admonitions-plugin",
@@ -115,7 +113,6 @@ post-install-commands = ["prek install"]
 
 [tool.hatch.envs.docs]
 skip-install = true
-dependencies = ["mike==2.1.4"]
 features = ["docs"]
 
 [tool.hatch.envs.docs.scripts]
