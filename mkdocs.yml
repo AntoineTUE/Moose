@@ -91,10 +91,12 @@ plugins:
     version_selector: true
   mkdocs-jupyter:
     # markdown_cell_processor: mkdocs
-    include_requirejs: true
+    # include_requirejs: true
     include_source: true
     include: ["*.ipynb"]
     ignore: ["*/.ipynb_checkpoints/*.ipynb"]
+    mathjax_version: 3
+
   document-dates:
     position: bottom
     type: date
@@ -150,6 +152,7 @@ nav:
 - index.md
 - Getting started: get_started.md
 # - Principles: Theory.md
+- Tips and tricks: Tips_and_tricks.md
 - Citing: citing.md
 - Examples:
   - examples.md

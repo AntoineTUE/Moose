@@ -42,6 +42,7 @@ default_params = {
     "resolution": {"value": 100, "vary": False},
     "wl_pad": {"value": 10, "vary": False},
 }
+"""Default parameters to use when fitting models, to quickly set initial estimates and bounds with e.g. `lmfit.create_params(**Moose.default_params)`"""
 
 thermal_default_params = {
     "sigma": {"value": 0.05, "min": 0.0001, "max": 0.3},
@@ -54,6 +55,7 @@ thermal_default_params = {
     "resolution": {"value": 100, "vary": False},
     "wl_pad": {"value": 10, "vary": False},
 }
+"""Default parameters to use when fitting models assuming thermal equilibruim ($T_{rot}=T_{vib}$), to quickly set initial estimates and bounds with e.g. `lmfit.create_params(**Moose.thermal_default_params)`"""
 
 
 @array_cache(maxsize=32)

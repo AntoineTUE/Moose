@@ -34,13 +34,13 @@ pip install moose-spectra[all]
 
 A basic example demonstrating how to simulate and fit a spectrum is as follows.
 
-1. Query a database for the emission system of interest, which is done with [`query_DB`](../reference/Moose/Simulation/#Moose.Simulation.query_DB). This function will look for databases in the location where `Moose` has been installed, but it can also be provided with a path to your own compatible database. See the [code reference](../reference/Moose) for more information.
+1. Query a database for the emission system of interest, which is done with [`query_DB`][Moose.Simulation.query_DB]. This function will look for databases in the location where `Moose` has been installed, but it can also be provided with a path to your own compatible database. See the [code reference](../reference/Moose) for more information.
 
-2.  Create a sample spectrum and add noise to it. To do this, first call the [`model_for_fit`](../reference/Moose/Simulation/#Moose.Simulation.model_for_fit) function, which is a high level function to calculate a spectrum, given line positions, temperatures, broadening parameters, and so forth.
+2.  Create a sample spectrum and add noise to it. To do this, first call the [`model_for_fit`][Moose.Simulation.model_for_fit] function, which is a high level function to calculate a spectrum, given line positions, temperatures, broadening parameters, and so forth.
 
-3. Next prepare to fit this simulated spectrum. Create an `lmfit.Model`, by wrapping the `model_for_fit` function and passing in the database as well to the wrapper. 
+3. Next prepare to fit this simulated spectrum. Create an `lmfit.Model`, by wrapping the [`model_for_fit`][Moose.Simulation.model_for_fit] function and passing in the database as well to the wrapper. 
 
-4. As initial guess and bounds for the fit parameters, create an `lmfit.Parameters` object. For simplicity you can set these with some default values using [`Moose.default_params`](../reference/Moose/Simulation/#Moose.Simulation.default_params).
+4. As initial guess and bounds for the fit parameters, create an `lmfit.Parameters` object. For simplicity you can set these with some default values using [`Moose.default_params`][Moose.Simulation.default_params].
 
 
 
